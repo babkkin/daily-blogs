@@ -38,7 +38,7 @@ export default function AboutPage() {
 <div className="flex items-start gap-8 mx-[44vh] mb-16">
   <div className="flex-shrink-0">
     <img 
-      src="https://i.pinimg.com/474x/e0/7c/cc/e07cccccff9ddf7982e886c1d3c0a6d4.jpg" 
+      src="https://i.pinimg.com/736x/b9/77/aa/b977aa4db50caec17707ceb586412140.jpg" 
       alt="Full Stack Developer" 
       className="w-64 h-64 rounded-lg object-cover shadow-lg"
     />
@@ -55,7 +55,7 @@ export default function AboutPage() {
 <div className="flex items-start gap-8 mx-[44vh] mb-16">
   <div className="flex-shrink-0">
     <img 
-      src="https://lh6.googleusercontent.com/proxy/jjfyyszpD6I-ecYhOOfMOqe4ykGNuLPMrxh2WHXPD1_52bghBcETI6nEJfDdZr4Pfcneim_9-IILeuZi7hrDkhg-je9HGnz6OXlWKvr3sJ6GXCadnjAdvFhrUfdst9WHceF0aVI=w1200-h630-p-k-no-nu" 
+      src="https://i.pinimg.com/originals/5e/f2/ce/5ef2cef8aa32880df4f6fa891f3ef3b6.jpg" 
       alt="Frontend Developer" 
       className="w-64 h-64 rounded-lg object-cover shadow-lg"
     />
@@ -72,7 +72,7 @@ export default function AboutPage() {
 <div className="flex items-start gap-8 mx-[44vh] mb-16">
   <div className="flex-shrink-0">
     <img 
-      src="https://i.pinimg.com/originals/cc/b1/0e/ccb10e6cfeb44c9e3e45a7938f6a8192.jpg" 
+      src="https://i.pinimg.com/originals/1a/7a/20/1a7a203dcc7282d58f2f2b2c564a540c.jpg" 
       alt="Backend Developer" 
       className="w-64 h-64 rounded-lg object-cover shadow-lg"
     />
@@ -89,7 +89,7 @@ export default function AboutPage() {
 <div className="flex items-start gap-8 mx-[44vh] mb-16">
   <div className="flex-shrink-0">
     <img 
-      src="https://i.pinimg.com/474x/fe/74/3d/fe743d0a4ceadcf2535ae7d4fa5e5720.jpg?nii=t" 
+      src="https://d.wattpad.com/story_parts/830383355/images/15ec6c9550547d2f135020464133.jpg" 
       alt="Project Manager" 
       className="w-64 h-64 rounded-lg object-cover shadow-lg"
     />
