@@ -38,13 +38,13 @@ export default function AboutPage() {
 <div className="flex items-start gap-8 mx-[44vh] mb-16">
   <div className="flex-shrink-0">
     <img 
-      src="https://i.pinimg.com/736x/b9/77/aa/b977aa4db50caec17707ceb586412140.jpg" 
+      src="/team/member1.jpg" 
       alt="Full Stack Developer" 
       className="w-64 h-64 rounded-lg object-cover shadow-lg"
     />
   </div>
   <div className="flex-1">
-    <p className="text-4xl font-bold text-black text-justify">Paul Azel Marasigan</p>
+    <p className="text-4xl font-bold text-black text-justify">FirstName MiddleName LastName</p>
     <p className="text-4xl text-black mb-4 text-justify">Full Stack Developer</p>
     <br/>
     <p className="text-4xl text-black text-justify">About me: I like both coding the front and back end, and I enjoy learning new things along the way. For me, this project is a chance to explore how everything fits together in building a website.</p>
@@ -55,13 +55,13 @@ export default function AboutPage() {
 <div className="flex items-start gap-8 mx-[44vh] mb-16">
   <div className="flex-shrink-0">
     <img 
-      src="https://i.pinimg.com/originals/5e/f2/ce/5ef2cef8aa32880df4f6fa891f3ef3b6.jpg" 
+      src="/team/member2.jpg" 
       alt="Frontend Developer" 
       className="w-64 h-64 rounded-lg object-cover shadow-lg"
     />
   </div>
   <div className="flex-1">
-    <p className="text-4xl font-bold text-black text-justify">Jhune Rey Magdurulan</p>
+    <p className="text-4xl font-bold text-black text-justify">FirstName MiddleName LastName</p>
     <p className="text-4xl text-black mb-4 text-justify">Frontend Developer</p>
     <br/>
     <p className="text-4xl text-black text-justify">About me: I love working on layouts, colors, and everything that makes a site look good. I enjoy experimenting with designs and making sure the website feels smooth and easy to use.</p>
@@ -72,13 +72,13 @@ export default function AboutPage() {
 <div className="flex items-start gap-8 mx-[44vh] mb-16">
   <div className="flex-shrink-0">
     <img 
-      src="https://i.pinimg.com/originals/1a/7a/20/1a7a203dcc7282d58f2f2b2c564a540c.jpg" 
+      src="/team/member3.jpg" 
       alt="Backend Developer" 
       className="w-64 h-64 rounded-lg object-cover shadow-lg"
     />
   </div>
   <div className="flex-1">
-    <p className="text-4xl font-bold text-black text-justify">Ivan Kien Sambat</p>
+    <p className="text-4xl font-bold text-black text-justify">FirstName MiddleName LastName</p>
     <p className="text-4xl text-black mb-4 text-justify">Backend Developer</p>
     <br/>
     <p className="text-4xl text-black text-justify">About me: I'm passionate about problem-solving and making sure everything works behind the scenes. I like figuring out how to connect features and keep things running efficiently</p>
@@ -89,13 +89,13 @@ export default function AboutPage() {
 <div className="flex items-start gap-8 mx-[44vh] mb-16">
   <div className="flex-shrink-0">
     <img 
-      src="https://d.wattpad.com/story_parts/830383355/images/15ec6c9550547d2f135020464133.jpg" 
+      src="/team/member4.jpg" 
       alt="Project Manager" 
       className="w-64 h-64 rounded-lg object-cover shadow-lg"
     />
   </div>
   <div className="flex-1">
-    <p className="text-4xl font-bold text-black text-justify">Jhon Llyod Alonzo</p>
+    <p className="text-4xl font-bold text-black text-justify">FirstName MiddleName LastName</p>
     <p className="text-4xl text-black mb-4 text-justify">Project Manager</p>
     <br/>
     <p className="text-4xl text-black text-justify">About me: I help organize tasks, keep the group on track, and make sure deadlines are met. I like planning things out and seeing ideas come to life through teamwork.</p>
@@ -106,13 +106,13 @@ export default function AboutPage() {
 <div className="flex items-start gap-8 mx-[44vh] mb-16">
   <div className="flex-shrink-0">
     <img 
-      src="https://64.media.tumblr.com/6a227da8e4f9015281cf279d2f084865/e2edc3cea2f1f5db-ab/s1280x1920/754f83df308046c83084fa009ecd7607fca394c6.jpg" 
+      src="/team/member5.jpg" 
       alt="Content Writer" 
       className="w-64 h-64 rounded-lg object-cover shadow-lg"
     />
   </div>
   <div className="flex-1">
-    <p className="text-4xl font-bold text-black text-justify">Nicolette Sairyelle Gonio</p>
+    <p className="text-4xl font-bold text-black text-justify">FirstName MiddleName LastName</p>
     <p className="text-4xl text-black mb-4 text-justify">Content Writer</p>
     <br/>
     <p className="text-4xl text-black text-justify">About me: I enjoy writing and sharing ideas through words. I like exploring different topics, putting them into blogs, and giving our site personality through content.</p>
