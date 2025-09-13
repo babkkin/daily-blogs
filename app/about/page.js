@@ -44,7 +44,7 @@ export default function AboutPage() {
     />
   </div>
   <div className="flex-1">
-    <p className="text-4xl font-bold text-black text-justify">FirstName MiddleName LastName</p>
+    <p className="text-4xl font-bold text-black text-justify">Paul Azel Marasigan</p>
     <p className="text-4xl text-black mb-4 text-justify">Full Stack Developer</p>
     <br/>
     <p className="text-4xl text-black text-justify">About me: I like both coding the front and back end, and I enjoy learning new things along the way. For me, this project is a chance to explore how everything fits together in building a website.</p>
@@ -61,7 +61,7 @@ export default function AboutPage() {
     />
   </div>
   <div className="flex-1">
-    <p className="text-4xl font-bold text-black text-justify">FirstName MiddleName LastName</p>
+    <p className="text-4xl font-bold text-black text-justify">Jhune Rey Magdurulan</p>
     <p className="text-4xl text-black mb-4 text-justify">Frontend Developer</p>
     <br/>
     <p className="text-4xl text-black text-justify">About me: I love working on layouts, colors, and everything that makes a site look good. I enjoy experimenting with designs and making sure the website feels smooth and easy to use.</p>
@@ -78,7 +78,7 @@ export default function AboutPage() {
     />
   </div>
   <div className="flex-1">
-    <p className="text-4xl font-bold text-black text-justify">FirstName MiddleName LastName</p>
+    <p className="text-4xl font-bold text-black text-justify">Ivan Kien Sambat</p>
     <p className="text-4xl text-black mb-4 text-justify">Backend Developer</p>
     <br/>
     <p className="text-4xl text-black text-justify">About me: I'm passionate about problem-solving and making sure everything works behind the scenes. I like figuring out how to connect features and keep things running efficiently</p>
@@ -95,7 +95,7 @@ export default function AboutPage() {
     />
   </div>
   <div className="flex-1">
-    <p className="text-4xl font-bold text-black text-justify">FirstName MiddleName LastName</p>
+    <p className="text-4xl font-bold text-black text-justify">Jhon Llyod Alonzo</p>
     <p className="text-4xl text-black mb-4 text-justify">Project Manager</p>
     <br/>
     <p className="text-4xl text-black text-justify">About me: I help organize tasks, keep the group on track, and make sure deadlines are met. I like planning things out and seeing ideas come to life through teamwork.</p>
@@ -112,7 +112,7 @@ export default function AboutPage() {
     />
   </div>
   <div className="flex-1">
-    <p className="text-4xl font-bold text-black text-justify">FirstName MiddleName LastName</p>
+    <p className="text-4xl font-bold text-black text-justify">Nicolette Sairyelle Gonio</p>
     <p className="text-4xl text-black mb-4 text-justify">Content Writer</p>
     <br/>
     <p className="text-4xl text-black text-justify">About me: I enjoy writing and sharing ideas through words. I like exploring different topics, putting them into blogs, and giving our site personality through content.</p>
