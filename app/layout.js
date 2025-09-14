@@ -59,68 +59,90 @@ export default function RootLayout({ children }) {
           This website was made by MAMA MO!
         </footer>
 
-        {/* Modal */}
-        {showAuth && (
-          <div
-            className="fixed inset-0 bg-black/50  flex justify-center items-center z-50"
-            onClick={closeModal}
-          >
-            <div
-              className="bg-white p-8 rounded-xl w-96 shadow-2xl max-w-[90vw]"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <h2 className="text-2xl font-bold mb-6 text-center text-gray-900">
-                {authType === "login" ? "Welcome back" : "Join DailyBlogs"}
-              </h2>
-              <form className="flex flex-col gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Email address
-                  </label>
-                  <input
-                    type="email"
-                    placeholder="Enter your email"
-                    className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Password
-                  </label>
-                  <input
-                    type="password"
-                    placeholder="Enter your password"
-                    className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
-                  />
-                </div>
-                <button
-                  type="submit"
-                  className="w-full bg-black text-white py-3 rounded-lg hover:bg-gray-800 transition-colors duration-200 font-medium mt-2"
-                >
-                  {authType === "login" ? "Sign in" : "Create account"}
-                </button>
-              </form>
-              
-              <div className="mt-6 text-center">
-                <button
-                  className="text-sm text-gray-500 hover:text-gray-700 transition-colors"
-                  onClick={() => setAuthType(authType === "login" ? "signup" : "login")}
-                >
-                  {authType === "login" 
-                    ? "Don't have an account? Sign up" 
-                    : "Already have an account? Sign in"}
-                </button>
-              </div>
+{/* Modal */}
+{showAuth && (
+  <div
+    className="fixed inset-0 bg-black/50 flex justify-center items-center z-50"
+    onClick={closeModal}
+  >
+    <div
+      className="bg-white p-8 rounded-xl w-96 shadow-2xl max-w-[90vw]"
+      onClick={(e) => e.stopPropagation()}
+    >
+      <button
+        className="text-center text-gray-500 ml-74 hover:text-black text-5xl"
+        onClick={closeModal}
+      >
+        ×
+      </button>
 
-              <button
-                className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-xl"
-                onClick={closeModal}
-              >
-                ×
-              </button>
-            </div>
-          </div>
-        )}
+      <h2 className="text-2xl font-bold mb-5 text-center text-gray-900">
+        {authType === "login" ? "Welcome back" : "Join DailyBlogs"}
+      </h2>
+
+      {/* Google login */}
+      <button
+        onClick={() => alert("TODO: Google login")}
+        className="w-full border border-gray-300 py-3 rounded-lg flex items-center justify-center gap-2 hover:bg-gray-100 transition-colors"
+      >
+        <img
+          src="https://www.svgrepo.com/show/475656/google-color.svg"
+          alt="Google"
+          className="w-5 h-5"
+        />
+        Continue with Google
+      </button>
+
+      {/* Divider */}
+      <div className="my-4 flex items-center">
+        <hr className="flex-1 border-gray-300" />
+        <span className="px-3 text-gray-400 text-sm">or</span>
+        <hr className="flex-1 border-gray-300" />
+      </div>
+
+      {/* Email only */}
+      <form
+        className="flex flex-col gap-4"
+        onSubmit={(e) => {
+          e.preventDefault();
+          alert("TODO: Email signup/login flow");
+        }}
+      >
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Email address
+          </label>
+          <input
+            type="email"
+            placeholder="Enter your email"
+            className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+          />
+        </div>
+        <button
+          type="submit"
+          className="w-full bg-black text-white py-3 rounded-lg hover:bg-gray-800 transition-colors duration-200 font-medium"
+        >
+          {authType === "login" ? "Sign in with Email" : "Create account"}
+        </button>
+      </form>
+
+      {/* Switch login/signup */}
+      <div className="mt-6 text-center">
+        <button
+          className="text-sm text-gray-500 hover:text-gray-700 transition-colors"
+          onClick={() =>
+            setAuthType(authType === "login" ? "signup" : "login")
+          }
+        >
+          {authType === "login"
+            ? "Don't have an account? Sign up"
+            : "Already have an account? Sign in"}
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
       </body>
     </html>
   );
