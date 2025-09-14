@@ -9,10 +9,23 @@
     "lint": "eslint"
   },
   "dependencies": {
+<<<<<<< Updated upstream
+=======
+<<<<<<< HEAD
+>>>>>>> Stashed changes
     "mysql2": "^3.14.5",
     "next": "15.5.3",
     "next-auth": "^4.24.11",
     "nodemailer": "^6.10.1",
+<<<<<<< Updated upstream
+=======
+=======
+    "@sendgrid/mail": "^8.1.5",
+    "bcrypt": "^6.0.0",
+    "mysql2": "^3.14.5",
+    "next": "15.5.3",
+>>>>>>> 4f064d46cf100eae94a6d938a0fc6a5b68887a7b
+>>>>>>> Stashed changes
     "react": "19.1.0",
     "react-dom": "19.1.0"
   },
