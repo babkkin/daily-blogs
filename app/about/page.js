@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import Image from &apos;next/image&apos;;
 
 export default function AboutPage() {
   return (
@@ -15,9 +15,9 @@ export default function AboutPage() {
 <p className="text-4xl text-black mb-8 mx-[44vh] text-justify">
   We started this website as a group of students working on a school project. At first, it was just about passing a subject—but along the way, we realized it could be something bigger.
   Instead of being just our personal blog, DailyBlogs is designed as a space where anyone can share their thoughts, stories, and ideas.<br /><br />
-  For us, this project is a way to explore coding, learn how real websites work, and experiment with building something useful for others. But for you, it's a platform to express yourself.
-  Whether it's about your day, your passions, or something you're learning, DailyBlogs gives you a place to write, share, and connect.  At the core, DailyBlogs is about learning, growing, and building a community through writing. We're still figuring things out, but that's part of the fun—improving little by little while giving people a space to blog freely.<br /><br />
-  So, whether you're here to read, write, or just look around, we're glad you stopped by. Let's make this journey together, one blog at a time.
+  For us, this project is a way to explore coding, learn how real websites work, and experiment with building something useful for others. But for you, it&apos;s a platform to express yourself.
+  Whether it&apos;s about your day, your passions, or something you&apos;re learning, DailyBlogs gives you a place to write, share, and connect.  At the core, DailyBlogs is about learning, growing, and building a community through writing. We&apos;re still figuring things out, but that&apos;s part of the fun—improving little by little while giving people a space to blog freely.<br /><br />
+  So, whether you&apos;re here to read, write, or just look around, we&apos;re glad you stopped by. Let&apos;s make this journey together, one blog at a time.
 </p>
 <br/>
 <br/>
@@ -89,7 +89,7 @@ export default function AboutPage() {
     <p className="text-4xl font-bold text-black text-justify">FirstName MiddleName LastName</p>
     <p className="text-4xl text-black mb-4 text-justify">Backend Developer</p>
     <br/>
-    <p className="text-4xl text-black text-justify">About me: I'm passionate about problem-solving and making sure everything works behind the scenes. I like figuring out how to connect features and keep things running efficiently</p>
+    <p className="text-4xl text-black text-justify">About me: I&apos;m passionate about problem-solving and making sure everything works behind the scenes. I like figuring out how to connect features and keep things running efficiently</p>
   </div>
 </div>
 
