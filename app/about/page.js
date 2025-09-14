@@ -1,4 +1,4 @@
-import Image from &apos;next/image&apos;;
+import Image from 'next/image';
 
 export default function AboutPage() {
   return (
