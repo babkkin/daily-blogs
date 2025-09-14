@@ -6,13 +6,36 @@ import "./globals.css";
 export default function RootLayout({ children }) {
   const [showAuth, setShowAuth] = useState(false);
   const [authType, setAuthType] = useState("login"); // "login" or "signup"
-
+  const [message, setMessage] = useState("");
   const openModal = (type) => {
     setAuthType(type);
     setShowAuth(true);
   };
 
   const closeModal = () => setShowAuth(false);
+
+    const handleSubmit = async (e) => {
+    e.preventDefault();
+    const email = e.target.user_email.value
+    const password = e.target.user_password.value
+
+    const response = await fetch("/api/auth", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password, type: authType }),
+    });
+
+    const data = await response.json();
+    if (data.success) {
+    if (authType === "signup") {
+      setMessage("Account created! Please check your email to verify your account.");
+    } else if (authType === "login") {
+      setMessage("Login successful!");
+    }
+  } else {
+    setMessage(data.error || "Something went wrong.");
+  }
+  };
 
   return (
     <html lang="en">
@@ -72,13 +95,22 @@ export default function RootLayout({ children }) {
               <h2 className="text-2xl font-bold mb-6 text-center text-gray-900">
                 {authType === "login" ? "Welcome back" : "Join DailyBlogs"}
               </h2>
-              <form className="flex flex-col gap-4">
+
+              {message && (
+              <div className="mb-4 text-center text-blue-600 font-medium">
+                {message}
+              </div>
+              )}
+
+              <form className="flex flex-col gap-4"onSubmit={handleSubmit}>
+                <fieldset disabled={authType === "signup" && message.includes("verify")}>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Email address
                   </label>
                   <input
                     type="email"
+                    name="user_email"
                     placeholder="Enter your email"
                     className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
                   />
@@ -89,6 +121,7 @@ export default function RootLayout({ children }) {
                   </label>
                   <input
                     type="password"
+                    name="user_password"
                     placeholder="Enter your password"
                     className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
                   />
@@ -99,6 +132,7 @@ export default function RootLayout({ children }) {
                 >
                   {authType === "login" ? "Sign in" : "Create account"}
                 </button>
+                </fieldset>
               </form>
               
               <div className="mt-6 text-center">
