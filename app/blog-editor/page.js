@@ -78,11 +78,12 @@ export default function BlogEditor() {
 			{/* Blog Editor */}
 			<div className="bg-white rounded-lg shadow-md mb-4">
 				<ReactQuill
-					theme="snow"
-					value={content}
-					onChange={setContent}
-					className="custom-editor"
-				/>
+                theme="snow"
+                value={content}
+                onChange={setContent}
+                className="custom-editor"
+            />
+
 			</div>
 
 			{/* Publish Button */}
