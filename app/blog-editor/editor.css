@@ -1,0 +1,9 @@
+/* Make ReactQuill editor taller without breaking the layout */
+.custom-editor .ql-container {
+	min-height: 400px; /* 👈 adjust height */
+	border-radius: 0 0 0.5rem 0.5rem;
+}
+
+.custom-editor .ql-editor {
+	min-height: 400px; /* typing area height */
+}
