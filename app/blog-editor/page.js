@@ -1,9 +1,14 @@
 "use client";
 
-import React, { useState } from "react";
-import ReactQuill from "react-quill-new"; // using react-quill-new for React 19+
+import React, { useState } from "react";// using react-quill-new for React 19+
 import "react-quill-new/dist/quill.snow.css";
 import "./editor.css"; // 👈 custom styles for editor height
+
+import dynamic from "next/dynamic";
+
+const ReactQuill = dynamic(() => import("react-quill-new"), {
+	ssr: false,
+});
 
 export default function BlogEditor() {
 	const [content, setContent] = useState("");
