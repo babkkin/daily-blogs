@@ -9,7 +9,7 @@ export async function GET(req) {
     return NextResponse.json({ error: "Missing token" }, { status: 400 });
   }
 
-  const record = await db.verificationTokens.findUnique({ where: { token } });
+  const record = await db.verification_token.findUnique({ where: { token } });
 
   if (!record || record.expiresAt < new Date()) {
     return NextResponse.json({ error: "Invalid or expired token" }, { status: 400 });
@@ -20,7 +20,7 @@ export async function GET(req) {
     data: { verified: true },
   });
 
-  await db.verificationTokens.delete({ where: { token } });
+  await db.verification_token.delete({ where: { token } });
 
   return NextResponse.redirect("/verified");
 }
