@@ -13,6 +13,7 @@
     "bcrypt": "^6.0.0",
     "mysql2": "^3.14.5",
     "next": "15.5.3",
+    "next-auth": "^4.24.11",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-quill-new": "^3.6.0",
