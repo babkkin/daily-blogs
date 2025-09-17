@@ -3,6 +3,7 @@ import React from "react";
 import { useAuthModal } from "./AuthModalProvider";
 import LoginForm from "./LoginForm";
 import SignupForm from "./SignupForm";
+import { signIn } from "next-auth/react";
 
 export default function AuthModal() {
   const { isOpen, authType, closeModal, openModal } = useAuthModal();
@@ -41,7 +42,7 @@ export default function AuthModal() {
 
         {/* Google button (placeholder) */}
         <button
-          onClick={() => alert("TODO: Google login")}
+          onClick={() => signIn("google")}
           className="w-full border border-gray-300 py-3 rounded-lg flex items-center justify-center gap-2 hover:bg-gray-100 transition mb-4"
         >
           <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="w-5 h-5" />
