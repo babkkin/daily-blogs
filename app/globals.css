@@ -1,19 +1,4 @@
 @import "tailwindcss";
-/*@tailwind utilities;
-
-@import url('https://fonts.googleapis.com/css2?family=Kalnia:wght@400;600;700&display=swap');
-
-@layer base {
-  html {
-    font-family: 'Kalnia', serif;
-  }
-}
-
-@layer utilities {
-  .font-kalnia {
-    font-family: 'Kalnia', serif;
-  }
-}*/
 
 @import url('https://fonts.googleapis.com/css2?family=Kalnia:wght@400;600;700&display=swap');
 
@@ -33,4 +18,21 @@ webname{
   font-weight: 900;
   font-size:2rem
 }
+
+
+.custom-editor {
+	height: 400px;
+}
+
+/* Keep toolbar fixed, editor content scrolls */
+.custom-editor .ql-container {
+	height: calc(100% - 42px) !important; /* 42px is toolbar height */
+}
+
+/* Only the text area scrolls */
+.custom-editor .ql-editor {
+	height: 100% !important;
+	overflow-y: auto !important;
+}
+
 
