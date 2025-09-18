@@ -84,7 +84,7 @@ export default function BlogEditor() {
 					{/* Remove Image button */}
 					{thumbnailUrl && (
 					<button
-						className="absolute top-0 right-2 w-10 h-10 flex items-center justify-center text-white text-5xl font-bold hover:bg-gray-800  "
+						className="absolute top-0 right-1 w-5 h-5 flex items-center justify-center rounded-tr-3xl bg-black text-white text-5xl font-bold hover:bg-gray-800  "
 						onClick={() => {
 						setThumbnail(null);
 						setThumbnailUrl("");
