@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { useRouter } from "next/navigation";   // ✅ added this
 
 export default function CategorySelector() {
   const allCategories = [
@@ -22,6 +23,7 @@ export default function CategorySelector() {
 
   const [visibleCount, setVisibleCount] = useState(9); // show first 9 initially
   const [selected, setSelected] = useState([]);
+  const router = useRouter();   // ✅ added this
 
   const toggleCategory = (category) => {
     if (selected.includes(category)) {
@@ -30,6 +32,12 @@ export default function CategorySelector() {
       setSelected([...selected, category]);
     }
   };
+
+    // ✅ new function
+  const handleDone = () => {
+    router.push("/home");
+  };
+
 
   const loadMore = () => {
     setVisibleCount((prev) => prev + 2);
@@ -68,6 +76,13 @@ export default function CategorySelector() {
             </button>
           )}
         </div>
+        {/* ✅ New Done button block */}
+        <button
+          onClick={handleDone}
+          className="mt-6 px-6 py-3 bg-black text-white rounded-lg hover:bg-gray-800 transition"
+        >
+          Done
+        </button>
       </div>
     </div>
   );
