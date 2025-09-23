@@ -2,7 +2,13 @@
 import Link from "next/link";
 import { AuthModalProvider, useAuthModal } from "@/components/AuthModalProvider";
 import AuthModal from "@/components/AuthModal";
+import { Kalnia } from "next/font/google";
 import "./globals.css";
+
+const kalnia = Kalnia({
+  subsets: ["latin"],
+  weight: ["400", "600", "700"],
+});
 
 function Header() {
   const { openModal } = useAuthModal();
@@ -52,15 +58,7 @@ function Footer() {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="true" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Kalnia:wght@400;600;700&display=swap"
-          rel="stylesheet"
-        />
-      </head>
-      <body className="font-kalnia bg-gray-50 min-h-screen flex flex-col">
+      <body className={`${kalnia.className} bg-gray-50 min-h-screen flex flex-col`}>
         <AuthModalProvider>
           <Header />
           <main className="flex-1">{children}</main>
