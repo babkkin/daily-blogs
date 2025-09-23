@@ -1,8 +1,12 @@
 "use client";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useAuthModal } from "@/components/AuthModalProvider"; // ✅ import context
 
 export default function SignupForm() {
   const [message, setMessage] = useState("");
+  const router = useRouter();
+  const { closeModal } = useAuthModal(); // ✅ grab modal closer
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -19,6 +23,12 @@ export default function SignupForm() {
       const data = await res.json();
       if (res.ok && data.success) {
         setMessage("Account created! Check your email to verify.");
+
+        // ✅ close modal first
+        closeModal();
+
+        // ✅ then redirect
+        router.push("/category");
       } else {
         setMessage(data.error || "Signup failed");
       }
