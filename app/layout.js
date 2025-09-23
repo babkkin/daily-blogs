@@ -14,7 +14,7 @@ function Header() {
   const { openModal } = useAuthModal();
 
   return (
-    <header className="bg-white border-b border-gray-200 px-8 py-4 flex items-center justify-between shadow-sm">
+    <header className="sticky top-0 bg-white border-b border-gray-200 px-8 py-4 flex items-center justify-between shadow-sm">
       <div className="flex items-center gap-8">
         <Link
           href="/"
