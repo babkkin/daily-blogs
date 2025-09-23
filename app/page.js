@@ -1,12 +1,24 @@
 "use client";
 import { useAuthModal } from "@/components/AuthModalProvider";
 import { useRouter } from "next/navigation";
+import  InteractiveGridPattern  from "@/components/ui/interactive-grid-pattern";
 
 export default function HomePage() {
   const { openModal } = useAuthModal();
   const router = useRouter();
 
   return (
+    <div>
+          <div className="relative flex h-[500px] w-full flex-col items-center justify-center overflow-hidden rounded-lg border bg-background">
+      <InteractiveGridPattern
+        className={cn(
+          "[mask-image:radial-gradient(400px_circle_at_center,white,transparent)]",
+          "inset-x-0 inset-y-[-30%] h-[200%] skew-y-12",
+        )}
+      />
+    </div>
+
+    
     <div className="flex flex-col justify-center min-h-[80vh]">
       <h1 className="text-8xl font-bold text-black mt-[50px] mb-6 mx-[44vh]">
         Daily Experiences <br /> and Wisdom
@@ -29,5 +41,6 @@ export default function HomePage() {
         </button>
       </div>
     </div>
+        </div>
   );
 }

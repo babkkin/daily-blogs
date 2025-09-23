@@ -5,34 +5,28 @@
 .font-kalnia {
   font-family: 'Kalnia', sans-serif;
 }
- 
-
 
 body {
-  color: var(--foreground);
+  color: var(--foreground, #000); /* fallback black */
   font-family: Arial, Helvetica, sans-serif;
 }
 
-
-webname{
+webname {
   font-weight: 900;
-  font-size:2rem
+  font-size: 2rem;
 }
 
-
 .custom-editor {
-	height: 400px;
+  height: 400px;
 }
 
 /* Keep toolbar fixed, editor content scrolls */
 .custom-editor .ql-container {
-	height: calc(100% - 42px) !important; /* 42px is toolbar height */
+  height: calc(100% - 42px) !important; /* 42px is toolbar height */
 }
 
 /* Only the text area scrolls */
 .custom-editor .ql-editor {
-	height: 100% !important;
-	overflow-y: auto !important;
+  height: 100% !important;
+  overflow-y: auto !important;
 }
-
-
