@@ -3,6 +3,7 @@ import Link from "next/link";
 import { AuthModalProvider, useAuthModal } from "@/components/AuthModalProvider";
 import AuthModal from "@/components/AuthModal";
 import { Kalnia } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next"
 import "./globals.css";
 
 const kalnia = Kalnia({
@@ -12,7 +13,7 @@ const kalnia = Kalnia({
 
 function Header() {
   const { openModal } = useAuthModal();
-
+vercel deploy
   return (
     <header className="bg-white border-b border-gray-200 px-8 py-4 flex items-center justify-between shadow-sm">
       <div className="flex items-center gap-8">
@@ -62,6 +63,7 @@ export default function RootLayout({ children }) {
         <AuthModalProvider>
           <Header />
           <main className="flex-1">{children}</main>
+           <Analytics />
           <Footer />
           <AuthModal />
         </AuthModalProvider>
