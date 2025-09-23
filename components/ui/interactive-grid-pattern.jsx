@@ -1,8 +1,10 @@
 "use client";
+import dynamic from "next/dynamic";
 import { useAuthModal } from "@/components/AuthModalProvider";
 import { useRouter } from "next/navigation";
-import InteractiveGridPattern from "@/components/ui/interactive-grid-pattern";
 import { cn } from "@/lib/utils";
+
+const InteractiveGridPattern = dynamic(() => import("@/components/ui/interactive-grid-pattern"), { ssr: false });
 
 export default function HomePage() {
   const { openModal } = useAuthModal();
