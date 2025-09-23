@@ -9,11 +9,11 @@ export default function HomePage() {
   const router = useRouter();
 
   return (
-    <main className="relative flex items-center justify-center h-[100dvh] w-[100dvw] overflow-hidden">
+    <main className="relative flex items-center justify-center h-screen w-screen overflow-hidden">
       {/* Background Grid */}
       <InteractiveGridPattern
         className={cn(
-          "absolute inset-0 -z-10 h-[100dvh] w-[100dvw]",
+          "absolute inset-0 -z-10 h-full w-full",
           "[mask-image:radial-gradient(1200px_circle_at_center,white,transparent)]",
           "skew-y-12"
         )}
@@ -23,7 +23,7 @@ export default function HomePage() {
       />
 
       {/* Foreground Content */}
-      <div className="flex flex-col justify-center min-h-[80vh] relative z-10">
+      <div className="flex flex-col justify-center h-full w-full relative z-10">
         <h1 className="text-8xl font-bold text-black mt-[50px] mb-6 mx-[44vh]">
           Daily Experiences <br /> and Wisdom
         </h1>
