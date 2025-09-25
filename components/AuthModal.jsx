@@ -29,7 +29,7 @@ export default function AuthModal() {
         onClick={(e) => e.stopPropagation()}
       >
         <button
-          className="absolute top-3 right-3 text-2xl text-gray-500 hover:text-black"
+          className="float-right mr-4 right-3 text-2xl text-gray-500 hover:text-black"
           onClick={closeModal}
           aria-label="Close"
         >
@@ -73,3 +73,4 @@ export default function AuthModal() {
     </div>
   );
 }
+
