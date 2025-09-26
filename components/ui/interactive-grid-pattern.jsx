@@ -18,8 +18,7 @@ export default function InteractiveGridPattern({
     <svg
       viewBox={`0 0 ${width * horizontal} ${height * vertical}`}
       preserveAspectRatio="xMidYMid slice"
-      className={`absolute inset-0 h-full w-full ${className || ''}`}
-      style={{ background: 'transparent' }}
+      className={` absolute inset-0 h-full w-full bg-white ${className || ''}`}
       {...props}
     >
       {Array.from({ length: horizontal * vertical }).map((_, index) => {
@@ -32,7 +31,7 @@ export default function InteractiveGridPattern({
             y={y}
             width={width}
             height={height}
-            className={`stroke-gray-600/20 fill-transparent ${squaresClassName || ''}`}
+            className={`stroke-black/30 fill-transparent ${squaresClassName || ''}`}
           />
         );
       })}

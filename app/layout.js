@@ -2,7 +2,6 @@
 import Link from "next/link";
 import { AuthModalProvider, useAuthModal } from "@/components/AuthModalProvider";
 import AuthModal from "@/components/AuthModal";
-import { DarkModeProvider, useDarkMode } from "./DarkModeContext";
 import "./globals.css";
 import { Kalnia } from "next/font/google";
 
@@ -13,19 +12,14 @@ const kalnia = Kalnia({
 
 function Header() {
   const { openModal } = useAuthModal();
-  const { darkMode } = useDarkMode();
 
   return (
-    <header
-      className={`px-8 py-4 flex items-center justify-between shadow-sm border-b transition-colors duration-300
-      ${darkMode ? "bg-gray-900 border-gray-700 text-white" : "bg-white border-gray-200 text-black"}`}
-    >
+    <header className="px-8 py-4 flex items-center justify-between border-b transition-colors duration-300">
       {/* Logo */}
       <div className="flex items-center gap-8">
         <Link
           href="/"
-          className={`text-5xl font-bold m-4 mx-[42vh] transition-colors
-          ${darkMode ? "text-white hover:text-gray-300" : "text-black hover:text-gray-900"}`}
+          className="text-5xl font-bold m-4 mx-[42vh] transition-colors"
         >
           DailyBlogs
         </Link>
@@ -33,17 +27,12 @@ function Header() {
 
       {/* Nav / Actions */}
       <div className="flex gap-6 items-center mr-[42vh] whitespace-nowrap">
-        <Link
-          href="/about"
-          className={`text-xl transition-colors
-          ${darkMode ? "text-gray-300 hover:text-white" : "text-gray-600 hover:text-gray-900"}`}
-        >
+        <Link href="/about" className="text-xl transition-colors">
           About us
         </Link>
 
         <button
-          className={`text-xl transition-colors
-          ${darkMode ? "text-gray-300 hover:text-white" : "text-gray-600 hover:text-gray-900"}`}
+          className="text-xl transition-colors"
           onClick={() => openModal("login")}
         >
           Sign in
@@ -58,13 +47,9 @@ function Header() {
 
         <Link
           href="/setting"
-          className={`mx-1 transition-colors duration-200 flex items-center justify-center 
-          h-[38px] w-[38px] rounded-full
-          ${darkMode ? "text-white hover:bg-[#102b63]" : "text-gray-800 hover:bg-[#e7e7e7]"}`}
+          className="mx-1 transition-colors duration-200 flex items-center justify-center h-[38px] w-[38px] rounded-full"
         >
-          <i className="fi fi-tc-settings : text-[30px]"></i>
-          {/* Or FontAwesome:
-              <i className="fa-solid fa-gear text-[30px]"></i> */}
+          <i className="fi fi-tc-settings text-[30px]"></i>
         </Link>
       </div>
     </header>
@@ -72,30 +57,26 @@ function Header() {
 }
 
 function Footer() {
-  const { darkMode } = useDarkMode();
-
   return (
-    <footer
-      className={`p-4 text-center text-2xl transition-colors duration-300 border-t
-      ${darkMode ? "bg-gray-900 border-gray-700 text-gray-400" : "bg-white border-gray-200 text-gray-500"}`}
-    >
+    <footer className="p-4 text-center text-2xl transition-colors duration-300 border-t">
       This website was made by MAMA MO!
     </footer>
   );
 }
 
 export default function RootLayout({ children }) {
+
   return (
     <html lang="en">
       <body className={`${kalnia.className} min-h-screen flex flex-col transition-colors duration-300`}>
-        <DarkModeProvider>
-          <AuthModalProvider>
-            <Header />
-            <main className="flex-1">{children}</main>
-            <Footer />
-            <AuthModal />
-          </AuthModalProvider>
-        </DarkModeProvider>
+        <AuthModalProvider>
+          <Header />
+          <main className="flex-1 ">
+            {children}
+          </main>
+         <Footer />
+          <AuthModal />
+        </AuthModalProvider>
       </body>
     </html>
   );

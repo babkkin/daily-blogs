@@ -8,17 +8,14 @@ export default function HomePage() {
   const router = useRouter();
 
   return (
-    <main className="relative items-center justify-center h-screen overflow-hidden">
+<main className="relative flex items-center justify-start min-h-full overflow-hidden">
       {/* Background Grid */}
       <InteractiveGridPattern
-        className=" overflow-hiddenabsolute inset-0 -z-10 h-full w-full -top-0 -left-0 skew-y-12 [mask-image:radial-gradient(800px_circle_at_center,white,transparent)]"
-        squares={[40, 40]}
-        width={20}
-        height={20}
+        className="absolute inset-0 -z-10 h-full w-full -top-0 -left-0 skew-y-12 mask-[mask-image:radial-gradient(800px_circle_at_center,white,transparent)]"
       />
 
       {/* Foreground Content */}
-      <div className="flex flex-col justify-center h-full relative z-10">
+      <div className="overflow-hidden flex flex-col justify-center h-full relative z-10">
         <h1 className="text-8xl font-bold text-black mt-[50px] mb-6 mx-[44vh]">
           Daily Experiences <br /> and Wisdom
         </h1>
