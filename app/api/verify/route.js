@@ -10,23 +10,19 @@ export async function GET(req) {
   }
 
   try {
-
-    const [rows] = await db.query(
-      "SELECT * FROM users WHERE verification_token = ?",
+    const result = await db.query(
+      "SELECT * FROM users WHERE verification_token = $1",
       [token]
     );
 
-    const user = rows[0];
+    const user = result.rows[0];
 
     if (!user) {
-      return NextResponse.json(
-        { error: "Invalid token" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Invalid token" }, { status: 400 });
     }
 
     await db.query(
-      "UPDATE users SET verified = 1, verification_token = NULL WHERE user_id = ?",
+      "UPDATE users SET verified = true, verification_token = NULL WHERE user_id = $1",
       [user.user_id]
     );
 
