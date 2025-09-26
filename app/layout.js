@@ -5,7 +5,6 @@ import AuthModal from "@/components/AuthModal";
 import { DarkModeProvider, useDarkMode } from "./DarkModeContext";
 import "./globals.css";
 import { Kalnia } from "next/font/google";
-import { Analytics } from "@vercel/analytics/next";
 
 const kalnia = Kalnia({
   subsets: ["latin"],
@@ -93,7 +92,6 @@ export default function RootLayout({ children }) {
           <AuthModalProvider>
             <Header />
             <main className="flex-1">{children}</main>
-            <Analytics />
             <Footer />
             <AuthModal />
           </AuthModalProvider>
