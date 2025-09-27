@@ -14,32 +14,32 @@ function Header() {
   const { openModal } = useAuthModal();
 
   return (
-    <header className="px-8 py-4 flex items-center justify-between border-b transition-colors duration-300">
+    <header className="px-4 md:px-8 py-4 flex items-center justify-between border-b transition-colors duration-300">
       {/* Logo */}
-      <div className="flex items-center gap-8">
+      <div className="flex items-center">
         <Link
           href="/"
-          className="text-5xl font-bold m-4 mx-[42vh] transition-colors"
+          className="text-2xl md:text-3xl lg:text-5xl font-bold mx-4 md:mx-8 lg:mx-[42vh] transition-colors"
         >
           DailyBlogs
         </Link>
       </div>
 
-      {/* Nav / Actions */}
-      <div className="flex gap-6 items-center mr-[42vh] whitespace-nowrap">
-        <Link href="/about" className="text-xl transition-colors">
+      {/* Nav / Actions - Desktop */}
+      <div className="hidden md:flex gap-4 lg:gap-6 items-center mr-4 md:mr-8 lg:mr-[42vh]">
+        <Link href="/about" className="text-lg lg:text-xl transition-colors">
           About us
         </Link>
 
         <button
-          className="text-xl transition-colors"
+          className="text-lg lg:text-xl transition-colors"
           onClick={() => openModal("login")}
         >
           Sign in
         </button>
 
         <button
-          className="px-6 py-2 text-xl bg-black text-white rounded-full hover:bg-gray-800 transition-colors duration-200"
+          className="px-4 lg:px-6 py-2 text-lg lg:text-xl bg-black text-white rounded-full hover:bg-gray-800 transition-colors duration-200"
           onClick={() => openModal("signup")}
         >
           Get Started
@@ -52,29 +52,44 @@ function Header() {
           <i className="fi fi-tc-settings text-[30px]"></i>
         </Link>
       </div>
+
+      {/* Mobile Menu Button */}
+      <div className="md:hidden flex items-center gap-2">
+        <button
+          className="px-3 py-1 text-sm bg-black text-white rounded-full"
+          onClick={() => openModal("signup")}
+        >
+          Get Started
+        </button>
+        <Link
+          href="/setting"
+          className="flex items-center justify-center h-[32px] w-[32px] rounded-full"
+        >
+          <i className="fi fi-tc-settings text-[24px]"></i>
+        </Link>
+      </div>
     </header>
   );
 }
 
 function Footer() {
   return (
-    <footer className="p-4 text-center text-2xl transition-colors duration-300 border-t">
+    <footer className="p-4 text-center text-lg md:text-xl lg:text-2xl transition-colors duration-300 border-t">
       This website was made by MAMA MO!
     </footer>
   );
 }
 
 export default function RootLayout({ children }) {
-
   return (
     <html lang="en">
       <body className={`${kalnia.className} min-h-screen flex flex-col transition-colors duration-300`}>
         <AuthModalProvider>
           <Header />
-          <main className="flex-1 ">
+          <main className="flex-1">
             {children}
           </main>
-         <Footer />
+          <Footer />
           <AuthModal />
         </AuthModalProvider>
       </body>
