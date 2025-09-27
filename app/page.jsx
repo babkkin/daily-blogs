@@ -1,6 +1,7 @@
 "use client";
 import { useAuthModal } from "@/components/AuthModalProvider";
 import { useRouter } from "next/navigation";
+
 import InteractiveGridPattern from "@/components/ui/interactive-grid-pattern";
 
 export default function HomePage() {
@@ -24,7 +25,7 @@ export default function HomePage() {
         </p>
         <div className="mx-[44vh] flex gap-4">
           <button
-            className="px-20 py-4 bg-black text-white rounded-full hover:bg-gray-800 transition-colors duration-200 text-4xl font-medium"
+            className="px-20 py-4 bg-black  text-white rounded-full hover:bg-gray-800 transition-colors duration-200 text-4xl font-medium bg-"
             onClick={() => openModal("signup")}
           >
             Join us

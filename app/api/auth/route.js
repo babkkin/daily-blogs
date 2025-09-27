@@ -1,4 +1,4 @@
-import db from "../../../lib/db.js";
+import db from "@/lib/db";
 import { sendVerificationEmail } from "../../../lib/mailer.js";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
