@@ -1,12 +1,10 @@
 "use client";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { useAuthModal } from "@/components/AuthModalProvider"; // ✅ import context
+import { useAuthModal } from "@/components/AuthModalProvider";
 
 export default function SignupForm() {
   const [message, setMessage] = useState("");
-  const router = useRouter();
-  const { closeModal } = useAuthModal(); // ✅ grab modal closer
+  const { closeModal } = useAuthModal();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -16,7 +14,6 @@ export default function SignupForm() {
     const password = e.target.user_password.value;
     const confirmPassword = e.target.user_confirm_password.value;
 
-    // ✅ Check if passwords match before sending request
     if (password !== confirmPassword) {
       setMessage("Passwords do not match.");
       return;
@@ -28,21 +25,19 @@ export default function SignupForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password, type: "signup" }),
       });
+
       const data = await res.json();
+
       if (res.ok && data.success) {
-        setMessage("Account created! Check your email to verify.");
+        setMessage("✅ Account created! Please check your email to verify.");
 
-        // ✅ close modal first
-        closeModal();
-
-        // ✅ then redirect
-        router.push("/category");
+        setTimeout(() => closeModal(), 1500);
       } else {
-        setMessage(data.error || "Signup failed");
+        setMessage(data.error || "Signup failed.");
       }
     } catch (err) {
-      setMessage("Network error");
       console.error(err);
+      setMessage("Network error, please try again.");
     }
   };
 
