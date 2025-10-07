@@ -24,7 +24,7 @@ export default function AuthModal() {
 
       {/* modal box */}
       <div
-        className="mt-[29vh] relative max-w-md mx-auto bg-white rounded-xl p-6 shadow-2xl z-10"
+        className="mt-[2vh] relative max-w-md mx-auto bg-white rounded-xl p-6 shadow-2xl z-10"
   
         onClick={(e) => e.stopPropagation()}
       >
