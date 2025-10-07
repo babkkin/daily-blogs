@@ -31,7 +31,11 @@ export default function HomePage() {
             Join us
           </button>
           <button
+<<<<<<< Updated upstream
             onClick={() => router.push("/user-profile")}
+=======
+            onClick={() => router.push("/admin-dashboard")}
+>>>>>>> Stashed changes
             className="px-20 py-4 bg-black text-white rounded-full hover:bg-gray-800 transition-colors duration-200 text-4xl font-medium"
           >
             Editor

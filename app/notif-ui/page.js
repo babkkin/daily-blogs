@@ -58,7 +58,11 @@ export default function NotificationsUI() {
 						))}
 					</ul>
 				) : (
+<<<<<<< Updated upstream
 					<p className="text-gray-500 mt-6">You're all caught up.</p>
+=======
+					<p className="text-gray-500 mt-6">{"You're all caught up."}</p>
+>>>>>>> Stashed changes
 				)}
 			</main>
 		</div>
