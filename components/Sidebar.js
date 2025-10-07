@@ -15,9 +15,9 @@ export default function Sidebar({ isOpen, onClose }) {
   ];
 
   // 🧩 Close sidebar when route changes
-  useEffect(() => {
-    if (onClose) onClose(); // ✅ avoid undefined
-  }, [pathname]);
+useEffect(() => {
+  onClose();
+}, [pathname, onClose]);
 
   return (
     <div
