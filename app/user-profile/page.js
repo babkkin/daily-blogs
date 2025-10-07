@@ -1,5 +1,9 @@
 "use client";
 import { useState } from "react";
+<<<<<<< Updated upstream
+=======
+import Image from "next/image"; 
+>>>>>>> Stashed changes
 
 export default function MediumStyleProfile() {
 	const [activeTab, setActiveTab] = useState("home");
@@ -36,10 +40,20 @@ export default function MediumStyleProfile() {
 				{/* User Info */}
 				<div className="flex flex-col items-center mb-10">
 					{photo ? (
+<<<<<<< Updated upstream
 						<img
 							src={photo}
 							alt="Profile"
 							className="w-24 h-24 rounded-full object-cover border"
+=======
+						<Image
+							src={photo}
+							alt="Profile"
+							width={96}
+							height={96}
+							className="rounded-full object-cover border"
+							unoptimized // ✅ Needed for Base64 preview
+>>>>>>> Stashed changes
 						/>
 					) : (
 						<div className="w-24 h-24 rounded-full bg-purple-600 flex items-center justify-center text-white text-4xl font-bold">
@@ -142,7 +156,13 @@ export default function MediumStyleProfile() {
 
 								{/* Pronouns */}
 								<div>
+<<<<<<< Updated upstream
 									<label className="block text-sm font-medium mb-1">Pronouns</label>
+=======
+									<label className="block text-sm font-medium mb-1">
+										Pronouns
+									</label>
+>>>>>>> Stashed changes
 									<input
 										type="text"
 										value={pronouns}
@@ -153,7 +173,13 @@ export default function MediumStyleProfile() {
 
 								{/* Bio */}
 								<div>
+<<<<<<< Updated upstream
 									<label className="block text-sm font-medium mb-1">Short bio</label>
+=======
+									<label className="block text-sm font-medium mb-1">
+										Short bio
+									</label>
+>>>>>>> Stashed changes
 									<textarea
 										value={bio}
 										onChange={(e) => setBio(e.target.value)}
