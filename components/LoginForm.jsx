@@ -1,11 +1,9 @@
 "use client";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { useAuthModal } from "@/components/AuthModalProvider"; // ✅ import context
 
 export default function LoginForm() {
   const [message, setMessage] = useState("");
-  const router = useRouter();
   const { closeModal } = useAuthModal(); // ✅ grab modal closer
 
   const handleSubmit = async (e) => {
@@ -29,8 +27,6 @@ export default function LoginForm() {
         // ✅ close modal first
         closeModal();
 
-        // ✅ then redirect
-        router.push("/category");
       } else {
         setMessage(data.error || "Login failed");
       }

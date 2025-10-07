@@ -1,5 +1,6 @@
 @import "tailwindcss";
-
+@import url("https://cdn-uicons.flaticon.com/uicons-bold-rounded/css/uicons-bold-rounded.css");
+@import url("https://cdn-uicons.flaticon.com/uicons-regular-rounded/css/uicons-regular-rounded.css");
 @import url('https://fonts.googleapis.com/css2?family=Kalnia:wght@400;600;700&display=swap');
 
 .font-kalnia {
@@ -37,4 +38,8 @@ html, body {
   margin: 0;
   padding: 0;
   height: 100%;
+}
+
+:root {
+  --navbar-height: 44px;
 }
