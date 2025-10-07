@@ -24,7 +24,7 @@ export default function AuthModal() {
 
       {/* modal box */}
       <div
-        className="mt-[29vh] relative max-w-md mx-auto bg-white rounded-xl p-6 shadow-2xl z-10"
+        className="mt-[2vh] relative max-w-md mx-auto bg-white rounded-xl p-6 shadow-2xl z-10"
   
         onClick={(e) => e.stopPropagation()}
       >
@@ -42,7 +42,7 @@ export default function AuthModal() {
 
         {/* Google button (placeholder) */}
         <button
-          onClick={() => signIn("google", { callbackUrl: "/category" })}
+          onClick={() => signIn("google", { callbackUrl: "/landing" })}
           className="w-full border border-gray-300 py-3 rounded-lg flex items-center justify-center gap-2 hover:bg-gray-100 transition mb-4"
         >
           <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="w-5 h-5" />

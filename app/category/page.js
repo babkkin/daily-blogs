@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { useRouter } from "next/navigation";   // ✅ added this
+import { useRouter } from "next/navigation";
 
 export default function CategorySelector() {
   const allCategories = [
@@ -21,26 +21,44 @@ export default function CategorySelector() {
     "News & Politics",
   ];
 
-  const [visibleCount, setVisibleCount] = useState(9); // show first 9 initially
+  const [visibleCount, setVisibleCount] = useState(9);
   const [selected, setSelected] = useState([]);
-  const router = useRouter();   // ✅ added this
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   const toggleCategory = (category) => {
-    if (selected.includes(category)) {
-      setSelected(selected.filter((c) => c !== category));
-    } else if (selected.length >= 0) {
-      setSelected([...selected, category]);
+    setSelected((prev) =>
+      prev.includes(category)
+        ? prev.filter((c) => c !== category)
+        : [...prev, category]
+    );
+  };
+
+  const loadMore = () => setVisibleCount((prev) => prev + 2);
+
+  const handleDone = async () => {
+    try {
+      setLoading(true);
+
+      const res = await fetch("/api/save-categories", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ categories: selected }),
+      });
+
+      if (!res.ok) throw new Error("Failed to save categories");
+
+      router.push("/home");
+    } catch (err) {
+      console.error(err);
+      alert("Error saving your preferences. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
-    // ✅ new function
-  const handleDone = () => {
+  const handleSkip = () => {
     router.push("/home");
-  };
-
-
-  const loadMore = () => {
-    setVisibleCount((prev) => prev + 2);
   };
 
   return (
@@ -49,7 +67,7 @@ export default function CategorySelector() {
         <h1 className="block text-3xl font-semibold">
           What content would you like to see?
         </h1>
-        <p className="text-xl mb-4">Choose from the following           </p>
+        <p className="text-xl mb-4">Choose from the following</p>
 
         <div className="grid grid-cols-3 gap-4 p-6 max-w-4xl">
           {allCategories.slice(0, visibleCount).map((category) => (
@@ -76,13 +94,30 @@ export default function CategorySelector() {
             </button>
           )}
         </div>
-        {/* ✅ New Done button block */}
-        <button
-          onClick={handleDone}
-          className="mt-6 px-6 py-3 bg-black text-white rounded-lg hover:bg-gray-800 transition"
-        >
-          Done
-        </button>
+
+        <div className="mt-6 flex justify-center gap-4">
+          {/* Skip button */}
+          <button
+            onClick={handleSkip}
+            disabled={loading}
+            className="px-6 py-3 rounded-lg border-2 border-gray-400 text-gray-700 hover:bg-gray-100 transition"
+          >
+            Skip
+          </button>
+
+          {/* Done button */}
+          <button
+            onClick={handleDone}
+            disabled={loading || selected.length === 0}
+            className={`px-6 py-3 rounded-lg transition ${
+              loading || selected.length === 0
+                ? "bg-gray-400 text-white cursor-not-allowed"
+                : "bg-black text-white hover:bg-gray-800"
+            }`}
+          >
+            {loading ? "Saving..." : "Done"}
+          </button>
+        </div>
       </div>
     </div>
   );

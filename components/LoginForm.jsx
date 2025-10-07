@@ -1,10 +1,13 @@
 "use client";
 import { useState } from "react";
-import { useAuthModal } from "@/components/AuthModalProvider"; // ✅ import context
+import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react"; // ✅ import NextAuth signIn
+import { useAuthModal } from "@/components/AuthModalProvider";
 
 export default function LoginForm() {
   const [message, setMessage] = useState("");
-  const { closeModal } = useAuthModal(); // ✅ grab modal closer
+  const router = useRouter();
+  const { closeModal } = useAuthModal();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -12,27 +15,20 @@ export default function LoginForm() {
     const email = e.target.user_email.value;
     const password = e.target.user_password.value;
 
-    try {
-      const res = await fetch("/api/auth", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password, type: "login" }),
-      });
+    const res = await signIn("credentials", {
+      email,
+      password,
+      redirect: false,
+    });
 
-      const data = await res.json();
+    if (res?.error) {
+      setMessage(res.error);
+    } else {
+      setMessage("Login successful!");
 
-      if (res.ok && data.success) {
-        setMessage("Login successful!");
-
-        // ✅ close modal first
-        closeModal();
-
-      } else {
-        setMessage(data.error || "Login failed");
-      }
-    } catch (err) {
-      setMessage("Network error");
-      console.error(err);
+      // ✅ close modal first
+      closeModal();
+      router.push("/landing");
     }
   };
 
