@@ -62,6 +62,7 @@ export default function BlogPostPage() {
 					</div>
 				</div>
 
+
 				{/* Featured Image */}
 				<div className="w-full rounded-2xl overflow-hidden shadow-lg mb-10">
 					<Image
