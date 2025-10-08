@@ -1,156 +1,132 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import InteractiveGridPattern from "@/components/ui/interactive-grid-pattern";
 import Image from "next/image";
-import { Heart, MessageCircle } from "lucide-react"; // <-- clean icons
+import { Heart, MessageCircle } from "lucide-react";
 
 export default function BlogPostPage() {
-	const [likes, setLikes] = useState(0);
-	const [isLiked, setIsLiked] = useState(false);
-	const [comment, setComment] = useState("");
-	const [comments, setComments] = useState([]);
+  const [blogs, setBlogs] = useState([]);
+  const [likes, setLikes] = useState({});
+  const [comments, setComments] = useState({});
+  const [newComments, setNewComments] = useState({});
 
-	// Mock logged-in user
-	const user = { name: "Bam Aquino" };
+  useEffect(() => {
+    const fetchBlogs = async () => {
+      try {
+        const res = await fetch("/api/blogs");
+        const data = await res.json();
+        if (data.success) setBlogs(data.blogs);
+      } catch (err) {
+        console.error("Failed to load blogs:", err);
+      }
+    };
+    fetchBlogs();
+  }, []);
 
-	// ❤️ Like handler
-	const handleLike = () => {
-		if (!user) return alert("Please log in to like this post.");
-		setIsLiked(!isLiked);
-		setLikes((prev) => (isLiked ? prev - 1 : prev + 1));
-	};
+  const handleLike = (id) => {
+    setLikes((prev) => ({
+      ...prev,
+      [id]: prev[id] ? prev[id] - 1 : 1,
+    }));
+  };
 
-	// 💬 Comment handler
-	const handleCommentSubmit = (e) => {
-		e.preventDefault();
-		if (!user) return alert("Please log in to comment.");
-		if (comment.trim() === "") return;
+  const handleCommentSubmit = (id, e) => {
+    e.preventDefault();
+    const text = newComments[id]?.trim();
+    if (!text) return;
+    setComments((prev) => ({
+      ...prev,
+      [id]: [...(prev[id] || []), { user: "Anonymous", text }],
+    }));
+    setNewComments((prev) => ({ ...prev, [id]: "" }));
+  };
 
-		const newComment = { user: user.name, text: comment };
-		setComments((prev) => [newComment, ...prev]);
-		setComment("");
-	};
+  return (
+    <div className="relative flex flex-col items-center justify-start min-h-screen overflow-hidden bg-white">
+      <InteractiveGridPattern className="absolute inset-0 -z-10 h-full w-full skew-y-12 [mask-image:radial-gradient(800px_circle_at_center,white,transparent)]" />
 
-	return (
-		<div className="relative flex items-center justify-start min-h-screen overflow-hidden bg-white">
-			{/* Background Grid */}
-			<InteractiveGridPattern
-				className="absolute inset-0 -z-10 h-full w-full skew-y-12 [mask-image:radial-gradient(800px_circle_at_center,white,transparent)]"
-			/>
+      <div className="z-10 w-full max-w-3xl px-6 md:px-16 py-16 space-y-16">
+        {blogs.length === 0 ? (
+          <p className="text-gray-500 italic text-center">No blog posts yet.</p>
+        ) : (
+          blogs.map((blog, index) => (
+            <div key={index} className="border-b border-gray-300 pb-10">
+              {/* Blog Header */}
+              <h1 className="text-4xl font-bold text-gray-900 mb-2">{blog.title}</h1>
+              <p className="text-sm text-gray-500 mb-4">
+                Published on {new Date(blog.created_at).toLocaleDateString()}
+              </p>
 
-			{/* Content */}
-			<div className="flex flex-col justify-start px-6 md:px-16 lg:mx-[44vh] py-16 md:py-20 relative z-10 max-w-3xl">
-				{/* Header */}
-				<div className="mb-8">
-					<p className="text-sm text-gray-500 font-medium mb-2">
-						⭐ Member-only story
-					</p>
-					<h1 className="text-4xl md:text-6xl font-bold text-gray-900 leading-tight mb-3">
-						You're Using ChatGPT Wrong.<br />Here's How to Prompt Like a Pro
-					</h1>
-					<p className="text-gray-700 text-lg">
-						Smarter prompts lead to smarter responses.
-					</p>
+              {/* Blog Thumbnail */}
+              {blog.image_url && (
+                <div className="w-full rounded-2xl overflow-hidden shadow-lg mb-6">
+                  <Image
+                    src={blog.image_url}
+                    alt="Thumbnail"
+                    width={800}
+                    height={400}
+                    className="object-cover w-full h-auto"
+                  />
+                </div>
+              )}
 
-					{/* Author Info */}
-					<div className="flex items-center gap-3 mt-5">
-						<div className="w-10 h-10 rounded-full bg-gray-300" />
-						<div>
-							<p className="font-medium text-gray-900">Rodante Marcoleta</p>
-							<p className="text-sm text-gray-500">Jun 6, 2025 · 12 min read</p>
-						</div>
-					</div>
-				</div>
+              {/* Blog Content */}
+              <div
+                className="prose max-w-none text-gray-800 mb-8"
+                dangerouslySetInnerHTML={{ __html: blog.content }}
+              />
 
+              {/* Like & Comments */}
+              <div className="border-t border-gray-300 pt-4">
+                {/* Like Button */}
+                <button
+                  onClick={() => handleLike(index)}
+                  className={`flex items-center gap-2 text-lg font-medium transition-colors duration-200 ${
+                    likes[index] ? "text-red-600" : "text-gray-800 hover:text-red-600"
+                  }`}
+                >
+                  <Heart
+                    size={22}
+                    fill={likes[index] ? "currentColor" : "none"}
+                    strokeWidth={2}
+                  />
+                  <span>{likes[index] || 0} {likes[index] === 1 ? "Like" : "Likes"}</span>
+                </button>
 
-				{/* Featured Image */}
-				<div className="w-full rounded-2xl overflow-hidden shadow-lg mb-10">
-					<Image
-						src="/ai-blog-image.png"
-						alt="AI Prompting Illustration"
-						width={800}
-						height={400}
-						className="object-cover w-full h-auto"
-					/>
-					<p className="text-sm text-gray-500 mt-2 text-center">
-						Image generated by DALL·E, OpenAI
-					</p>
-				</div>
+                {/* Comment Form */}
+                <form onSubmit={(e) => handleCommentSubmit(index, e)} className="mt-4">
+                  <textarea
+                    value={newComments[index] || ""}
+                    onChange={(e) =>
+                      setNewComments((prev) => ({ ...prev, [index]: e.target.value }))
+                    }
+                    className="w-full border border-gray-300 rounded-2xl p-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-400"
+                    placeholder="Write a comment..."
+                    rows={2}
+                  />
+                  <button
+                    type="submit"
+                    className="mt-2 flex items-center gap-2 px-5 py-2 bg-black text-white rounded-full hover:bg-gray-800 transition-colors duration-200"
+                  >
+                    <MessageCircle size={18} />
+                    Post Comment
+                  </button>
+                </form>
 
-				{/* Article Content */}
-				<div className="text-gray-800 text-lg leading-relaxed space-y-6 mb-10">
-					<p>
-						Most people use ChatGPT for quick answers. But reframing the way we understand Large Language Models (LLMs)
-						can instantly improve the responses we get. With the right prompts, your conversations become sharper,
-						more accurate, and tailored to your needs.
-					</p>
-					<p>
-						This guide will teach you how to think like a "prompt engineer" — without the complexity. You’ll learn how
-						to structure your queries, add context, and make ChatGPT work like your personal research assistant.
-					</p>
-					<p className="border-l-4 border-gray-800 pl-4 italic text-gray-700">
-						Disclaimer: I’m no professional AI engineer. What follows is a mix of research, personal experience, and a
-						lot of experimentation.
-					</p>
-				</div>
-
-				{/* Like & Comment Section */}
-				<div className="border-t border-gray-300 pt-6">
-					{/* Like Button */}
-					<div className="flex items-center gap-3 mb-6">
-						<button
-							onClick={handleLike}
-							className={`flex items-center gap-2 text-lg font-medium transition-colors duration-200 ${
-								isLiked ? "text-red-600" : "text-gray-800 hover:text-red-600"
-							}`}
-						>
-							<Heart
-								size={22}
-								fill={isLiked ? "currentColor" : "none"}
-								strokeWidth={2}
-							/>
-							<span>{likes} {likes === 1 ? "Like" : "Likes"}</span>
-						</button>
-					</div>
-
-					{/* Comment Form */}
-					<form onSubmit={handleCommentSubmit} className="mb-6">
-						<textarea
-							value={comment}
-							onChange={(e) => setComment(e.target.value)}
-							className="w-full border border-gray-300 rounded-2xl p-4 text-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-400"
-							placeholder="Write a comment..."
-							rows={3}
-						/>
-						<button
-							type="submit"
-							className="mt-3 flex items-center gap-2 px-6 py-2 bg-black text-white rounded-full hover:bg-gray-800 transition-colors duration-200"
-						>
-							<MessageCircle size={18} />
-							Post Comment
-						</button>
-					</form>
-
-					{/* Comments List */}
-					{comments.length === 0 ? (
-						<p className="text-gray-500 italic">
-							No comments yet. Be the first to share your thoughts!
-						</p>
-					) : (
-						<div className="space-y-4">
-							{comments.map((c, i) => (
-								<div
-									key={i}
-									className="border border-gray-200 rounded-2xl p-4 bg-gray-50"
-								>
-									<p className="font-medium text-gray-900">{c.user}</p>
-									<p className="text-gray-700">{c.text}</p>
-								</div>
-							))}
-						</div>
-					)}
-				</div>
-			</div>
-		</div>
-	);
+                {/* Comments */}
+                <div className="mt-4 space-y-3">
+                  {(comments[index] || []).map((c, i) => (
+                    <div key={i} className="border border-gray-200 rounded-2xl p-3 bg-gray-50">
+                      <p className="font-medium text-gray-900">{c.user}</p>
+                      <p className="text-gray-700">{c.text}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+  );
 }
