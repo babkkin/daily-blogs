@@ -1,45 +1,71 @@
 import { NextResponse } from "next/server";
-import fs from "fs";
-import path from "path";
+import { getToken } from "next-auth/jwt";
+import pool from "@/lib/db.js";
+import { supabase } from "@/lib/supabaseClient.js";
+
+const secret = process.env.NEXTAUTH_SECRET;
 
 export async function POST(req) {
-	try {
-		const formData = await req.formData();
-		const file = formData.get("file");
+  try {
+    const token = await getToken({ req, secret });
+    if (!token || !token.sub)
+      return NextResponse.json({ success: false, error: "Unauthorized" });
 
-		if (!file) {
-			return NextResponse.json(
-				{ success: false, error: "No file uploaded" },
-				{ status: 400 }
-			);
-		}
+    const userId = token.sub;
+    const formData = await req.formData();
 
-		// Convert file -> buffer
-		const bytes = await file.arrayBuffer();
-		const buffer = Buffer.from(bytes);
+    const file = formData.get("file");
+    const title = formData.get("title");
+    const content = formData.get("content");
 
-		// Save in /public/uploads
-		const uploadDir = path.join(process.cwd(), "public/uploads");
-		if (!fs.existsSync(uploadDir)) {
-			fs.mkdirSync(uploadDir, { recursive: true });
-		}
+    if (!title || !content)
+      return NextResponse.json({
+        success: false,
+        error: "Missing title or content",
+      });
 
-		// Unique filename
-		const fileName = `${Date.now()}-${file.name}`;
-		const filePath = path.join(uploadDir, fileName);
+    let imageUrl = null;
 
-		fs.writeFileSync(filePath, buffer);
+    if (file) {
+      const fileName = `${Date.now()}-${file.name}`;
+      const { data, error } = await supabase.storage
+        .from("blog-images")
+        .upload(fileName, file, {
+          contentType: file.type,
+          upsert: false,
+        });
 
-		// Return URL
-		return NextResponse.json({
-			success: true,
-			url: `/uploads/${fileName}`,
-		});
-	} catch (err) {
-		console.error("Upload error:", err);
-		return NextResponse.json(
-			{ success: false, error: "Upload failed" },
-			{ status: 500 }
-		);
-	}
+      if (error)
+        return NextResponse.json({ success: false, error: "Image upload failed" });
+
+      const { data: publicUrlData } = supabase.storage
+        .from("blog-images")
+        .getPublicUrl(fileName);
+
+      imageUrl = publicUrlData.publicUrl;
+    }
+
+    const client = await pool.connect();
+    try {
+      await client.query(
+        `INSERT INTO blogs (user_id, title, content, image_url)
+         VALUES ($1, $2, $3, $4)`,
+        [userId, title, content, imageUrl]
+      );
+    } finally {
+      client.release();
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: "Blog post saved successfully.",
+      imageUrl,
+    });
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json({
+      success: false,
+      error: "Server error while uploading blog.",
+    });
+  }
 }
