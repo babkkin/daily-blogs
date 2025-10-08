@@ -1,8 +1,15 @@
+"use client";
 import Image from 'next/image';
+import PublicHeader from '@/components/PublicHeader';
+import PublicFooter from '@/components/PublicFooter';
 
 export default function AboutPage() {
   return (
     <div className="px-4 md:px-8 lg:mx-[44vh] py-8 md:py-12">
+
+      {/* Public Header */}
+      <PublicHeader />
+
       <h1 className="text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-black mb-4 md:mb-6">
         How it all Happened?
       </h1>
@@ -128,6 +135,10 @@ export default function AboutPage() {
           </p>
         </div>
       </div>
+
+      {/* Public Footer */}
+      <PublicFooter />
+
     </div>
   );
 }
