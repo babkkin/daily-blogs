@@ -1,9 +1,9 @@
-import Blogdisplay from '@/components/Blogdisplay';
+import Homeee from '@/components/Homeee';
 
 export default function HomePage() {
   return (
     <div>
-      <Blogdisplay />
+      <Homeee />
     </div>
   );
 }
