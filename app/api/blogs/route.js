@@ -1,16 +1,35 @@
+import { NextResponse } from "next/server";
 import pool from "@/lib/db.js";
 
 export async function GET() {
-  try {
-    const { rows } = await pool.query(`
-      SELECT user_id, title, content, image_url, created_at
-      FROM blogs
-      ORDER BY created_at DESC
-    `);
+	try {
+		console.log("📡 Connecting to database...");
 
-    return Response.json({ success: true, blogs: rows });
-  } catch (err) {
-    console.error("Error fetching blogs:", err);
-    return Response.json({ success: false, error: "Failed to fetch blogs" }, { status: 500 });
-  }
+		// Fetch all blogs from the database
+		const { rows } = await pool.query(`
+			SELECT 
+				blog_id AS id,
+				user_id,
+				title,
+				content,
+				image_url,
+				created_at
+			FROM blogs
+			ORDER BY created_at DESC
+		`);
+
+		console.log("✅ Query successful, found:", rows.length, "blogs");
+
+		// Return success with blog list
+		return NextResponse.json({ success: true, blogs: rows });
+	} catch (err) {
+		console.error("❌ Database error:", err.message);
+
+		// Return a 500 response with error message
+		return NextResponse.json(
+			{ success: false, error: "Database error: " + err.message },
+			{ status: 500 }
+		);
+	}
 }
+
