@@ -10,8 +10,10 @@ export default function PublicHeader() {
 
       <div className="hidden md:flex gap-4 lg:gap-6 items-center">
         <Link href="/about" className="text-lg lg:text-xl">About us</Link>
-        <button className="text-lg lg:text-xl">Sign in</button>
-        <button className="px-4 lg:px-6 py-2 text-lg lg:text-xl bg-black text-white rounded-full hover:bg-gray-800 transition-colors duration-200">
+        <button className="text-lg lg:text-xl"
+        onClick={() => openModal("login")}>Sign in</button>
+        <button className="px-4 lg:px-6 py-2 text-lg lg:text-xl bg-black text-white rounded-full hover:bg-gray-800 transition-colors duration-200"
+        onClick={() => openModal("signup")}>
           Get Started
         </button>
       </div>
