@@ -16,11 +16,11 @@ export async function GET(req) {
 
     const { rows } = await pool.query(
       `
-      SELECT user_id, title, content, image_url, created_at
+      SELECT blog_id AS id, user_id, title, content, image_url, created_at
       FROM blogs
       WHERE user_id = $1
       ORDER BY created_at DESC
-    `,
+      `,
       [userId]
     );
 
