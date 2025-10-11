@@ -37,12 +37,6 @@ export default function HomePage() {
             >
               Join us
             </button>
-            <button
-              onClick={() => router.push("/blog-editor")}
-              className="px-20 py-4 bg-black text-white rounded-full hover:bg-gray-800 transition-colors duration-200 text-4xl font-medium"
-            >
-              AdminBoard
-            </button>
           </div>
         </div>
       </main>
