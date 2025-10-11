@@ -17,12 +17,7 @@ export async function POST(req) {
     const file = formData.get("file");
     const title = formData.get("title");
     const content = formData.get("content");
-
-    if (!title || !content)
-      return NextResponse.json({
-        success: false,
-        error: "Missing title or content",
-      });
+    const subtitle = formData.get("subtitle");
 
     let imageUrl = null;
 
@@ -48,9 +43,9 @@ export async function POST(req) {
     const client = await pool.connect();
     try {
       await client.query(
-        `INSERT INTO blogs (user_id, title, content, image_url)
-         VALUES ($1, $2, $3, $4)`,
-        [userId, title, content, imageUrl]
+        `INSERT INTO blogs (user_id, title, content, image_url, subtitle)
+         VALUES ($1, $2, $3, $4, $5)`,
+        [userId, title, content, imageUrl, subtitle]
       );
     } finally {
       client.release();

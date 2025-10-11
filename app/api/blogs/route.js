@@ -13,6 +13,7 @@ export async function GET() {
 				title,
 				content,
 				image_url,
+				subtitle,
 				created_at
 			FROM blogs
 			ORDER BY created_at DESC
