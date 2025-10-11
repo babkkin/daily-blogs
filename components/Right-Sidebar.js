@@ -1,46 +1,62 @@
-import React, { useState } from 'react';
-import { Users, BookmarkPlus } from 'lucide-react';
+"use client";
+
+import React, { useState } from "react";
+import { Users, BookmarkPlus } from "lucide-react";
 
 export default function MediumSidebar() {
   const [followedUsers, setFollowedUsers] = useState(new Set());
+  const [visibleCount, setVisibleCount] = useState(9);
+  const loadMore = () => setVisibleCount((prev) => prev + 2);
 
-  const topics = ['Technology', 'Design', 'Programming', 'AI', 'Productivity', 'Writing'];
-  
+  const topics = [
+    "Technology",
+    "Health & Wellness",
+    "Travel",
+    "Food",
+    "Lifestyle",
+    "Education",
+    "Finance",
+    "Entertainment",
+    "Science",
+    "Sports",
+    "Music",
+    "Gaming",
+    "History",
+    "Art & Design",
+    "News & Politics",
+  ];
+
   const users = [
-    { id: 1, name: 'Sarah Chen', tagline: 'Design lead at tech startup', avatar: 'SC' },
-    { id: 2, name: 'Alex Rivera', tagline: 'Full-stack developer & writer', avatar: 'AR' },
-    { id: 3, name: 'Maya Patel', tagline: 'Product manager, tech enthusiast', avatar: 'MP' }
+    { id: 1, name: "Sarah Chen", tagline: "Design lead at tech startup", avatar: "SC" },
+    { id: 2, name: "Alex Rivera", tagline: "Full-stack developer & writer", avatar: "AR" },
+    { id: 3, name: "Maya Patel", tagline: "Product manager, tech enthusiast", avatar: "MP" },
   ];
 
   const articles = [
-    { id: 1, title: 'The Future of Web Development in 2025', author: 'John Doe', reads: '5 min read' },
-    { id: 2, title: 'How AI is Reshaping Creative Industries', author: 'Jane Smith', reads: '8 min read' },
-    { id: 3, title: 'Building Better User Experiences', author: 'Mike Johnson', reads: '6 min read' },
-    { id: 4, title: 'The Art of Clean Code', author: 'Emily Davis', reads: '7 min read' }
+    { id: 1, title: "The Future of Web Development in 2025", author: "John Doe", reads: "5 min read" },
+    { id: 2, title: "How AI is Reshaping Creative Industries", author: "Jane Smith", reads: "8 min read" },
+    { id: 3, title: "Building Better User Experiences", author: "Mike Johnson", reads: "6 min read" },
+    { id: 4, title: "The Art of Clean Code", author: "Emily Davis", reads: "7 min read" },
   ];
 
   const toggleFollow = (userId) => {
-    setFollowedUsers(prev => {
+    setFollowedUsers((prev) => {
       const newSet = new Set(prev);
-      if (newSet.has(userId)) {
-        newSet.delete(userId);
-      } else {
-        newSet.add(userId);
-      }
+      if (newSet.has(userId)) newSet.delete(userId);
+      else newSet.add(userId);
       return newSet;
     });
   };
 
   return (
-    <div className="space-y-8">
-      
+    <div className="space-y-8 pl-[2vh] ">
       {/* Recommended Topics */}
       <div className="mt-[5vh]">
         <h3 className="text-sm font-semibold text-gray-900 mb-3">
           Discover more of what matters to you
         </h3>
-        <div className="flex flex-wrap gap-2">
-          {topics.map(topic => (
+        <div className="flex flex-wrap gap-2 mb-3">
+          {topics.slice(0, visibleCount).map((topic) => (
             <button
               key={topic}
               className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-full text-sm text-gray-700 transition"
@@ -49,6 +65,14 @@ export default function MediumSidebar() {
             </button>
           ))}
         </div>
+        {visibleCount < topics.length && (
+          <button
+            onClick={loadMore}
+            className="text-sm text-blue-600 hover:text-blue-800 font-medium transition"
+          >
+            Load more
+          </button>
+        )}
       </div>
 
       {/* Who to Follow */}
@@ -58,7 +82,7 @@ export default function MediumSidebar() {
           Who to follow
         </h3>
         <div className="space-y-4">
-          {users.map(user => (
+          {users.map((user) => (
             <div key={user.id} className="flex items-start gap-3">
               <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-400 to-blue-500 flex items-center justify-center text-white font-semibold text-sm flex-shrink-0">
                 {user.avatar}
@@ -71,11 +95,11 @@ export default function MediumSidebar() {
                 onClick={() => toggleFollow(user.id)}
                 className={`px-3 py-1 rounded-full text-xs font-medium transition flex-shrink-0 ${
                   followedUsers.has(user.id)
-                    ? 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                    : 'bg-black text-white hover:bg-gray-800'
+                    ? "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                    : "bg-black text-white hover:bg-gray-800"
                 }`}
               >
-                {followedUsers.has(user.id) ? 'Following' : 'Follow'}
+                {followedUsers.has(user.id) ? "Following" : "Follow"}
               </button>
             </div>
           ))}
@@ -89,7 +113,7 @@ export default function MediumSidebar() {
           Recommended reading
         </h3>
         <div className="space-y-5">
-          {articles.map(article => (
+          {articles.map((article) => (
             <div key={article.id} className="group cursor-pointer">
               <h4 className="font-medium text-gray-900 text-sm leading-snug mb-1 group-hover:text-black line-clamp-2">
                 {article.title}
@@ -118,7 +142,6 @@ export default function MediumSidebar() {
           <a href="#" className="hover:text-gray-900">Teams</a>
         </div>
       </div>
-
     </div>
   );
 }

@@ -13,8 +13,8 @@ export default function HomePage() {
         </div>
 
         {/* Sidebar - Right Side */}
-        <aside className="w-80 flex-shrink-0 hidden lg:block">
-          <div className="sticky top-8">
+        <aside className="w-80 flex-shrink-0 hidden lg:block border-l border-gray-200">
+          <div className="sticky top-1">
             <MediumSidebar />
           </div>
         </aside>
