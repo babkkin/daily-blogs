@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import EditBio from "@/components/Editbio"; // Import the component
 
 export default function MediumStyleProfile() {
   const [activeTab, setActiveTab] = useState("home");
@@ -11,12 +12,13 @@ export default function MediumStyleProfile() {
   const [photo, setPhoto] = useState(null);
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isEditBioOpen, setIsEditBioOpen] = useState(false);
 
   // Fetch user info
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await fetch("/api/users/me"); // Adjust endpoint as needed
+        const res = await fetch("/api/users/me");
         const data = await res.json();
 
         if (data.success) {
@@ -56,27 +58,31 @@ export default function MediumStyleProfile() {
     fetchPosts();
   }, []);
 
+  const handleBioSave = (newBio) => {
+    setBio(newBio);
+  };
+
   return (
     <div className="flex min-h-screen bg-white text-black justify-center">
       <main className="w-full max-w-5xl p-8">
         {/* User Info */}
-<div className="flex flex-col items-center mb-10">
-  {photo ? (
-    <Image
-      src={photo}
-      alt="Profile"
-      width={128}
-      height={128}
-      className="w-32 h-32 rounded-full object-cover border-4 border-gray-200"
-      unoptimized
-    />
-  ) : (
-    <div className="w-32 h-32 rounded-full bg-purple-600 flex items-center justify-center text-white text-5xl font-bold border-4 border-gray-200">
-      {name ? name.charAt(0).toUpperCase() : "U"}
-    </div>
-  )}
-  <h2 className="text-3xl font-bold mt-4">{name || "Unnamed User"}</h2>
-</div>
+        <div className="flex flex-col items-center mb-10">
+          {photo ? (
+            <Image
+              src={photo}
+              alt="Profile"
+              width={128}
+              height={128}
+              className="w-32 h-32 rounded-full object-cover border-4 border-gray-200"
+              unoptimized
+            />
+          ) : (
+            <div className="w-32 h-32 rounded-full bg-purple-600 flex items-center justify-center text-white text-5xl font-bold border-4 border-gray-200">
+              {name ? name.charAt(0).toUpperCase() : "U"}
+            </div>
+          )}
+          <h2 className="text-3xl font-bold mt-4">{name || "Unnamed User"}</h2>
+        </div>
 
         {/* Tabs */}
         <div className="border-b flex justify-center gap-10 text-lg font-medium mb-8 cursor-pointer">
@@ -140,6 +146,15 @@ export default function MediumStyleProfile() {
         {/* About Tab */}
         {activeTab === "about" && (
           <div className="mt-10">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-bold">About</h3>
+              <button
+                onClick={() => setIsEditBioOpen(true)}
+                className="px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800 transition"
+              >
+                Edit Bio
+              </button>
+            </div>
             {!bio ? (
               <p className="text-gray-700 mb-4">No bio yet.</p>
             ) : (
@@ -148,6 +163,14 @@ export default function MediumStyleProfile() {
           </div>
         )}
       </main>
+
+      {/* Edit Bio Modal */}
+      <EditBio
+        isOpen={isEditBioOpen}
+        onClose={() => setIsEditBioOpen(false)}
+        currentBio={bio}
+        onSave={handleBioSave}
+      />
     </div>
   );
 }
