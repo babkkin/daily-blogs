@@ -1,6 +1,7 @@
 "use client";
 import { motion } from "framer-motion";
 import Link from "next/link"; // ✅ Import Link
+import SignOut from "@/components/SignOut";
 
 export default function Sidebar({ isOpen, onClose }) {
 	return (
@@ -59,12 +60,9 @@ export default function Sidebar({ isOpen, onClose }) {
 
 
 			{/* Logout Section */}
-			<div className="p-4">
-				<li className="flex items-center gap-3 p-3 rounded-lg border border-transparent hover:border-black hover:bg-gray-100 cursor-pointer transition-all duration-300 ease-in-out list-none">
-					<i className="fi fi-rr-sign-out-alt text-lg flex-shrink-0"></i>
-					<span className="text-base leading-none">Logout</span>
-				</li>
-			</div>
+<div className="p-4">
+	<SignOut />
+</div>
 
 		</motion.div>
 	);
