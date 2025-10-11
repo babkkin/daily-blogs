@@ -60,23 +60,23 @@ export default function MediumStyleProfile() {
     <div className="flex min-h-screen bg-white text-black justify-center">
       <main className="w-full max-w-5xl p-8">
         {/* User Info */}
-        <div className="flex flex-col items-center mb-10">
-          {photo ? (
-            <Image
-              src={photo}
-              alt="Profile"
-              width={96}
-              height={96}
-              className="rounded-full object-cover border"
-              unoptimized
-            />
-          ) : (
-            <div className="w-24 h-24 rounded-full bg-purple-600 flex items-center justify-center text-white text-4xl font-bold">
-              {name ? name.charAt(0) : "U"}
-            </div>
-          )}
-          <h2 className="text-3xl font-bold mt-4">{name || "Unnamed User"}</h2>
-        </div>
+<div className="flex flex-col items-center mb-10">
+  {photo ? (
+    <Image
+      src={photo}
+      alt="Profile"
+      width={128}
+      height={128}
+      className="w-32 h-32 rounded-full object-cover border-4 border-gray-200"
+      unoptimized
+    />
+  ) : (
+    <div className="w-32 h-32 rounded-full bg-purple-600 flex items-center justify-center text-white text-5xl font-bold border-4 border-gray-200">
+      {name ? name.charAt(0).toUpperCase() : "U"}
+    </div>
+  )}
+  <h2 className="text-3xl font-bold mt-4">{name || "Unnamed User"}</h2>
+</div>
 
         {/* Tabs */}
         <div className="border-b flex justify-center gap-10 text-lg font-medium mb-8 cursor-pointer">

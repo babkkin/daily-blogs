@@ -6,19 +6,36 @@ import { useRouter } from "next/navigation";
 import Sidebar from "./Sidebar";
 import Image from 'next/image';
 
-
 export default function Header() {
 	const [sidebarOpen, setSidebarOpen] = useState(true);
 	const [searchQuery, setSearchQuery] = useState("");
 	const [searchResults, setSearchResults] = useState([]);
 	const [showDropdown, setShowDropdown] = useState(false);
+	const [userData, setUserData] = useState(null);
 	const router = useRouter();
 	const dropdownRef = useRef(null);
+
+	// Fetch user data for profile picture
+	useEffect(() => {
+		const fetchUserData = async () => {
+			try {
+				const res = await fetch('/api/users/me');
+				const data = await res.json();
+				if (data.success) {
+					setUserData(data.user);
+				}
+			} catch (err) {
+				console.error("Error fetching user data:", err);
+			}
+		};
+		fetchUserData();
+	}, []);
 
 	// Fetch search results live
 	useEffect(() => {
 		if (searchQuery.trim() === "") {
 			setSearchResults([]);
+			setShowDropdown(false);
 			return;
 		}
 
@@ -26,7 +43,10 @@ export default function Header() {
 			try {
 				const res = await fetch(`/api/blogs/search?q=${encodeURIComponent(searchQuery)}`);
 				const data = await res.json();
-				if (data.success) setSearchResults(data.blogs);
+				if (data.success) {
+					setSearchResults(data.blogs);
+					setShowDropdown(true);
+				}
 			} catch (err) {
 				console.error("Search error:", err);
 			}
@@ -91,21 +111,25 @@ export default function Header() {
 						DailyBlogs
 					</Link>
 
-					<form
-						onSubmit={handleSearchSubmit}
-						className="ml-3 flex items-center bg-gray-100 rounded-full px-3 py-1 w-[250px] focus-within:ring-2 focus-within:ring-black transition relative"
-					>
-						<i className="fi fi-rr-search text-gray-500 text-lg"></i>
-						<input
-							type="text"
-							placeholder="Search blogs or authors"
-							value={searchQuery}
-							onChange={(e) => {
-								setSearchQuery(e.target.value);
-								setShowDropdown(true);
-							}}
-							className="bg-transparent outline-none px-2 w-full"
-						/>
+					<div className="relative ml-3">
+						<form
+							onSubmit={handleSearchSubmit}
+							className="flex items-center bg-gray-100 rounded-full px-3 py-1 w-[250px] focus-within:ring-2 focus-within:ring-black transition"
+						>
+							<i className="fi fi-rr-search text-gray-500 text-lg"></i>
+							<input
+								type="text"
+								placeholder="Search blogs or authors"
+								value={searchQuery}
+								onChange={(e) => {
+									setSearchQuery(e.target.value);
+								}}
+								onFocus={() => {
+									if (searchResults.length > 0) setShowDropdown(true);
+								}}
+								className="bg-transparent outline-none px-2 w-full"
+							/>
+						</form>
 
 						{showDropdown && searchResults.length > 0 && (
 							<ul
@@ -120,12 +144,12 @@ export default function Header() {
 									>
 										{blog.image_url && (
 											<Image 
-												width={10}
-												height={10}
+												width={40}
+												height={40}
 												src={blog.image_url}
 												alt={blog.title}
 												className="w-10 h-10 object-cover rounded"
-												
+												unoptimized
 											/>
 										)}
 										<div className="flex flex-col">
@@ -136,7 +160,7 @@ export default function Header() {
 								))}
 							</ul>
 						)}
-					</form>
+					</div>
 				</div>
 
 				{/* Right Section: Buttons */}
@@ -160,10 +184,23 @@ export default function Header() {
 					</div>
 
 					<button
-						className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center hover:bg-gray-300"
+						className="h-10 w-10 rounded-full overflow-hidden bg-purple-600 flex items-center justify-center hover:opacity-90 transition"
 						onClick={() => router.push("/user-profile")}
 					>
-						<i className="fi fi-rr-user"></i>
+						{userData?.profile_url ? (
+							<Image
+								src={userData.profile_url}
+								alt="Profile"
+								width={40}
+								height={40}
+								className="w-full h-full object-cover"
+								unoptimized
+							/>
+						) : (
+							<span className="text-white text-lg font-bold">
+								{userData?.name ? userData.name.charAt(0).toUpperCase() : "U"}
+							</span>
+						)}
 					</button>
 				</div>
 			</header>
