@@ -1,14 +1,33 @@
 import { NextResponse } from "next/server";
 import pool from "@/lib/db.js";
+import { getToken } from "next-auth/jwt";
 
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
     const blogId = searchParams.get("blogId");
+    const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
+    
     if (!blogId) return NextResponse.json({ success: false, error: "Missing blogId" }, { status: 400 });
 
-    const res = await pool.query("SELECT COUNT(*) FROM claps WHERE blog_id=$1", [blogId]);
-    return NextResponse.json({ success: true, claps: parseInt(res.rows[0].count) });
+    // Get total claps count
+    const countRes = await pool.query("SELECT COUNT(*) FROM claps WHERE blog_id=$1", [blogId]);
+    
+    // Check if current user has clapped
+    let hasClapped = false;
+    if (token?.userId) {
+      const userClapRes = await pool.query(
+        "SELECT * FROM claps WHERE blog_id=$1 AND user_id=$2",
+        [blogId, token.userId]
+      );
+      hasClapped = userClapRes.rows.length > 0;
+    }
+
+    return NextResponse.json({ 
+      success: true, 
+      claps: parseInt(countRes.rows[0].count),
+      hasClapped 
+    });
   } catch (err) {
     console.error(err);
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });
@@ -17,12 +36,48 @@ export async function GET(request) {
 
 export async function POST(request) {
   try {
-    const { blogId, userId } = await request.json();
+    const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
+
+    if (!token || !token.userId) {
+      return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { blogId } = await request.json();
     if (!blogId) return NextResponse.json({ success: false, error: "Missing blogId" }, { status: 400 });
 
-    await pool.query("INSERT INTO claps (blog_id, user_id) VALUES ($1, $2)", [blogId, userId || null]);
-    const res = await pool.query("SELECT COUNT(*) FROM claps WHERE blog_id=$1", [blogId]);
-    return NextResponse.json({ success: true, claps: parseInt(res.rows[0].count) });
+    const userId = token.userId;
+
+    // Check if user already clapped
+    const existingClap = await pool.query(
+      "SELECT * FROM claps WHERE blog_id=$1 AND user_id=$2",
+      [blogId, userId]
+    );
+
+    if (existingClap.rows.length > 0) {
+      // User already clapped, so remove the clap (unlike)
+      await pool.query(
+        "DELETE FROM claps WHERE blog_id=$1 AND user_id=$2",
+        [blogId, userId]
+      );
+      const countRes = await pool.query("SELECT COUNT(*) FROM claps WHERE blog_id=$1", [blogId]);
+      return NextResponse.json({ 
+        success: true, 
+        claps: parseInt(countRes.rows[0].count),
+        hasClapped: false
+      });
+    } else {
+      // User hasn't clapped, so add a clap
+      await pool.query(
+        "INSERT INTO claps (blog_id, user_id) VALUES ($1, $2)",
+        [blogId, userId]
+      );
+      const countRes = await pool.query("SELECT COUNT(*) FROM claps WHERE blog_id=$1", [blogId]);
+      return NextResponse.json({ 
+        success: true, 
+        claps: parseInt(countRes.rows[0].count),
+        hasClapped: true
+      });
+    }
   } catch (err) {
     console.error(err);
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });
