@@ -46,7 +46,7 @@ export default function HomePage() {
 
 return (
 	<div className="max-w-6xl mx-auto px-6 py-16">
-		<h1 className="font-medium text-xl mb-6 text-gray-900 border-b pb-3">
+		<h1 className="font-medium text-xl mb-6 text-gray-900 border-b border-gray-300  pb-3">
 			For you
 		</h1>
 		<div className="flex flex-col gap-10">

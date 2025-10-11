@@ -68,7 +68,7 @@ export default function Header() {
 			{/* Sidebar controlled by Header */}
 			<Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-			<header className="fixed top-0 left-0 right-0 z-50 bg-white border-b px-4 md:px-8 py-3 flex items-center justify-between">
+			<header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 px-4 md:px-8 py-3 flex items-center justify-between">
 				<link
 					rel="stylesheet"
 					href="https://cdn-uicons.flaticon.com/uicons-bold-rounded/css/uicons-bold-rounded.css"

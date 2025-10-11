@@ -12,7 +12,7 @@ export default function Footer() {
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       {/* Sticky Footer */}
-      <footer className="fixed bottom-0 left-0 w-full border-t bg-white shadow-md p-1 flex justify-between items-center z-50">
+      <footer className="fixed bottom-0 left-0 w-full border-t border-gray-200   bg-white shadow-md p-1 flex justify-between items-center z-50">
         {/* Burger Button */}
         
 
