@@ -107,23 +107,39 @@ export default function BlogEditor() {
 				/>
 			</div>
 
-			{/* Title Input */}
-			<input
-				type="text"
-				value={title}
-				onChange={(e) => setTitle(e.target.value)}
-				placeholder="Enter blog title..."
-				className="w-full mb-4 p-3 border border-gray-300 rounded-lg text-lg focus:outline-none focus:ring-2 focus:ring-black"
-			/>
+{/* Title Input with 100 character limit */}
+<input
+	type="text"
+	value={title}
+	onChange={(e) => {
+		if (e.target.value.length <= 100) {
+			setTitle(e.target.value);
+		}
+	}}
+	placeholder="Enter blog title..."
+	className="w-full mb-4 p-3 border border-gray-300 rounded-lg text-lg focus:outline-none focus:ring-2 focus:ring-black"
+	maxLength={100}
+/>
+<p className="text-sm text-gray-500 -mt-3 mb-4 text-right">
+	{title.length}/100 characters
+</p>
 
-			{/* ✅ Subtitle Input */}
-			<input
-				type="text"
-				value={subtitle}
-				onChange={(e) => setSubtitle(e.target.value)}
-				placeholder="Enter a short subtitle..."
-				className="w-full mb-4 p-3 border border-gray-300 rounded-lg text-base italic focus:outline-none focus:ring-2 focus:ring-black"
-			/>
+{/* Subtitle Input with 200 character limit */}
+<input
+	type="text"
+	value={subtitle}
+	onChange={(e) => {
+		if (e.target.value.length <= 200) {
+			setSubtitle(e.target.value);
+		}
+	}}
+	placeholder="Enter a short subtitle..."
+	className="w-full mb-4 p-3 border border-gray-300 rounded-lg text-base italic focus:outline-none focus:ring-2 focus:ring-black"
+	maxLength={200}
+/>
+<p className="text-sm text-gray-500 -mt-3 mb-4 text-right">
+	{subtitle.length}/200 characters
+</p>
 
 			{/* Blog Content Editor */}
 			<div className="bg-white rounded-lg shadow-md mb-4">

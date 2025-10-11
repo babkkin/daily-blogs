@@ -91,58 +91,77 @@ export default function BlogPage() {
   if (error) return <div className="text-red-500">{error}</div>;
   if (!blog) return <div>No blog found</div>;
 
-  return (
-    <div className="max-w-4xl mx-auto px-6 py-12">
-      <Link href="/home" className="text-emerald-600 hover:underline mb-4 block">← Back to Blogs</Link>
+return (
+	<div className="max-w-4xl mx-auto px-6 py-12">
+		<Link href="/home" className="text-emerald-600 hover:underline mb-4 block">
+			← Back to Blogs
+		</Link>
 
-      <h1 className="text-4xl font-bold mb-4">{blog.title}</h1>
-      <p className="text-gray-500 text-sm mb-6">{new Date(blog.created_at).toLocaleDateString()}</p>
+		<h1 className="text-4xl font-bold mb-4 break-words">{blog.title}</h1>
+		<p className="text-gray-500 text-sm mb-2 break-words italic">{blog.subtitle}</p>
+		<p className="text-gray-500 text-sm mb-6">
+			{new Date(blog.created_at).toLocaleDateString()}
+		</p>
 
-      {blog.image_url && (
-        <div className="relative w-full aspect-[16/9] mb-6 rounded-lg overflow-hidden">
-          <Image src={blog.image_url} alt={blog.title} fill className="object-cover" />
-        </div>
-      )}
+		{blog.image_url && (
+			<div className="relative w-full aspect-[16/9] mb-6 rounded-lg overflow-hidden">
+				<Image src={blog.image_url} alt={blog.title} fill className="object-cover" />
+			</div>
+		)}
 
-      <div className="text-gray-800 text-lg mb-8" dangerouslySetInnerHTML={{ __html: blog.content }} />
+		<div
+			className="text-gray-800 text-lg mb-8 break-words prose prose-lg max-w-none"
+			dangerouslySetInnerHTML={{ __html: blog.content }}
+		/>
 
-      {/* Clap */}
-      <div className="flex items-center gap-4 mb-6">
-        <button onClick={handleClap} className="flex items-center gap-2 px-4 py-2 bg-red-100 text-red-600 rounded-full hover:bg-red-200 transition">
-          <Heart size={20} fill={claps > 0 ? "currentColor" : "none"} strokeWidth={2} />
-          <span>{claps}</span>
-        </button>
-      </div>
+		{/* Clap */}
+		<div className="flex items-center gap-4 mb-6">
+			<button
+				onClick={handleClap}
+				className="flex items-center gap-2 px-4 py-2 bg-red-100 text-red-600 rounded-full hover:bg-red-200 transition"
+			>
+				<Heart size={20} fill={claps > 0 ? "currentColor" : "none"} strokeWidth={2} />
+				<span>{claps}</span>
+			</button>
+		</div>
 
-      {/* Comments */}
-      <div className="mt-8">
-        <h2 className="text-2xl font-bold mb-4">Comments</h2>
+		{/* Comments */}
+		<div className="mt-8">
+			<h2 className="text-2xl font-bold mb-4">Comments</h2>
 
-        <form onSubmit={handleCommentSubmit} className="mb-6">
-          <textarea
-            value={newComment}
-            onChange={e => setNewComment(e.target.value)}
-            rows={3}
-            placeholder="Write a comment..."
-            className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-gray-400"
-          />
-          <button type="submit" className="mt-2 px-5 py-2 bg-black text-white rounded-full hover:bg-gray-800 flex items-center gap-2">
-            <MessageCircle size={18} /> Post Comment
-          </button>
-        </form>
+			<form onSubmit={handleCommentSubmit} className="mb-6">
+				<textarea
+					value={newComment}
+					onChange={(e) => setNewComment(e.target.value)}
+					rows={3}
+					placeholder="Write a comment..."
+					className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-gray-400"
+					maxLength={500}
+				/>
+				<div className="flex items-center justify-between mt-2">
+					<p className="text-sm text-gray-500">{newComment.length}/500 characters</p>
+					<button
+						type="submit"
+						className="px-5 py-2 bg-black text-white rounded-full hover:bg-gray-800 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+						disabled={!newComment.trim()}
+					>
+						<MessageCircle size={18} /> Post Comment
+					</button>
+				</div>
+			</form>
 
-        {comments.length === 0 ? (
-          <p>No comments yet.</p>
-        ) : (
-          <div className="space-y-4">
-            {comments.map(c => (
-              <div key={c.comment_id} className="border p-3 rounded bg-gray-50">
-                <p>{c.text}</p>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
-  );
+			{comments.length === 0 ? (
+				<p className="text-gray-500 italic">No comments yet.</p>
+			) : (
+				<div className="space-y-4">
+					{comments.map((c) => (
+						<div key={c.comment_id} className="border p-3 rounded bg-gray-50">
+							<p className="break-words">{c.text}</p>
+						</div>
+					))}
+				</div>
+			)}
+		</div>
+	</div>
+);
 }
