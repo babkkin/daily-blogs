@@ -7,7 +7,7 @@ import Sidebar from "./Sidebar";
 import Image from 'next/image';
 
 export default function Header() {
-	const [sidebarOpen, setSidebarOpen] = useState(true);
+	const [sidebarOpen, setSidebarOpen] = useState(false);
 	const [searchQuery, setSearchQuery] = useState("");
 	const [searchResults, setSearchResults] = useState([]);
 	const [showDropdown, setShowDropdown] = useState(false);
