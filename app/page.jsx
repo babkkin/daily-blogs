@@ -2,7 +2,6 @@
 import { useAuthModal } from "@/components/AuthModalProvider";
 import { useRouter } from "next/navigation";
 import InteractiveGridPattern from "@/components/ui/interactive-grid-pattern";
-import Link from "next/link";
 import PublicHeader from "@/components/PublicHeader";
 import PublicFooter from "@/components/PublicFooter";
 

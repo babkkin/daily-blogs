@@ -3,6 +3,8 @@ import { AuthModalProvider } from "@/components/AuthModalProvider";
 import AuthModal from "@/components/AuthModal";
 import "./globals.css";
 import { Kalnia } from "next/font/google";
+import PublicFooter from "@/components/PublicFooter";
+
 
 const kalnia = Kalnia({
   subsets: ["latin"],

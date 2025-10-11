@@ -10,7 +10,7 @@ export default function AboutPage() {
       {/* Public Header */}
       <PublicHeader />
 
-      <h1 className="text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-black mb-4 md:mb-6">
+      <h1 className="mt-[8vh] text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-black mb-4 md:mb-6">
         How it all Happened?
       </h1>
       <p className="text-lg md:text-xl lg:text-2xl text-black mb-8 md:mb-12">
@@ -137,8 +137,6 @@ export default function AboutPage() {
       </div>
 
       {/* Public Footer */}
-      <PublicFooter />
-
     </div>
   );
 }

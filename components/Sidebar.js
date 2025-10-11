@@ -8,8 +8,8 @@ export default function Sidebar({ isOpen, onClose }) {
 			initial={{ x: "-100%" }}
 			animate={{ x: isOpen ? 0 : "-100%" }}
 			transition={{ type: "tween", duration: 0.5, ease: "easeInOut" }}
-			className="fixed top-0 left-0 h-full max-h-[93.5vh] overflow-y-auto w-64 bg-white text-gray-800 shadow-lg z-50 flex flex-col justify-between"
-			style={{ boxShadow: "2px 0 5px rgba(0,0,0,0.1)" }}
+			className="fixed top-0 left-0 h-full max-h-full overflow-y-auto w-[25vh] bg-white text-gray-800 shadow-lg z-50 flex flex-col justify-between"
+			style={{ boxShadow: "2px 0 5px rgba(0,0,0,0.05)" }}
 		>
 			{/* Header Section */}
 			<div>
@@ -24,11 +24,11 @@ export default function Sidebar({ isOpen, onClose }) {
 				</div>
 
 				{/* Menu Items */}
-				<ul className="p-4 space-y-2">
+				<ul className="p-4 space-y-2 mt-[3vh]">
 					{/* Home */}
 					<li className="flex items-center gap-3 p-3 rounded-lg border border-transparent hover:border-black hover:bg-gray-100 cursor-pointer transition-all duration-300 ease-in-out">
-						<i className="fi fi-rr-home text-lg flex-shrink-0"></i>
-						<span className="text-base leading-none">Home</span>
+						<i className="fi fi-rr-home text-xl flex-shrink-0"></i>
+						<span className="text-xl leading-none">Home</span>
 					</li>
 
 					{/* About */}
@@ -37,8 +37,8 @@ export default function Sidebar({ isOpen, onClose }) {
 							onClick={onClose}
 							className="flex items-center gap-3 p-3 rounded-lg border border-transparent hover:border-black hover:bg-gray-100 cursor-pointer transition-all duration-300 ease-in-out"
 						>
-							<i className="fi fi-rr-info text-lg flex-shrink-0"></i>
-							<span className="text-base leading-none">About</span>
+							<i className="fi fi-rr-info text-xl flex-shrink-0"></i>
+							<span className="text-xl leading-none">About</span>
 						</li>
 					</Link>
 
@@ -48,12 +48,15 @@ export default function Sidebar({ isOpen, onClose }) {
 							onClick={onClose}
 							className="flex items-center gap-3 p-3 rounded-lg border border-transparent hover:border-black hover:bg-gray-100 cursor-pointer transition-all duration-300 ease-in-out"
 						>
-							<i className="fi fi-rr-settings text-lg flex-shrink-0"></i>
-							<span className="text-base leading-none">Settings</span>
+							<i className="fi fi-rr-settings text-xl flex-shrink-0"></i>
+							<span className="text-xl leading-none">Settings</span>
 						</li>
 					</Link>
 				</ul>
+
+
 			</div>
+
 
 			{/* Logout Section */}
 			<div className="p-4">
@@ -62,6 +65,7 @@ export default function Sidebar({ isOpen, onClose }) {
 					<span className="text-base leading-none">Logout</span>
 				</li>
 			</div>
+
 		</motion.div>
 	);
 }

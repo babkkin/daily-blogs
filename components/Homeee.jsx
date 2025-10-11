@@ -45,12 +45,11 @@ export default function HomePage() {
 		);
 
 	return (
-		<div className="max-w-5xl mx-auto px-6 py-16">
-			<h1 className="text-4xl font-bold mb-12 text-gray-900 text-center">
-				Latest Blogs
+		<div className="max-w-6xl mx-auto px-6 py-16">
+			<h1 className="font-medium text-xl mb-6 text-gray-900 border-b pb-3 ">
+				For you
 			</h1>
-
-			<div className="flex flex-col gap-12">
+			<div className="flex flex-col gap-10">
 				{blogs.map((blog) => (
 					<Link
 						key={blog.id}
@@ -59,16 +58,16 @@ export default function HomePage() {
 					>
 						{/* Left Side: Text */}
 						<div className="flex-1">
-							<p className="text-sm text-gray-500 mb-1">
+							<p className="text-sm text-gray-500 mb-1 mt-[3vh]">
 								In <span className="font-medium text-gray-700">Data Science Collective</span> by{" "}
 								<span className="text-gray-700 font-semibold">Unknown Author</span>
 							</p>
 
-							<h2 className="text-2xl font-bold text-gray-900 group-hover:text-black transition-colors">
+							<h2 className="text-3xl font-bold text-gray-900 group-hover:text-black transition-colors">
 								{blog.title}
 							</h2>
 
-							<p className="text-gray-600 text-base mt-1 line-clamp-2">
+							<p className=" text-gray-600 text-2xl mt-1 line-clamp-2">
 								{blog.subtitle || "No description provided."}
 							</p>
 
@@ -79,7 +78,7 @@ export default function HomePage() {
 
 						{/* Right Side: Thumbnail */}
 						{blog.image_url && (
-							<div className="w-full sm:w-48 h-32 flex-shrink-0 overflow-hidden rounded-md">
+							<div className="w-full sm:w-48 h-32 flex-shrink-0 overflow-hidden rounded-md mt-[3vh]">
 								<Image
 									src={blog.image_url}
 									alt={blog.title}

@@ -4,10 +4,11 @@ import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Sidebar from "./Sidebar";
+import Image from 'next/image';
 
 
 export default function Header() {
-	const [sidebarOpen, setSidebarOpen] = useState(false);
+	const [sidebarOpen, setSidebarOpen] = useState(true);
 	const [searchQuery, setSearchQuery] = useState("");
 	const [searchResults, setSearchResults] = useState([]);
 	const [showDropdown, setShowDropdown] = useState(false);
@@ -118,10 +119,13 @@ export default function Header() {
 										onClick={() => handleResultClick(blog.id)}
 									>
 										{blog.image_url && (
-											<img
+											<Image 
+												width={10}
+												height={10}
 												src={blog.image_url}
 												alt={blog.title}
 												className="w-10 h-10 object-cover rounded"
+												
 											/>
 										)}
 										<div className="flex flex-col">
@@ -139,15 +143,15 @@ export default function Header() {
 				<div className="flex items-center gap-5 relative">
 					<button
 						onClick={() => router.push("/blog-editor")}
-						className="flex items-center gap-1 text-lg"
-					>
+						className="flex items-center gap-1 text-lg text-gray-800/70 hover:text-black"
+					> 
 						<i className="fi fi-rr-edit"></i>
 						<span>Write</span>
 					</button>
 
 					<div className="relative">
 						<button
-							className="text-xl p-1 hover:bg-gray-100 rounded-full transition"
+							className="text-xl text-gray-800/70 p-1 hover:text-black rounded-full transition"
 							onClick={() => alert("Notifications placeholder")}
 						>
 							<i className="fi fi-rr-bell"></i>
@@ -156,7 +160,7 @@ export default function Header() {
 					</div>
 
 					<button
-						className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center"
+						className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center hover:bg-gray-300"
 						onClick={() => router.push("/user-profile")}
 					>
 						<i className="fi fi-rr-user"></i>

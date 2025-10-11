@@ -8,7 +8,6 @@ export default function AppLayout({ children }) {
     <div className="min-h-screen flex flex-col transition-colors duration-300">
       <Header />
       <main className="flex-1 pt-20">{children}</main>
-      <Footer />
     </div>
   );
 }
