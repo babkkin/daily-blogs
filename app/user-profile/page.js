@@ -86,48 +86,48 @@ export default function MediumStyleProfile() {
           </button>
         </div>
 
-        {/* Home Tab */}
-        {activeTab === "home" && (
-          <div className="flex flex-col gap-8">
-            {loading ? (
-              <p className="text-gray-500 text-center">Loading posts...</p>
-            ) : posts.length === 0 ? (
-              <p className="text-gray-500 text-center">No posts yet.</p>
-            ) : (
-              posts.map((post) => (
-                <Link
-                  key={post.id} // ✅ unique key fixed
-                  href={`/blogs/${post.id}`}
-                  className="group flex flex-col sm:flex-row justify-between gap-6 border-b border-gray-200 pb-8 rounded-xl p-4 hover:bg-gray-50 transition-all cursor-pointer"
-                >
-                  <div className="flex-1">
-                    <p className="text-sm text-gray-500 mb-1">
-                      Published on {new Date(post.created_at).toLocaleDateString()}
-                    </p>
-                    <h2 className="text-2xl font-bold text-gray-900 group-hover:text-black transition-colors">
-                      {post.title}
-                    </h2>
-                    <p className="text-gray-600 text-base mt-1 line-clamp-2">
-                      {post.subtitle || "No subtitle provided."}
-                    </p>
-                  </div>
-
-                  {post.image_url && (
-                    <div className="w-full sm:w-48 h-32 flex-shrink-0 overflow-hidden rounded-md">
-                      <Image
-                        src={post.image_url}
-                        alt={post.title}
-                        width={400}
-                        height={250}
-                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                      />
-                    </div>
-                  )}
-                </Link>
-              ))
-            )}
+{/* Home Tab */}
+{activeTab === "home" && (
+  <div className="flex flex-col gap-8">
+    {loading ? (
+      <p className="text-gray-500 text-center">Loading posts...</p>
+    ) : posts.length === 0 ? (
+      <p className="text-gray-500 text-center">No posts yet.</p>
+    ) : (
+      posts.map((post) => (
+        <Link
+          key={post.id}
+          href={`/blogs/${post.id}`}
+          className="group flex flex-col sm:flex-row justify-between gap-6 border-b border-gray-200 pb-8 rounded-xl p-4 hover:bg-gray-50 transition-all cursor-pointer"
+        >
+          <div className="flex-1 min-w-0">
+            <p className="text-sm text-gray-500 mb-1">
+              Published on {new Date(post.created_at).toLocaleDateString()}
+            </p>
+            <h2 className="text-2xl font-bold text-gray-900 group-hover:text-black transition-colors break-words">
+              {post.title}
+            </h2>
+            <p className="text-gray-600 text-base mt-1 line-clamp-2 break-words">
+              {post.subtitle || "No subtitle provided."}
+            </p>
           </div>
-        )}
+
+          {post.image_url && (
+            <div className="w-full sm:w-48 h-32 flex-shrink-0 overflow-hidden rounded-md">
+              <Image
+                src={post.image_url}
+                alt={post.title}
+                width={400}
+                height={250}
+                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+              />
+            </div>
+          )}
+        </Link>
+      ))
+    )}
+  </div>
+)}
 
         {/* About Tab */}
         {activeTab === "about" && (
