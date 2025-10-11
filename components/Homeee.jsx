@@ -60,7 +60,7 @@ return (
 					<div className="flex-1 min-w-0">
 						<p className="text-sm text-gray-500 mb-1 mt-[3vh]">
 							In <span className="font-medium text-gray-700">Data Science Collective</span> by{" "}
-							<span className="text-gray-700 font-semibold">Unknown Author</span>
+							<span className="text-gray-700 font-semibold">{blog.user_name}</span>
 						</p>
 
 						<h2 className="text-3xl font-bold text-gray-900 group-hover:text-black transition-colors break-words">
