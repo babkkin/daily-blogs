@@ -17,7 +17,12 @@ export default function MediumStyleProfile() {
   const [loading, setLoading] = useState(true);
   const [isEditBioOpen, setIsEditBioOpen] = useState(false);
   const [profileUserId, setProfileUserId] = useState(null);
+  const [isFollowing, setIsFollowing] = useState(false); // ✅ new state
+  const [isProcessing, setIsProcessing] = useState(false); // ✅ for button disabling
   const { id } = useParams();
+
+  const currentUserId = session?.user?.userId || session?.user?.id;
+  const isOwnProfile = currentUserId === profileUserId;
 
   // Fetch user info
   useEffect(() => {
@@ -29,7 +34,7 @@ export default function MediumStyleProfile() {
           setName(data.user.name);
           setBio(data.user.bio || "");
           setPhoto(data.user.profile_url || null);
-          setProfileUserId(data.user.userId); // Get the profile's user ID
+          setProfileUserId(data.user.userId);
         } else {
           console.error("Failed to load user info:", data.error);
         }
@@ -60,15 +65,50 @@ export default function MediumStyleProfile() {
     fetchPosts();
   }, [id]);
 
-  const handleBioSave = (newBio) => {
-    setBio(newBio);
+  // ✅ Check follow status
+useEffect(() => {
+  if (!currentUserId || !profileUserId || currentUserId === profileUserId) return;
+
+  const checkFollow = async () => {
+    try {
+      const res = await fetch(`/api/blogs/user/follow?authorId=${profileUserId}`);
+      const data = await res.json();
+      if (data.success) setIsFollowing(data.isFollowing);
+    } catch (err) {
+      console.error("Failed to check follow status:", err);
+    }
   };
 
-  // Check if viewing own profile
-  // session might have userId instead of id, so check both
-  const currentUserId = session?.user?.userId || session?.user?.id;
-  const isOwnProfile = currentUserId === profileUserId;
+  checkFollow();
+}, [currentUserId, profileUserId]);
 
+  // ✅ Handle Follow / Unfollow actions
+const handleFollowToggle = async () => {
+  if (!profileUserId) return; // profile user ID to follow/unfollow
+  setIsProcessing(true);
+
+  try {
+    const res = await fetch("/api/blogs/user/follow", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ authorId: profileUserId }), // ✅ send only authorId
+    });
+
+    const data = await res.json();
+    if (data.success) {
+      setIsFollowing(data.isFollowing); // toggle state based on response
+    } else {
+      console.error("Follow action failed:", data.error);
+    }
+  } catch (err) {
+    console.error("Failed to follow/unfollow:", err);
+  } finally {
+    setIsProcessing(false);
+  }
+};
+
+
+  const handleBioSave = (newBio) => setBio(newBio);
 
   return (
     <div className="flex min-h-screen bg-white text-black justify-center">
@@ -90,22 +130,35 @@ export default function MediumStyleProfile() {
             </div>
           )}
           <h2 className="text-2xl sm:text-3xl font-bold mt-4">{name || "Unnamed User"}</h2>
+
+          {/* ✅ Follow/Unfollow button */}
+          {!isOwnProfile && (
+            <button
+              onClick={handleFollowToggle}
+              disabled={isProcessing}
+              className={`mt-3 px-5 py-2 rounded-md text-sm sm:text-base font-medium transition 
+                ${isFollowing ? "bg-gray-200 text-black hover:bg-gray-300" : "bg-black text-white hover:bg-gray-800"}
+              `}
+            >
+              {isProcessing
+                ? "Processing..."
+                : isFollowing
+                ? "Unfollow"
+                : "Follow"}
+            </button>
+          )}
         </div>
 
         {/* Tabs */}
         <div className="border-b flex flex-wrap justify-center gap-6 sm:gap-10 text-base sm:text-lg font-medium mb-8 cursor-pointer">
           <button
-            className={`pb-2 ${
-              activeTab === "home" ? "border-b-2 border-black" : "text-gray-500"
-            }`}
+            className={`pb-2 ${activeTab === "home" ? "border-b-2 border-black" : "text-gray-500"}`}
             onClick={() => setActiveTab("home")}
           >
             Home
           </button>
           <button
-            className={`pb-2 ${
-              activeTab === "about" ? "border-b-2 border-black" : "text-gray-500"
-            }`}
+            className={`pb-2 ${activeTab === "about" ? "border-b-2 border-black" : "text-gray-500"}`}
             onClick={() => setActiveTab("about")}
           >
             About
@@ -160,7 +213,6 @@ export default function MediumStyleProfile() {
           <div className="mt-8 sm:mt-10 px-2 sm:px-0">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-4">
               <h3 className="text-lg sm:text-xl font-bold">About</h3>
-              {/* ONLY show Edit Bio button if it's your own profile */}
               {isOwnProfile && (
                 <button
                   onClick={() => setIsEditBioOpen(true)}
@@ -180,7 +232,6 @@ export default function MediumStyleProfile() {
         )}
       </main>
 
-      {/* Edit Bio Modal - Only render if own profile */}
       {isOwnProfile && (
         <EditBio
           isOpen={isEditBioOpen}

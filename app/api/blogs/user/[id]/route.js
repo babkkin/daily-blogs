@@ -2,7 +2,8 @@ import pool from "@/lib/db.js";
 
 export async function GET(req, { params }) {
   try {
-    const { id: userId } = params;
+    const { id: userId } = await params; // ✅ Await params here
+
     if (!userId) {
       return new Response(
         JSON.stringify({ success: false, error: "Missing user ID" }),
