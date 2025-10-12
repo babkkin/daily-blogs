@@ -13,17 +13,17 @@ export async function GET(request) {
     }
 
     // Get all users the current user is following
-    const { rows } = await pool.query(
-      `SELECT 
-        up.user_id,
-        up.user_name,
-        up.profile_url
-      FROM follows f
-      JOIN users_profile up ON f.following_id = up.user_id
-      WHERE f.follower_id = $1
-      ORDER BY f.created_at DESC`,
-      [token.userId]
-    );
+const { rows } = await pool.query(
+  `SELECT 
+    up.user_id,
+    up.user_name,
+    up.profile_url
+  FROM follows f
+  JOIN users_profile up ON f.following_id::uuid = up.user_id
+  WHERE f.follower_id = $1
+  ORDER BY f.created_at DESC`,
+  [token.userId]
+);
 
     return NextResponse.json({ 
       success: true, 

@@ -110,7 +110,7 @@ export default function Sidebar({ isOpen, onClose }) {
 									<Link
 										key={user.user_id}
 										href={`/profile/${user.user_id}`}
-										className="flex items-center gap-2 p-2 hover:bg-gray-100 rounded transition"
+										className="flex items-center gap-3 p-2 mb-10 border border-transparent text-gray-900/90 hover:border-black border-r-0 border-t-0 border-b-0 hover:bg-gray-100 hover:text-black cursor-pointer transition-all duration-300 ease-in-out"
 										onClick={onClose}
 									>
 										{user.profile_url ? (
@@ -119,7 +119,7 @@ export default function Sidebar({ isOpen, onClose }) {
 												alt={user.user_name}
 												width={32}
 												height={32}
-												className="rounded-full object-cover"
+												className="w-8 h-8 rounded-full object-cover"
 												unoptimized
 											/>
 										) : (
