@@ -191,6 +191,16 @@ export default function Header() {
             <span>Write</span>
           </button>
 
+		  <div className="relative">
+						<button
+							className="text-xl text-gray-800/70 p-1 hover:text-black rounded-full transition"
+							onClick={() => alert("Notifications placeholder")}
+						>
+							<i className="fi fi-rr-bell"></i>
+						</button>
+						<span className="absolute top-1 right-1 h-2 w-2 bg-red-500 rounded-full"></span>
+					</div>
+
 					<button
 						className="h-10 w-10 rounded-full overflow-hidden bg-purple-600 flex items-center justify-center hover:opacity-90 transition"
 						onClick={() => router.push(`/profile/${userData.userId}`)}
