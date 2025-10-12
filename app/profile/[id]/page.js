@@ -25,6 +25,8 @@ export default function MediumStyleProfile() {
   const [notification, setNotification] = useState("");
   const [manageTab, setManageTab] = useState("draft");
   const [openDropdown, setOpenDropdown] = useState(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [postToDelete, setPostToDelete] = useState(null);
 
   const currentUserId = session?.user?.userId || session?.user?.id;
   const isOwnProfile = currentUserId === profileUserId;
@@ -174,29 +176,42 @@ export default function MediumStyleProfile() {
     }
   };
 
-const handleDeletePermanently = async (postId) => {
-  setOpenDropdown(null);
-  if (!confirm("Are you sure you want to permanently delete this post?")) return;
+  const confirmDelete = (postId) => {
+    setPostToDelete(postId);
+    setShowDeleteConfirm(true);
+    setOpenDropdown(null);
+  };
 
-  try {
-    const res = await fetch(`/api/blogs/${postId}`, { method: "DELETE" });
-    console.log("Response status:", res.status);
-    const data = await res.json();
-    console.log("Response data:", data);
+  const performDelete = async () => {
+    if (!postToDelete) return;
 
-    if (data.success) {
-      setPosts(prev => prev.filter(p => p.id !== postId)); // make sure p.id matches your data
-      setNotification("Post deleted permanently");
+    setShowDeleteConfirm(false);
+
+    try {
+      const res = await fetch(`/api/blogs/${postToDelete}`, { method: "DELETE" });
+      console.log("Response status:", res.status);
+      const data = await res.json();
+      console.log("Response data:", data);
+
+      if (data.success) {
+        setPosts(prev => prev.filter(p => p.id !== postToDelete));
+        setNotification("Post deleted permanently");
+        setShowNotification(true);
+        setTimeout(() => setShowNotification(false), 2000);
+      } else {
+        setNotification(data.error || "Failed to delete post");
+        setShowNotification(true);
+        setTimeout(() => setShowNotification(false), 2000);
+      }
+    } catch (err) {
+      console.error(err);
+      setNotification("Failed to delete post");
       setShowNotification(true);
       setTimeout(() => setShowNotification(false), 2000);
-    } else {
-      alert(data.error || "Failed to delete post");
     }
-  } catch (err) {
-    console.error(err);
-    alert("Failed to delete post");
-  }
-};
+
+    setPostToDelete(null);
+  };
 
   return (
     <div className="flex min-h-screen bg-white text-black justify-center">
@@ -509,7 +524,7 @@ const handleDeletePermanently = async (postId) => {
                               Move to Drafts
                             </button>
                             <button
-                              onClick={() => handleDeletePermanently(post.id)}
+                              onClick={() => confirmDelete(post.id)}
                               className="w-full text-left px-4 py-2 hover:bg-red-50 text-red-600 transition"
                             >
                               Delete Permanently
@@ -533,6 +548,33 @@ const handleDeletePermanently = async (postId) => {
           currentBio={bio}
           onSave={handleBioSave}
         />
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 z-50 backdrop-blur-sm bg-white/10 overflow-y-auto flex items-center justify-center">
+          <div className="bg-white border-1 p-6 rounded-lg max-w-md w-full mx-4">
+            <h3 className="text-lg font-bold mb-4">Confirm Delete</h3>
+            <p className="text-gray-600 mb-6">Are you sure you want to permanently delete this post? This action cannot be undone.</p>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => {
+                  setShowDeleteConfirm(false);
+                  setPostToDelete(null);
+                }}
+                className="px-4 py-2 text-gray-600 hover:text-gray-800"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={performDelete}
+                className="px-4 py-2 bg-red-400 text-white rounded hover:bg-red-700"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
