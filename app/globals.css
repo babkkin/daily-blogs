@@ -12,6 +12,27 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+
+@keyframes progressBar {
+  0% { width: 0%; }
+  50% { width: 50%; }
+  100% { width: 30%; }
+}
+
+.animate-progressBar {
+  animation: progressBar 2s ease-in-out infinite;
+}
+
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 2s ease-in-out;
+}
+
+
 webname {
   font-weight: 900;
   font-size: 2rem;

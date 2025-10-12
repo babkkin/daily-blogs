@@ -9,7 +9,7 @@ export default function EditBio({ isOpen, onClose, currentBio, onSave }) {
   const handleSave = async () => {
     setSaving(true);
     try {
-      const res = await fetch("/api/blogs/user/update-bio", {  // Changed to match your file location
+      const res = await fetch("/api/blogs/user/update-bio", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -36,7 +36,7 @@ export default function EditBio({ isOpen, onClose, currentBio, onSave }) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 backdrop-blur-sm bg-white/10 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full p-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-2xl font-bold">Edit Bio</h2>

@@ -8,9 +8,11 @@ import { signIn } from "next-auth/react";
 export default function AuthModal() {
   const { isOpen, authType, closeModal, openModal } = useAuthModal();
 
-  // close on ESC
+  // Close on ESC
   React.useEffect(() => {
-    const onKey = (e) => { if (e.key === "Escape") closeModal(); };
+    const onKey = (e) => {
+      if (e.key === "Escape") closeModal();
+    };
     if (isOpen) window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [isOpen, closeModal]);
@@ -18,14 +20,15 @@ export default function AuthModal() {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50" role="dialog" aria-modal="true">
-      {/* backdrop */}
-      <div className="absolute inset-0 bg-black/50" onClick={closeModal} />
-
+    <div
+      className="fixed inset-0 z-50 backdrop-blur-sm bg-white/10 overflow-y-auto"
+      role="dialog"
+      aria-modal="true"
+      onClick={closeModal}
+    >
       {/* modal box */}
       <div
-        className="mt-[2vh] relative max-w-md mx-auto bg-white rounded-xl p-6 shadow-2xl z-10"
-  
+        className="mt-[2vh] relative max-w-md mx-auto bg-white rounded-xl p-6 shadow-2xl z-10 my-6 sm:my-10"
         onClick={(e) => e.stopPropagation()}
       >
         <button
@@ -40,12 +43,16 @@ export default function AuthModal() {
           {authType === "login" ? "Welcome back" : "Join DailyBlogs"}
         </h2>
 
-        {/* Google button (placeholder) */}
+        {/* Google sign-in */}
         <button
           onClick={() => signIn("google", { callbackUrl: "/landing" })}
           className="w-full border border-gray-300 py-3 rounded-lg flex items-center justify-center gap-2 hover:bg-gray-100 transition mb-4"
         >
-          <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="w-5 h-5" />
+          <img
+            src="https://www.svgrepo.com/show/475656/google-color.svg"
+            alt="Google"
+            className="w-5 h-5"
+          />
           Continue with Google
         </button>
 
@@ -55,10 +62,10 @@ export default function AuthModal() {
           <hr className="flex-1 border-gray-300" />
         </div>
 
-        {/* login / signup form */}
+        {/* Login / Signup form */}
         {authType === "login" ? <LoginForm /> : <SignupForm />}
 
-        {/* toggle */}
+        {/* Toggle link */}
         <div className="mt-4 text-center">
           <button
             onClick={() => openModal(authType === "login" ? "signup" : "login")}
