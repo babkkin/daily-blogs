@@ -58,6 +58,7 @@ export default function MediumSidebar() {
         <div className="flex flex-wrap gap-2 mb-3">
           {topics.slice(0, visibleCount).map((topic) => (
             <button
+              onClick={() => alert("Discovery placeholder")}
               key={topic}
               className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-full text-sm text-gray-700 transition"
             >

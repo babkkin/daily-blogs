@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 export default function CategorySelector() {
   const allCategories = [
@@ -80,7 +81,9 @@ export default function CategorySelector() {
             <label htmlFor="fileInput" className="cursor-pointer relative">
               <div className="w-28 h-28 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden border-2 border-gray-400">
                 {photo ? (
-                  <img
+                  <Image
+                    width={128}
+                    height={128}
                     src={photo}
                     alt="Profile"
                     className="w-full h-full object-cover"
