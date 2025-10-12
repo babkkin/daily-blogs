@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { Heart, MessageCircle, Trash2, Edit2, X, Check } from "lucide-react";
+import { Heart, MessageCircle, Trash2, Edit2, X, Check, Bookmark, UserPlus, UserCheck } from "lucide-react";
 import { useSession } from "next-auth/react";
 
 export default function BlogPage() {
@@ -19,6 +19,8 @@ export default function BlogPage() {
   const [newComment, setNewComment] = useState("");
   const [editingCommentId, setEditingCommentId] = useState(null);
   const [editingText, setEditingText] = useState("");
+  const [isBookmarked, setIsBookmarked] = useState(false);
+  const [isFollowing, setIsFollowing] = useState(false);
 
   // Fetch blog, claps, and comments
   useEffect(() => {
@@ -44,6 +46,20 @@ export default function BlogPage() {
         const clapsData = await clapsRes.json();
         setClaps(clapsData.claps || 0);
         setHasClapped(clapsData.hasClapped || false);
+
+        // Fetch bookmark status
+        if (session) {
+          const bookmarkRes = await fetch(`/api/blogs/bookmarks?blogId=${id}`);
+          const bookmarkData = await bookmarkRes.json();
+          setIsBookmarked(bookmarkData.isBookmarked || false);
+
+          // Fetch follow status
+          if (blogData.blog?.user_id) {
+            const followRes = await fetch(`/api/blogs/user/follow?authorId=${blogData.blog.user_id}`);
+            const followData = await followRes.json();
+            setIsFollowing(followData.isFollowing || false);
+          }
+        }
       } catch (err) {
         setError(err.message);
       } finally {
@@ -52,7 +68,7 @@ export default function BlogPage() {
     };
 
     fetchData();
-  }, [id]);
+  }, [id, session]);
 
   // Handle claps
   const handleClap = async () => {
@@ -72,6 +88,58 @@ export default function BlogPage() {
     } catch (err) {
       console.error(err);
       alert("Failed to clap");
+    }
+  };
+
+  // Handle bookmark
+  const handleBookmark = async () => {
+    if (!session) {
+      alert("Please login to bookmark");
+      return;
+    }
+
+    try {
+      const res = await fetch("/api/blogs/bookmarks", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ blogId: id })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setIsBookmarked(data.isBookmarked);
+      } else {
+        alert(data.error || "Failed to bookmark");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Failed to bookmark");
+    }
+  };
+
+  // Handle follow
+  const handleFollow = async () => {
+    if (!session) {
+      alert("Please login to follow");
+      return;
+    }
+
+    if (!blog?.user_id) return;
+
+    try {
+      const res = await fetch("/api/blogs/user/follow", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ authorId: blog.user_id })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setIsFollowing(data.isFollowing);
+      } else {
+        alert(data.error || "Failed to follow");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Failed to follow");
     }
   };
 
@@ -183,17 +251,89 @@ export default function BlogPage() {
   if (error) return <div className="text-red-500">{error}</div>;
   if (!blog) return <div>No blog found</div>;
 
+  // Check if current user is the author
+  const isAuthor = session?.user?.id === blog.user_id;
+
   return (
     <div className="max-w-4xl mx-auto px-6 py-12">
       <Link href="/home" className="text-emerald-600 hover:underline mb-4 block">
         ← Back to Blogs
       </Link>
 
+      {/* Author Info Section */}
+      <div className="flex items-center justify-between mb-6 pb-4 border-b">
+        <div className="flex items-center gap-3">
+          {/* Author Avatar */}
+          {blog.author_profile_url ? (
+            <Image
+              src={blog.author_profile_url}
+              alt={blog.author_name || "Author"}
+              width={48}
+              height={48}
+               className="w-24 h-24 rounded-full object-cover border-4 border-gray-200"
+              unoptimized
+            />
+          ) : (
+            <div className="w-12 h-12 rounded-full bg-purple-600 flex items-center justify-center text-white font-bold text-lg">
+              {blog.author_name ? blog.author_name.charAt(0).toUpperCase() : "A"}
+            </div>
+          )}
+
+          <div>
+            <Link href={`/profile/${blog.user_id}`} className="font-semibold text-gray-900 hover:underline">
+              {blog.author_name || "Anonymous"}
+            </Link>
+            <p className="text-sm text-gray-500">
+              {new Date(blog.created_at).toLocaleDateString("en-US", { 
+                month: "short", 
+                day: "numeric", 
+                year: "numeric" 
+              })}
+            </p>
+          </div>
+        </div>
+
+        {/* Follow and Bookmark Buttons */}
+        {!isAuthor && (
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleFollow}
+              className={`flex items-center gap-2 px-4 py-2 rounded-full transition ${
+                isFollowing
+                  ? "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                  : "bg-black text-white hover:bg-gray-800"
+              }`}
+            >
+              {isFollowing ? (
+                <>
+                  <UserCheck size={18} />
+                  Following
+                </>
+              ) : (
+                <>
+                  <UserPlus size={18} />
+                  Follow
+                </>
+              )}
+            </button>
+
+            <button
+              onClick={handleBookmark}
+              className={`p-2 rounded-full transition ${
+                isBookmarked
+                  ? "bg-yellow-100 text-yellow-600 hover:bg-yellow-200"
+                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+              }`}
+              title={isBookmarked ? "Remove bookmark" : "Bookmark"}
+            >
+              <Bookmark size={20} fill={isBookmarked ? "currentColor" : "none"} />
+            </button>
+          </div>
+        )}
+      </div>
+
       <h1 className="text-4xl font-bold mb-4 break-words">{blog.title}</h1>
-      <p className="text-gray-500 text-sm mb-2 break-words italic">{blog.subtitle}</p>
-      <p className="text-gray-500 text-sm mb-6">
-        {new Date(blog.created_at).toLocaleDateString()}
-      </p>
+      <p className="text-gray-500 text-sm mb-6 break-words italic">{blog.subtitle}</p>
 
       {blog.image_url && (
         <div className="relative w-full aspect-[16/9] mb-6 rounded-lg overflow-hidden">
@@ -262,7 +402,7 @@ export default function BlogPage() {
                         alt={c.user_name || "User"}
                         width={40}
                         height={40}
-                        className="w-16 h-16 rounded-full object-cover border-2 border-gray-200"
+                        className="w-10 h-10 rounded-full object-cover"
                         unoptimized
                       />
                     ) : (

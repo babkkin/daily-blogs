@@ -8,7 +8,19 @@ export async function GET(request) {
 
 	try {
 		const { rows } = await pool.query(
-			"SELECT blog_id AS id, title, content, image_url, created_at FROM blogs WHERE blog_id=$1",
+			`SELECT 
+				b.blog_id AS id,
+				b.user_id,
+				b.title,
+				b.subtitle,
+				b.content,
+				b.image_url,
+				b.created_at,
+				up.user_name AS author_name,
+				up.profile_url AS author_profile_url
+			FROM blogs b
+			LEFT JOIN users_profile up ON b.user_id = up.user_id
+			WHERE b.blog_id = $1`,
 			[id]
 		);
 

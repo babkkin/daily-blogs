@@ -102,9 +102,9 @@ export default function Header() {
 				<div className="flex items-center gap-3 relative">
 					<button
 						onClick={() => setSidebarOpen(!sidebarOpen)}
-						className="text-2xl p-1 text-gray-800/70 rounded-md hover:text-black transition"
+						className="text-xl p-1 text-gray-800/60 rounded-md hover:text-black transition"
 					>
-						<i className="fi fi-br-menu-burger"></i>
+						<i className="fi fi-rr-menu-burger"></i>
 					</button>
 
 					<Link href="/home" className="text-2xl font-bold">
