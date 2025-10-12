@@ -70,6 +70,14 @@ export default function Sidebar({ isOpen, onClose }) {
 						</li>
 					</Link>
 
+					{/* Bookmark */}
+					<Link href="#" className="block">
+						<li className="flex items-center gap-3 p-3 border border-transparent text-gray-900/90 hover:mask-r-from-20% hover:border-black border-r-0 border-t-0 border-b-0 hover:bg-gray-100 hover:text-black cursor-pointer transition-all duration-300 ease-in-out">
+							<i className="fi fi-rr-bookmark text-xl flex-shrink-0"></i>
+							<span className="text-xl leading-none">Bookmark</span>
+						</li>
+					</Link>
+
 					{/* About */}
 					<Link href="/about" className="block">
 						<li
