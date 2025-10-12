@@ -28,18 +28,15 @@ export default function BlogPage() {
       setLoading(true);
       setError("");
       try {
-        // Fetch blog
         const blogRes = await fetch(`/api/blogs/single-blog?id=${id}`);
         const blogData = await blogRes.json();
         if (!blogData.success) throw new Error(blogData.error || "Failed to fetch blog");
         setBlog(blogData.blog);
 
-        // Fetch comments
         const commentsRes = await fetch(`/api/blogs/comments?blogId=${id}`);
         const commentsData = await commentsRes.json();
         setComments(commentsData.comments || []);
 
-        // Fetch claps
         const clapsRes = await fetch(`/api/blogs/claps?blogId=${id}`);
         const clapsData = await clapsRes.json();
         setClaps(clapsData.claps || 0);
@@ -54,13 +51,12 @@ export default function BlogPage() {
     fetchData();
   }, [id]);
 
-  // Handle claps
   const handleClap = async () => {
     try {
       const res = await fetch("/api/blogs/claps", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ blogId: id })
+        body: JSON.stringify({ blogId: id }),
       });
       const data = await res.json();
       if (data.success) {
@@ -75,7 +71,6 @@ export default function BlogPage() {
     }
   };
 
-  // Handle new comment
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
     if (!newComment.trim()) return;
@@ -84,12 +79,11 @@ export default function BlogPage() {
       const res = await fetch("/api/blogs/comments", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ blogId: id, text: newComment })
+        body: JSON.stringify({ blogId: id, text: newComment }),
       });
-
       const data = await res.json();
       if (data.success) {
-        setComments(prev => [data.comment, ...prev]);
+        setComments((prev) => [data.comment, ...prev]);
         setNewComment("");
       } else {
         alert(data.error || "Failed to post comment");
@@ -100,18 +94,16 @@ export default function BlogPage() {
     }
   };
 
-  // Handle delete comment
   const handleDeleteComment = async (commentId) => {
     if (!confirm("Are you sure you want to delete this comment?")) return;
 
     try {
       const res = await fetch(`/api/blogs/comments?commentId=${commentId}`, {
-        method: "DELETE"
+        method: "DELETE",
       });
-
       const data = await res.json();
       if (data.success) {
-        setComments(prev => prev.filter(c => c.comment_id !== commentId));
+        setComments((prev) => prev.filter((c) => c.comment_id !== commentId));
       } else {
         alert(data.error || "Failed to delete comment");
       }
@@ -121,7 +113,6 @@ export default function BlogPage() {
     }
   };
 
-  // Handle edit comment
   const startEditComment = (comment) => {
     setEditingCommentId(comment.comment_id);
     setEditingText(comment.text);
@@ -139,14 +130,13 @@ export default function BlogPage() {
       const res = await fetch("/api/blogs/comments", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ commentId, text: editingText })
+        body: JSON.stringify({ commentId, text: editingText }),
       });
-
       const data = await res.json();
       if (data.success) {
-        setComments(prev => prev.map(c => 
-          c.comment_id === commentId ? { ...c, text: editingText } : c
-        ));
+        setComments((prev) =>
+          prev.map((c) => (c.comment_id === commentId ? { ...c, text: editingText } : c))
+        );
         cancelEdit();
       } else {
         alert(data.error || "Failed to update comment");
@@ -157,25 +147,18 @@ export default function BlogPage() {
     }
   };
 
-  // Format time ago
   const timeAgo = (date) => {
     const seconds = Math.floor((new Date() - new Date(date)) / 1000);
-    
     let interval = seconds / 31536000;
     if (interval > 1) return Math.floor(interval) + " years ago";
-    
     interval = seconds / 2592000;
     if (interval > 1) return Math.floor(interval) + " months ago";
-    
     interval = seconds / 86400;
     if (interval > 1) return Math.floor(interval) + " days ago";
-    
     interval = seconds / 3600;
     if (interval > 1) return Math.floor(interval) + " hours ago";
-    
     interval = seconds / 60;
     if (interval > 1) return Math.floor(interval) + " minutes ago";
-    
     return Math.floor(seconds) + " seconds ago";
   };
 
@@ -211,8 +194,8 @@ export default function BlogPage() {
         <button
           onClick={handleClap}
           className={`flex items-center gap-2 px-4 py-2 rounded-full transition ${
-            hasClapped 
-              ? "bg-red-500 text-white hover:bg-red-600" 
+            hasClapped
+              ? "bg-red-500 text-white hover:bg-red-600"
               : "bg-red-100 text-red-600 hover:bg-red-200"
           }`}
         >
@@ -256,31 +239,38 @@ export default function BlogPage() {
                 <div className="flex items-start gap-3">
                   {/* User Avatar */}
                   <div className="flex-shrink-0">
-                    {c.profile_url ? (
-                      <Image
-                        src={c.profile_url}
-                        alt={c.user_name || "User"}
-                        width={40}
-                        height={40}
-                        className="w-16 h-16 rounded-full object-cover border-2 border-gray-200"
-                        unoptimized
-                      />
-                    ) : (
-                      <div className="w-10 h-10 rounded-full bg-purple-600 flex items-center justify-center text-white font-bold">
-                        {c.user_name ? c.user_name.charAt(0).toUpperCase() : "U"}
-                      </div>
-                    )}
+                    <Link href={`/profile/${c.user_id}`} className="flex items-center gap-2">
+                      {c.profile_url ? (
+                        <Image
+                          src={c.profile_url}
+                          alt={c.user_name || "User"}
+                          width={40}
+                          height={40}
+                          className="w-16 h-16 rounded-full object-cover border-2 border-gray-200"
+                          unoptimized
+                        />
+                      ) : (
+                        <div className="w-10 h-10 rounded-full bg-purple-600 flex items-center justify-center text-white font-bold">
+                          {c.user_name ? c.user_name.charAt(0).toUpperCase() : "U"}
+                        </div>
+                      )}
+                    </Link>
                   </div>
 
                   <div className="flex-1">
                     {/* User name and timestamp */}
                     <div className="flex items-center justify-between mb-2">
                       <div>
-                        <p className="font-semibold text-gray-900">{c.user_name || "Anonymous"}</p>
+                        <Link
+                          href={`/profile/${c.user_id}`}
+                          className="font-semibold text-gray-900 hover:underline"
+                        >
+                          {c.user_name || "Anonymous"}
+                        </Link>
                         <p className="text-xs text-gray-500">{timeAgo(c.created_at)}</p>
                       </div>
 
-                      {/* Edit/Delete buttons - only show if it's the user's comment */}
+                      {/* Edit/Delete buttons */}
                       {session?.user?.id === c.user_id && (
                         <div className="flex gap-2">
                           {editingCommentId !== c.comment_id && (

@@ -1,18 +1,14 @@
-import { getToken } from "next-auth/jwt";
 import pool from "@/lib/db.js";
 
-export async function GET(req) {
+export async function GET(req, { params }) {
   try {
-    const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
-
-    if (!token || !token.userId) {
+    const { id: userId } = params;
+    if (!userId) {
       return new Response(
-        JSON.stringify({ success: false, error: "Unauthorized" }),
-        { status: 401 }
+        JSON.stringify({ success: false, error: "Missing user ID" }),
+        { status: 400 }
       );
     }
-
-    const userId = token.userId;
 
     const { rows } = await pool.query(
       `
