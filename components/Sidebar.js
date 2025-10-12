@@ -56,7 +56,7 @@ export default function Sidebar({ isOpen, onClose }) {
 				<ul className="p-6 space-y-2 mt-[3vh]">
 					{/* Home */}
 					<Link href="/home" className="block">
-						<li className="flex items-center gap-3 p-3 border border-transparent text-gray-900/90 hover:border-black border-r-0 border-t-0 border-b-0 hover:bg-gray-100 hover:text-black cursor-pointer transition-all duration-300 ease-in-out">
+						<li className="flex items-center gap-3 p-3 border border-transparent text-gray-900/90 hover:mask-r-from-20% hover:border-black border-r-0 border-t-0 border-b-0 hover:bg-gray-100 hover:text-black cursor-pointer transition-all duration-300 ease-in-out">
 							<i className="fi fi-rr-home text-xl flex-shrink-0"></i>
 							<span className="text-xl leading-none">Home</span>
 						</li>
@@ -64,7 +64,7 @@ export default function Sidebar({ isOpen, onClose }) {
 
 					{/* Profile */}
 					<Link href="/user-profile" className="block">
-						<li className="flex items-center gap-3 p-3 border border-transparent text-gray-900/90 hover:border-black border-r-0 border-t-0 border-b-0 hover:bg-gray-100 hover:text-black cursor-pointer transition-all duration-300 ease-in-out">
+						<li className="flex items-center gap-3 p-3 border border-transparent text-gray-900/90 hover:mask-r-from-20% hover:border-black border-r-0 border-t-0 border-b-0 hover:bg-gray-100 hover:text-black cursor-pointer transition-all duration-300 ease-in-out">
 							<i className="fi fi-rr-user text-xl flex-shrink-0"></i>
 							<span className="text-xl leading-none">Profile</span>
 						</li>
@@ -74,7 +74,7 @@ export default function Sidebar({ isOpen, onClose }) {
 					<Link href="/about" className="block">
 						<li
 							onClick={onClose}
-							className="flex items-center gap-3 p-3 border border-transparent text-gray-900/90 hover:border-black border-r-0 border-t-0 border-b-0 hover:bg-gray-100 hover:text-black cursor-pointer transition-all duration-300 ease-in-out"
+							className="flex items-center gap-3 p-3 border border-transparent text-gray-900/90 hover:mask-r-from-20% hover:border-black border-r-0 border-t-0 border-b-0 hover:bg-gray-100 hover:text-black cursor-pointer transition-all duration-300 ease-in-out"
 						>
 							<i className="fi fi-rr-info text-xl flex-shrink-0"></i>
 							<span className="text-xl leading-none">About</span>
@@ -85,7 +85,7 @@ export default function Sidebar({ isOpen, onClose }) {
 					<Link href="/setting" className="block">
 						<li
 							onClick={onClose}
-							className="flex items-center gap-3 p-3 mb-10 border border-transparent text-gray-900/90 hover:border-black border-r-0 border-t-0 border-b-0 hover:bg-gray-100 hover:text-black cursor-pointer transition-all duration-300 ease-in-out"
+							className="flex items-center gap-3 p-3 mb-10 border border-transparent text-gray-900/90 hover:mask-r-from-20% hover:border-black border-r-0 border-t-0 border-b-0 hover:bg-gray-100 hover:text-black cursor-pointer transition-all duration-300 ease-in-out"
 						>
 							<i className="fi fi-rr-settings text-xl flex-shrink-0"></i>
 							<span className="text-xl leading-none">Settings</span>
@@ -105,12 +105,12 @@ export default function Sidebar({ isOpen, onClose }) {
 						) : following.length === 0 ? (
 							<p className="text-sm text-gray-500 px-3">Not following anyone yet</p>
 						) : (
-							<div className="space-y-2 px-3">
+							<div className="space-y-2">
 								{displayedFollowing.map((user) => (
 									<Link
 										key={user.user_id}
 										href={`/profile/${user.user_id}`}
-										className="flex items-center gap-3 p-2 mb-10 border border-transparent text-gray-900/90 hover:border-black border-r-0 border-t-0 border-b-0 hover:bg-gray-100 hover:text-black cursor-pointer transition-all duration-300 ease-in-out"
+										className="flex items-center gap-3 p-2 border border-transparent text-gray-900/90 hover:mask-r-from-20% hover:border-black border-r-0 border-t-0 border-b-0 hover:bg-gray-100 hover:text-black cursor-pointer transition-all duration-300 ease-in-out"
 										onClick={onClose}
 									>
 										{user.profile_url ? (
