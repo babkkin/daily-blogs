@@ -3,10 +3,12 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import EditBio from "@/components/Editbio"; // Import the component
+import EditBio from "@/components/Editbio";
 import { useParams } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 export default function MediumStyleProfile() {
+  const { data: session } = useSession();
   const [activeTab, setActiveTab] = useState("home");
   const [name, setName] = useState("");
   const [bio, setBio] = useState("");
@@ -14,6 +16,7 @@ export default function MediumStyleProfile() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isEditBioOpen, setIsEditBioOpen] = useState(false);
+  const [profileUserId, setProfileUserId] = useState(null);
   const { id } = useParams();
 
   // Fetch user info
@@ -26,6 +29,7 @@ export default function MediumStyleProfile() {
           setName(data.user.name);
           setBio(data.user.bio || "");
           setPhoto(data.user.profile_url || null);
+          setProfileUserId(data.user.userId); // Get the profile's user ID
         } else {
           console.error("Failed to load user info:", data.error);
         }
@@ -34,7 +38,7 @@ export default function MediumStyleProfile() {
       }
     };
     fetchUser();
-  }, []);
+  }, [id]);
 
   // Fetch posts
   useEffect(() => {
@@ -54,16 +58,22 @@ export default function MediumStyleProfile() {
       }
     };
     fetchPosts();
-  }, []);
+  }, [id]);
 
   const handleBioSave = (newBio) => {
     setBio(newBio);
   };
 
+  // Check if viewing own profile
+  // session might have userId instead of id, so check both
+  const currentUserId = session?.user?.userId || session?.user?.id;
+  const isOwnProfile = currentUserId === profileUserId;
+
+
   return (
     <div className="flex min-h-screen bg-white text-black justify-center">
       <main className="w-full max-w-5xl px-4 sm:px-6 md:px-8 py-8">
-        {/* ===== User Info ===== */}
+        {/* User Info */}
         <div className="flex flex-col items-center text-center mb-10">
           {photo ? (
             <Image
@@ -82,7 +92,7 @@ export default function MediumStyleProfile() {
           <h2 className="text-2xl sm:text-3xl font-bold mt-4">{name || "Unnamed User"}</h2>
         </div>
 
-        {/* ===== Tabs ===== */}
+        {/* Tabs */}
         <div className="border-b flex flex-wrap justify-center gap-6 sm:gap-10 text-base sm:text-lg font-medium mb-8 cursor-pointer">
           <button
             className={`pb-2 ${
@@ -102,7 +112,7 @@ export default function MediumStyleProfile() {
           </button>
         </div>
 
-        {/* ===== Home Tab ===== */}
+        {/* Home Tab */}
         {activeTab === "home" && (
           <div className="flex flex-col gap-6 sm:gap-8">
             {loading ? (
@@ -145,17 +155,20 @@ export default function MediumStyleProfile() {
           </div>
         )}
 
-        {/* ===== About Tab ===== */}
+        {/* About Tab */}
         {activeTab === "about" && (
           <div className="mt-8 sm:mt-10 px-2 sm:px-0">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-4">
               <h3 className="text-lg sm:text-xl font-bold">About</h3>
-              <button
-                onClick={() => setIsEditBioOpen(true)}
-                className="px-4 py-2 bg-black text-white text-sm sm:text-base rounded-md hover:bg-gray-800 transition"
-              >
-                Edit Bio
-              </button>
+              {/* ONLY show Edit Bio button if it's your own profile */}
+              {isOwnProfile && (
+                <button
+                  onClick={() => setIsEditBioOpen(true)}
+                  className="px-4 py-2 bg-black text-white text-sm sm:text-base rounded-md hover:bg-gray-800 transition"
+                >
+                  Edit Bio
+                </button>
+              )}
             </div>
 
             {!bio ? (
@@ -167,13 +180,15 @@ export default function MediumStyleProfile() {
         )}
       </main>
 
-      {/* ===== Edit Bio Modal ===== */}
-      <EditBio
-        isOpen={isEditBioOpen}
-        onClose={() => setIsEditBioOpen(false)}
-        currentBio={bio}
-        onSave={handleBioSave}
-      />
+      {/* Edit Bio Modal - Only render if own profile */}
+      {isOwnProfile && (
+        <EditBio
+          isOpen={isEditBioOpen}
+          onClose={() => setIsEditBioOpen(false)}
+          currentBio={bio}
+          onSave={handleBioSave}
+        />
+      )}
     </div>
   );
 }

@@ -1,7 +1,7 @@
 import pool from "@/lib/db";
 
 export async function GET(req, { params }) {
-  const { id } = params;
+  const { id } = await params; // Add await here
   if (!id) return new Response(JSON.stringify({ success: false, error: "Missing id" }), { status: 400 });
 
   const result = await pool.query(

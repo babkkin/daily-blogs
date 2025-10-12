@@ -209,7 +209,24 @@ export default function BlogPage() {
     return Math.floor(seconds) + " seconds ago";
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return 	  <div className="flex items-center justify-center h-screen">
+      <div className="mx-auto w-[90%] overflow-hidden drop-shadow-2xl">
+
+        {/* Main Spinner Area */}
+        <div className="flex p-8 justify-center items-center h-[350px] sm:h-[450px]">
+          <div className="text-center space-y-6">
+            <div className="w-20 h-20 sm:w-24 sm:h-24 border-4 border-t-[#101010] border-[#dfdfdf] rounded-full animate-spin mx-auto" />
+            <div className="text-[#000000] font-semibold text-3xl sm:text-4xl opacity-90 animate-fadeIn">
+              Almost There...
+            </div>
+            <div className="text-black text-sm opacity-80 animate-fadeIn">
+              <p>Wet&apos;re getting everything ready for you...</p>
+              <p>Sit tight for just a moment.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>;
   if (error) return <div className="text-red-500">{error}</div>;
   if (!blog) return <div>No blog found</div>;
 
