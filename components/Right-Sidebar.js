@@ -1,11 +1,16 @@
 "use client";
 
-import React, { useState } from "react";
-import { Users, BookmarkPlus } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Users, BookmarkPlus, UserPlus, UserCheck } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
 
 export default function MediumSidebar() {
   const [followedUsers, setFollowedUsers] = useState(new Set());
   const [visibleCount, setVisibleCount] = useState(9);
+  const [suggestedUsers, setSuggestedUsers] = useState([]);
+  const [loadingUsers, setLoadingUsers] = useState(true);
+
   const loadMore = () => setVisibleCount((prev) => prev + 2);
 
   const topics = [
@@ -26,12 +31,6 @@ export default function MediumSidebar() {
     "News & Politics",
   ];
 
-  const users = [
-    { id: 1, name: "Sarah Chen", tagline: "Design lead at tech startup", avatar: "SC" },
-    { id: 2, name: "Alex Rivera", tagline: "Full-stack developer & writer", avatar: "AR" },
-    { id: 3, name: "Maya Patel", tagline: "Product manager, tech enthusiast", avatar: "MP" },
-  ];
-
   const articles = [
     { id: 1, title: "The Future of Web Development in 2025", author: "John Doe", reads: "5 min read" },
     { id: 2, title: "How AI is Reshaping Creative Industries", author: "Jane Smith", reads: "8 min read" },
@@ -39,17 +38,62 @@ export default function MediumSidebar() {
     { id: 4, title: "The Art of Clean Code", author: "Emily Davis", reads: "7 min read" },
   ];
 
-  const toggleFollow = (userId) => {
-    setFollowedUsers((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(userId)) newSet.delete(userId);
-      else newSet.add(userId);
-      return newSet;
-    });
+  // Fetch suggested users to follow
+  useEffect(() => {
+    const fetchSuggestedUsers = async () => {
+      try {
+        const res = await fetch("/api/users/suggested");
+        const data = await res.json();
+        if (data.success) {
+          setSuggestedUsers(data.users);
+          // Set initial follow status
+          const alreadyFollowing = new Set(
+            data.users
+              .filter(user => user.is_following)
+              .map(user => user.user_id)
+          );
+          setFollowedUsers(alreadyFollowing);
+        }
+      } catch (err) {
+        console.error("Failed to fetch suggested users:", err);
+      } finally {
+        setLoadingUsers(false);
+      }
+    };
+
+    fetchSuggestedUsers();
+  }, []);
+
+  const toggleFollow = async (userId) => {
+    try {
+      const res = await fetch("/api/blogs/user/follow", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ authorId: userId })
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        setFollowedUsers((prev) => {
+          const newSet = new Set(prev);
+          if (data.isFollowing) {
+            newSet.add(userId);
+          } else {
+            newSet.delete(userId);
+          }
+          return newSet;
+        });
+      } else {
+        alert(data.error || "Failed to follow user");
+      }
+    } catch (err) {
+      console.error("Failed to follow user:", err);
+      alert("Failed to follow user");
+    }
   };
 
   return (
-    <div className="space-y-8 pl-[2vh] ">
+    <div className="space-y-8 pl-[2vh]">
       {/* Recommended Topics */}
       <div className="mt-[5vh]">
         <h3 className="text-sm font-semibold text-gray-900 mb-3">
@@ -82,29 +126,64 @@ export default function MediumSidebar() {
           <Users size={18} />
           Who to follow
         </h3>
-        <div className="space-y-4">
-          {users.map((user) => (
-            <div key={user.id} className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-400 to-blue-500 flex items-center justify-center text-white font-semibold text-sm flex-shrink-0">
-                {user.avatar}
+        {loadingUsers ? (
+          <p className="text-sm text-gray-500">Loading suggestions...</p>
+        ) : suggestedUsers.length === 0 ? (
+          <p className="text-sm text-gray-500">No suggestions available</p>
+        ) : (
+          <div className="space-y-4">
+            {suggestedUsers.map((user) => (
+              <div key={user.user_id} className="flex items-start gap-3">
+                <Link href={`/profile/${user.user_id}`}>
+                  {user.profile_url ? (
+                    <Image
+                      src={user.profile_url}
+                      alt={user.user_name}
+                      width={40}
+                      height={40}
+                      className="w-10 h-10 rounded-full object-cover flex-shrink-0"
+                      unoptimized
+                    />
+                  ) : (
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-pink-400 to-pink-600 flex items-center justify-center text-white font-semibold text-sm flex-shrink-0">
+                      {user.user_name?.charAt(0).toUpperCase() || "U"}
+                    </div>
+                  )}
+                </Link>
+                <div className="flex-1 min-w-0">
+                  <Link href={`/profile/${user.user_id}`}>
+                    <h4 className="font-medium text-gray-900 text-sm truncate hover:underline">
+                      {user.user_name}
+                    </h4>
+                  </Link>
+                  <p className="text-xs text-gray-500 truncate line-clamp-2">
+                    {user.bio || "No bio available"}
+                  </p>
+                </div>
+                <button
+                  onClick={() => toggleFollow(user.user_id)}
+                  className={`px-3 py-1 rounded-full text-xs font-medium transition flex-shrink-0 flex items-center gap-1 ${
+                    followedUsers.has(user.user_id)
+                      ? "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                      : "bg-black text-white hover:bg-gray-800"
+                  }`}
+                >
+                  {followedUsers.has(user.user_id) ? (
+                    <>
+                      <UserCheck size={14} />
+                      Following
+                    </>
+                  ) : (
+                    <>
+                      <UserPlus size={14} />
+                      Follow
+                    </>
+                  )}
+                </button>
               </div>
-              <div className="flex-1 min-w-0">
-                <h4 className="font-medium text-gray-900 text-sm truncate">{user.name}</h4>
-                <p className="text-xs text-gray-500 truncate">{user.tagline}</p>
-              </div>
-              <button
-                onClick={() => toggleFollow(user.id)}
-                className={`px-3 py-1 rounded-full text-xs font-medium transition flex-shrink-0 ${
-                  followedUsers.has(user.id)
-                    ? "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                    : "bg-black text-white hover:bg-gray-800"
-                }`}
-              >
-                {followedUsers.has(user.id) ? "Following" : "Follow"}
-              </button>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Recommended Reading */}
