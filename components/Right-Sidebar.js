@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useState, useEffect } from "react";
 import { Users, BookmarkPlus, UserPlus, UserCheck } from "lucide-react";
 import Image from "next/image";
@@ -11,24 +10,16 @@ export default function MediumSidebar() {
   const [suggestedUsers, setSuggestedUsers] = useState([]);
   const [loadingUsers, setLoadingUsers] = useState(true);
 
+  // Notification state
+  const [showNotification, setShowNotification] = useState(false);
+  const [notification, setNotification] = useState("");
+
   const loadMore = () => setVisibleCount((prev) => prev + 2);
 
   const topics = [
-    "Technology",
-    "Health & Wellness",
-    "Travel",
-    "Food",
-    "Lifestyle",
-    "Education",
-    "Finance",
-    "Entertainment",
-    "Science",
-    "Sports",
-    "Music",
-    "Gaming",
-    "History",
-    "Art & Design",
-    "News & Politics",
+    "Technology","Health & Wellness","Travel","Food","Lifestyle",
+    "Education","Finance","Entertainment","Science","Sports",
+    "Music","Gaming","History","Art & Design","News & Politics"
   ];
 
   const articles = [
@@ -38,7 +29,6 @@ export default function MediumSidebar() {
     { id: 4, title: "The Art of Clean Code", author: "Emily Davis", reads: "7 min read" },
   ];
 
-  // Fetch suggested users to follow
   useEffect(() => {
     const fetchSuggestedUsers = async () => {
       try {
@@ -46,11 +36,8 @@ export default function MediumSidebar() {
         const data = await res.json();
         if (data.success) {
           setSuggestedUsers(data.users);
-          // Set initial follow status
           const alreadyFollowing = new Set(
-            data.users
-              .filter(user => user.is_following)
-              .map(user => user.user_id)
+            data.users.filter(user => user.is_following).map(user => user.user_id)
           );
           setFollowedUsers(alreadyFollowing);
         }
@@ -60,40 +47,59 @@ export default function MediumSidebar() {
         setLoadingUsers(false);
       }
     };
-
     fetchSuggestedUsers();
   }, []);
 
-  const toggleFollow = async (userId) => {
-    try {
-      const res = await fetch("/api/blogs/user/follow", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ authorId: userId })
+ // Updated toggleFollow to include username
+const toggleFollow = async (userId, userName) => {
+  try {
+    const res = await fetch("/api/blogs/user/follow", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ authorId: userId }),
+    });
+
+    const data = await res.json();
+    if (data.success) {
+      // Update the followedUsers set
+      setFollowedUsers((prev) => {
+        const newSet = new Set(prev);
+        if (data.isFollowing) newSet.add(userId);
+        else newSet.delete(userId);
+        return newSet;
       });
 
-      const data = await res.json();
-      if (data.success) {
-        setFollowedUsers((prev) => {
-          const newSet = new Set(prev);
-          if (data.isFollowing) {
-            newSet.add(userId);
-          } else {
-            newSet.delete(userId);
-          }
-          return newSet;
-        });
-      } else {
-        alert(data.error || "Failed to follow user");
-      }
-    } catch (err) {
-      console.error("Failed to follow user:", err);
-      alert("Failed to follow user");
+      // Show sliding notification with username
+      const action = data.isFollowing
+        ? `You followed ${userName}`
+        : `You unfollowed ${userName}`;
+
+      setNotification(action);
+      setShowNotification(true);
+
+      // Hide after 2 seconds
+      setTimeout(() => setShowNotification(false), 2000);
+    } else {
+      alert(data.error || "Failed to follow user");
     }
-  };
+  } catch (err) {
+    console.error("Failed to follow user:", err);
+    alert("Failed to follow user");
+  }
+};
+
 
   return (
-    <div className="space-y-8 pl-[2vh]">
+    <div className="space-y-8 pl-[2vh] relative">
+{/* Sliding Notification Popup */}
+<div
+  className={`fixed top-[80px] left-1/2 transform -translate-x-1/2 z-[2000] bg-black text-white px-4 py-2 rounded-md shadow-lg transition-all duration-300 ${
+    showNotification ? "translate-y-0 opacity-100" : "-translate-y-20 opacity-0"
+  }`}
+>
+  {notification}
+</div>
+
       {/* Recommended Topics */}
       <div className="mt-[5vh]">
         <h3 className="text-sm font-semibold text-gray-900 mb-3">
@@ -160,26 +166,26 @@ export default function MediumSidebar() {
                     {user.bio || "No bio available"}
                   </p>
                 </div>
-                <button
-                  onClick={() => toggleFollow(user.user_id)}
-                  className={`px-3 py-1 rounded-full text-xs font-medium transition flex-shrink-0 flex items-center gap-1 ${
-                    followedUsers.has(user.user_id)
-                      ? "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                      : "bg-black text-white hover:bg-gray-800"
-                  }`}
-                >
-                  {followedUsers.has(user.user_id) ? (
-                    <>
-                      <UserCheck size={14} />
-                      Following
-                    </>
-                  ) : (
-                    <>
-                      <UserPlus size={14} />
-                      Follow
-                    </>
-                  )}
-                </button>
+<button
+  onClick={() => toggleFollow(user.user_id, user.user_name)}
+  className={`px-3 py-1 rounded-full text-xs font-medium transition flex-shrink-0 flex items-center gap-1 ${
+    followedUsers.has(user.user_id)
+      ? "bg-gray-200 text-gray-700 hover:bg-gray-300"
+      : "bg-black text-white hover:bg-gray-800"
+  }`}
+>
+  {followedUsers.has(user.user_id) ? (
+    <>
+      <UserCheck size={14} />
+      Following
+    </>
+  ) : (
+    <>
+      <UserPlus size={14} />
+      Follow
+    </>
+  )}
+</button>
               </div>
             ))}
           </div>
