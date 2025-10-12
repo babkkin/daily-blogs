@@ -70,16 +70,17 @@ export default function CategorySelector() {
 
   const handleSkip = () => router.push("/home");
 
+  // STEP 1: Username + Photo
   if (step === 1) {
     return (
-      <div className="flex items-center justify-center min-h-[80vh] bg-gray-50">
-        <div className="bg-white shadow-md rounded-2xl p-6 w-full max-w-md text-center">
-          <h1 className="text-3xl font-semibold mb-4">Welcome!</h1>
-          <p className="text-gray-600 mb-6">Please set up your account.</p>
+      <div className="flex items-center justify-center min-h-[80vh] bg-gray-50 px-4">
+        <div className="bg-white shadow-md rounded-2xl p-6 w-full max-w-sm sm:max-w-md text-center">
+          <h1 className="text-2xl sm:text-3xl font-semibold mb-4">Welcome!</h1>
+          <p className="text-gray-600 mb-6 text-sm sm:text-base">Please set up your account.</p>
 
           <div className="flex flex-col items-center mb-5">
             <label htmlFor="fileInput" className="cursor-pointer relative">
-              <div className="w-28 h-28 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden border-2 border-gray-400">
+              <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden border-2 border-gray-400">
                 {photo ? (
                   <Image
                     width={128}
@@ -107,12 +108,15 @@ export default function CategorySelector() {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             placeholder="Enter username"
-            className="w-full p-3 rounded-md text-center outline-none border border-gray-300"
+            className="w-full p-3 rounded-md text-center outline-none border border-gray-300 text-sm sm:text-base"
           />
 
           <button
             onClick={handleNext}
-            className="mt-5 w-full py-3 rounded-md text-white bg-black hover:bg-gray-800 transition"
+            disabled={!username}
+            className={`mt-5 w-full py-3 rounded-md text-white transition ${
+              username ? "bg-black hover:bg-gray-800" : "bg-gray-400 cursor-not-allowed"
+            }`}
           >
             Continue
           </button>
@@ -121,18 +125,20 @@ export default function CategorySelector() {
     );
   }
 
+  // STEP 2: Category Selection
   return (
-    <div className="flex items-center justify-center min-h-[80vh]">
-      <div className="text-center">
-        <h1 className="block text-3xl font-semibold">Hi {username}! 👋</h1>
-        <p className="text-xl mb-4">What content would you like to see?</p>
+    <div className="flex items-center justify-center min-h-[80vh] px-4">
+      <div className="text-center w-full max-w-4xl">
+        <h1 className="text-2xl sm:text-3xl font-semibold mb-2">Hi {username}! 👋</h1>
+        <p className="text-base sm:text-lg mb-4">What content would you like to see?</p>
 
-        <div className="grid grid-cols-3 gap-4 p-6 max-w-4xl">
+        {/* Category grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4 p-4 sm:p-6">
           {allCategories.slice(0, visibleCount).map((category) => (
             <button
               key={category}
               onClick={() => toggleCategory(category)}
-              className={`border-2 rounded-lg p-2 text-center font-semibold text-lg transition-colors ${
+              className={`border-2 rounded-lg p-2 sm:p-3 text-sm sm:text-base font-semibold transition-colors ${
                 selected.includes(category)
                   ? "bg-black text-white border-black"
                   : "border-gray-300 hover:bg-gray-100"
@@ -145,24 +151,25 @@ export default function CategorySelector() {
           {visibleCount < allCategories.length && (
             <button
               onClick={loadMore}
-              className="border-2 border-dashed rounded-lg p-2 text-center text-lg font-bold hover:bg-gray-100"
+              className="border-2 border-dashed rounded-lg p-2 sm:p-3 text-center text-lg font-bold hover:bg-gray-100"
             >
               +
             </button>
           )}
         </div>
 
-        <div className="mt-6 flex justify-center gap-4">
+        {/* Action buttons */}
+        <div className="mt-6 flex flex-col sm:flex-row justify-center items-center gap-3 sm:gap-4">
           <button
             onClick={handleSkip}
-            className="px-6 py-3 rounded-lg border-2 border-gray-400 text-gray-700 hover:bg-gray-100 transition"
+            className="w-full sm:w-auto px-6 py-3 rounded-lg border-2 border-gray-400 text-gray-700 hover:bg-gray-100 transition text-sm sm:text-base"
           >
             Skip
           </button>
 
           <button
             onClick={handleDone}
-            className="px-6 py-3 rounded-lg bg-black text-white hover:bg-gray-800 transition"
+            className="w-full sm:w-auto px-6 py-3 rounded-lg bg-black text-white hover:bg-gray-800 transition text-sm sm:text-base"
           >
             Done
           </button>

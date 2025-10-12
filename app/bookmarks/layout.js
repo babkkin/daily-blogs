@@ -1,0 +1,12 @@
+"use client";
+
+import Header from "@/components/Header";
+
+export default function BookmarkLayout({ children }) {
+  return (
+    <div className="min-h-screen flex flex-col transition-colors duration-300">
+      <Header />
+      <main className="flex-1 pt-20">{children}</main>
+    </div>
+  );
+}
