@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { Heart, MessageCircle, Bookmark } from "lucide-react";
 
 export default function HomePage() {
   const [blogs, setBlogs] = useState([]);
@@ -30,28 +31,25 @@ export default function HomePage() {
     fetchBlogs();
   }, []);
 
-if (loading)
-  return (
-	  <div className="flex items-center justify-center h-screen">
-      <div className="mx-auto w-[90%] overflow-hidden drop-shadow-2xl">
-
-        {/* Main Spinner Area */}
-        <div className="flex p-8 justify-center items-center h-[350px] sm:h-[450px]">
-          <div className="text-center space-y-6">
-            <div className="w-20 h-20 sm:w-24 sm:h-24 border-4 border-t-[#101010] border-[#dfdfdf] rounded-full animate-spin mx-auto" />
-            <div className="text-[#000000] font-semibold text-3xl sm:text-4xl opacity-90 animate-fadeIn">
-              Almost There...
-            </div>
-            <div className="text-black text-sm opacity-80 animate-fadeIn">
-              <p>We're getting everything ready for you...</p>
-              <p>Sit tight for just a moment.</p>
+  if (loading)
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="mx-auto w-[90%] overflow-hidden drop-shadow-2xl">
+          <div className="flex p-8 justify-center items-center h-[350px] sm:h-[450px]">
+            <div className="text-center space-y-6">
+              <div className="w-20 h-20 sm:w-24 sm:h-24 border-4 border-t-[#101010] border-[#dfdfdf] rounded-full animate-spin mx-auto" />
+              <div className="text-[#000000] font-semibold text-3xl sm:text-4xl opacity-90 animate-fadeIn">
+                Almost There...
+              </div>
+              <div className="text-black text-sm opacity-80 animate-fadeIn">
+                <p>We're getting everything ready for you...</p>
+                <p>Sit tight for just a moment.</p>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-  );
-
+    );
 
   if (error)
     return (
@@ -65,8 +63,6 @@ if (loading)
       <h1 className="font-semibold text-2xl sm:text-3xl mb-6 text-gray-900 border-b border-gray-200 pb-3">
         For you
       </h1>
-
-
 
       <div className="flex flex-col gap-10">
         {blogs.map((blog) => (
@@ -96,9 +92,27 @@ if (loading)
                 {blog.subtitle || "No description provided."}
               </p>
 
-              <p className="text-gray-400 text-sm mt-2">
-                {new Date(blog.created_at).toLocaleDateString()}
-              </p>
+              <div className="flex items-center gap-4 mt-3">
+                <p className="text-gray-400 text-sm">
+                  {new Date(blog.created_at).toLocaleDateString()}
+                </p>
+
+                {/* Stats */}
+                <div className="flex items-center gap-4 text-gray-500 text-sm">
+                  <span className="flex items-center gap-1">
+                    <Heart size={16} />
+                    {blog.claps_count || 0}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <MessageCircle size={16} />
+                    {blog.comments_count || 0}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Bookmark size={16} />
+                    {blog.bookmarks_count || 0}
+                  </span>
+                </div>
+              </div>
             </div>
 
             {/* Right Side: Thumbnail */}

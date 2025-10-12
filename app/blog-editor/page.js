@@ -16,6 +16,8 @@ export default function BlogEditor() {
 	const [thumbnailUrl, setThumbnailUrl] = useState("");
 	const [isUploading, setIsUploading] = useState(false);
 	const fileInputRef = useRef(null);
+	const [isSavingDraft, setIsSavingDraft] = useState(false);
+const [isPublishing, setIsPublishing] = useState(false);
 
 	const handleThumbnailChange = (e) => {
 		const file = e.target.files[0];
@@ -25,36 +27,47 @@ export default function BlogEditor() {
 		}
 	};
 
-	const handleSubmit = async () => {
-		if (!title.trim() || !subtitle.trim() || !content.trim() || !thumbnail || isUploading) return;
-		setIsUploading(true);
+const handleSubmit = async (status = "published") => {
+  if (!title.trim() || !content.trim()) return; // title & content required for both
 
-		const formData = new FormData();
-		formData.append("file", thumbnail);
-		formData.append("title", title);
-		formData.append("subtitle", subtitle);
-		formData.append("content", content);
+  if (status === "published" && (!subtitle.trim() || !thumbnail)) return;
 
-		try {
-			const res = await fetch("/api/upload", {
-				method: "POST",
-				body: formData,
-			});
-			const data = await res.json();
-			if (data.success) {
-				setTitle("");
-				setSubtitle("");
-				setContent("");
-				setThumbnail(null);
-				setThumbnailUrl("");
-				if (fileInputRef.current) fileInputRef.current.value = "";
-			}
-		} catch (err) {
-			console.error("Upload error:", err);
-		} finally {
-			setIsUploading(false);
-		}
-	};
+  // Set the proper loading state
+  if (status === "draft") setIsSavingDraft(true);
+  else setIsPublishing(true);
+
+  const formData = new FormData();
+  if (thumbnail) formData.append("file", thumbnail);
+  formData.append("title", title);
+  formData.append("subtitle", subtitle);
+  formData.append("content", content);
+  formData.append("status", status);
+
+  try {
+    const res = await fetch("/api/upload", { method: "POST", body: formData });
+    const data = await res.json();
+
+    if (data.success) {
+      setTitle("");
+      setSubtitle("");
+      setContent("");
+      setThumbnail(null);
+      setThumbnailUrl("");
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      alert(status === "draft" ? "Draft saved!" : "Post published!");
+    } else {
+      alert(data.error || "Failed to save post");
+    }
+  } catch (err) {
+    console.error("Upload error:", err);
+    alert("Failed to save post");
+  } finally {
+    if (status === "draft") setIsSavingDraft(false);
+    else setIsPublishing(false);
+  }
+};
+
+
 
 	return (
 		<div className="max-w-3xl mx-auto p-4 sm:p-6">
@@ -146,19 +159,31 @@ export default function BlogEditor() {
 					className="custom-editor text-sm sm:text-base"
 				/>
 			</div>
+			
+<div className="flex gap-4 mt-4">
+  <button
+    onClick={() => handleSubmit("draft")}
+    disabled={isSavingDraft || !title.trim() || !content.trim()}
+    className="px-6 py-3 rounded-lg text-base sm:text-lg font-medium bg-gray-500 text-white hover:bg-gray-600 transition"
+  >
+    {isSavingDraft ? "Saving..." : "Save Draft"}
+  </button>
 
-			{/* Publish Button */}
-			<button
-				onClick={handleSubmit}
-				disabled={isUploading || !title.trim() || !subtitle.trim() || !content.trim() || !thumbnail}
-				className={`w-full sm:w-auto px-6 py-3 rounded-lg transition-colors text-base sm:text-lg font-medium ${
-					isUploading
-						? "bg-gray-500 text-white cursor-not-allowed"
-						: "bg-black text-white hover:bg-gray-800"
-				}`}
-			>
-				{isUploading ? "Publishing..." : "Publish"}
-			</button>
+  <button
+    onClick={() => handleSubmit("published")}
+    disabled={isPublishing || !title.trim() || !subtitle.trim() || !content.trim() || !thumbnail}
+    className={`px-6 py-3 rounded-lg text-base sm:text-lg font-medium ${
+      isPublishing
+        ? "bg-gray-500 text-white cursor-not-allowed"
+        : "bg-black text-white hover:bg-gray-800"
+    } transition`}
+  >
+    {isPublishing ? "Publishing..." : "Publish"}
+  </button>
+</div>
+				
+
 		</div>
+
 	);
 }

@@ -8,7 +8,7 @@ const secret = process.env.NEXTAUTH_SECRET;
 export async function POST(req) {
   try {
     const token = await getToken({ req, secret });
-    if (!token || !token.sub)
+    if (!token?.sub)
       return NextResponse.json({ success: false, error: "Unauthorized" });
 
     const userId = token.sub;
@@ -18,6 +18,7 @@ export async function POST(req) {
     const title = formData.get("title");
     const content = formData.get("content");
     const subtitle = formData.get("subtitle");
+    const status = formData.get("status") || "published"; // ✅ important
 
     let imageUrl = null;
 
@@ -25,10 +26,7 @@ export async function POST(req) {
       const fileName = `${Date.now()}-${file.name}`;
       const { data, error } = await supabase.storage
         .from("blog-images")
-        .upload(fileName, file, {
-          contentType: file.type,
-          upsert: false,
-        });
+        .upload(fileName, file, { contentType: file.type, upsert: false });
 
       if (error)
         return NextResponse.json({ success: false, error: "Image upload failed" });
@@ -43,9 +41,9 @@ export async function POST(req) {
     const client = await pool.connect();
     try {
       await client.query(
-        `INSERT INTO blogs (user_id, title, content, image_url, subtitle)
-         VALUES ($1, $2, $3, $4, $5)`,
-        [userId, title, content, imageUrl, subtitle]
+        `INSERT INTO blogs (user_id, title, content, image_url, subtitle, status)
+         VALUES ($1, $2, $3, $4, $5, $6)`,
+        [userId, title, content, imageUrl, subtitle, status]
       );
     } finally {
       client.release();
@@ -53,7 +51,7 @@ export async function POST(req) {
 
     return NextResponse.json({
       success: true,
-      message: "Blog post saved successfully.",
+      message: status === "draft" ? "Draft saved!" : "Blog post published!",
       imageUrl,
     });
   } catch (error) {

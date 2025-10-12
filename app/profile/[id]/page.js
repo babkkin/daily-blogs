@@ -6,6 +6,7 @@ import Link from "next/link";
 import EditBio from "@/components/Editbio";
 import { useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { Heart, MessageCircle, Bookmark, MoreVertical } from "lucide-react";
 
 export default function MediumStyleProfile() {
   const { data: session } = useSession();
@@ -17,12 +18,19 @@ export default function MediumStyleProfile() {
   const [loading, setLoading] = useState(true);
   const [isEditBioOpen, setIsEditBioOpen] = useState(false);
   const [profileUserId, setProfileUserId] = useState(null);
-  const [isFollowing, setIsFollowing] = useState(false); // ✅ new state
-  const [isProcessing, setIsProcessing] = useState(false); // ✅ for button disabling
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
   const { id } = useParams();
+  const [showNotification, setShowNotification] = useState(false);
+  const [notification, setNotification] = useState("");
+  const [manageTab, setManageTab] = useState("draft");
+  const [openDropdown, setOpenDropdown] = useState(null);
 
   const currentUserId = session?.user?.userId || session?.user?.id;
   const isOwnProfile = currentUserId === profileUserId;
+
+  const draftPosts = posts.filter(post => post.status === "draft");
+  const trashPosts = posts.filter(post => post.status === "trash");
 
   // Fetch user info
   useEffect(() => {
@@ -46,72 +54,161 @@ export default function MediumStyleProfile() {
   }, [id]);
 
   // Fetch posts
-  useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        const res = await fetch(`/api/blogs/user/${id}`);
-        const data = await res.json();
-        if (data.success) {
-          setPosts(data.blogs);
-        } else {
-          console.error("Failed to load posts:", data.error);
-        }
-      } catch (err) {
-        console.error("Failed to load posts:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchPosts();
-  }, [id]);
-
-  // ✅ Check follow status
-useEffect(() => {
-  if (!currentUserId || !profileUserId || currentUserId === profileUserId) return;
-
-  const checkFollow = async () => {
+ useEffect(() => {
+  const fetchPosts = async () => {
+    setLoading(true);
     try {
-      const res = await fetch(`/api/blogs/user/follow?authorId=${profileUserId}`);
+      // Fetch all user posts with counts in a single query
+      const res = await fetch(`/api/blogs/user/${id}`);
       const data = await res.json();
-      if (data.success) setIsFollowing(data.isFollowing);
+
+      if (data.success) {
+        // Posts now already include claps_count, comments_count, bookmarks_count
+        setPosts(data.blogs);
+      } else {
+        console.error("Failed to load posts:", data.error);
+      }
     } catch (err) {
-      console.error("Failed to check follow status:", err);
+      console.error("Failed to load posts:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
-  checkFollow();
-}, [currentUserId, profileUserId]);
+  if (id) fetchPosts();
+}, [id]);
 
-  // ✅ Handle Follow / Unfollow actions
-const handleFollowToggle = async () => {
-  if (!profileUserId) return; // profile user ID to follow/unfollow
-  setIsProcessing(true);
 
-  try {
-    const res = await fetch("/api/blogs/user/follow", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ authorId: profileUserId }), // ✅ send only authorId
-    });
+  // Check follow status
+  useEffect(() => {
+    if (!currentUserId || !profileUserId || currentUserId === profileUserId) return;
 
-    const data = await res.json();
-    if (data.success) {
-      setIsFollowing(data.isFollowing); // toggle state based on response
-    } else {
-      console.error("Follow action failed:", data.error);
+    const checkFollow = async () => {
+      try {
+        const res = await fetch(`/api/blogs/user/follow?authorId=${profileUserId}`);
+        const data = await res.json();
+        if (data.success) setIsFollowing(data.isFollowing);
+      } catch (err) {
+        console.error("Failed to check follow status:", err);
+      }
+    };
+
+    checkFollow();
+  }, [currentUserId, profileUserId]);
+
+  const handleFollowToggle = async () => {
+    if (!profileUserId) return;
+    setIsProcessing(true);
+
+    try {
+      const res = await fetch("/api/blogs/user/follow", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ authorId: profileUserId }),
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        setIsFollowing(data.isFollowing);
+        const action = data.isFollowing ? `You followed ${name}` : `You unfollowed ${name}`;
+        setNotification(action);
+        setShowNotification(true);
+        setTimeout(() => setShowNotification(false), 2000);
+      } else {
+        console.error("Follow action failed:", data.error);
+      }
+    } catch (err) {
+      console.error("Failed to follow/unfollow:", err);
+    } finally {
+      setIsProcessing(false);
     }
-  } catch (err) {
-    console.error("Failed to follow/unfollow:", err);
-  } finally {
-    setIsProcessing(false);
-  }
-};
-
+  };
 
   const handleBioSave = (newBio) => setBio(newBio);
 
+  const handleMoveToTrash = async (postId) => {
+    setOpenDropdown(null);
+    try {
+      const res = await fetch(`/api/blogs/${postId}/status`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "trash" }),
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        setPosts(prev => prev.map(p => p.id === postId ? { ...p, status: "trash" } : p));
+        setNotification("Post moved to trash");
+        setShowNotification(true);
+        setTimeout(() => setShowNotification(false), 2000);
+      } else {
+        alert(data.error || "Failed to move to trash");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Failed to move to trash");
+    }
+  };
+
+  const handleMoveToDraft = async (postId) => {
+    setOpenDropdown(null);
+    try {
+      const res = await fetch(`/api/blogs/${postId}/status`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "draft" }),
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        setPosts(prev => prev.map(p => p.id === postId ? { ...p, status: "draft" } : p));
+        setNotification("Post moved to drafts");
+        setShowNotification(true);
+        setTimeout(() => setShowNotification(false), 2000);
+      } else {
+        alert(data.error || "Failed to move to draft");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Failed to move to draft");
+    }
+  };
+
+const handleDeletePermanently = async (postId) => {
+  setOpenDropdown(null);
+  if (!confirm("Are you sure you want to permanently delete this post?")) return;
+
+  try {
+    const res = await fetch(`/api/blogs/${postId}`, { method: "DELETE" });
+    console.log("Response status:", res.status);
+    const data = await res.json();
+    console.log("Response data:", data);
+
+    if (data.success) {
+      setPosts(prev => prev.filter(p => p.id !== postId)); // make sure p.id matches your data
+      setNotification("Post deleted permanently");
+      setShowNotification(true);
+      setTimeout(() => setShowNotification(false), 2000);
+    } else {
+      alert(data.error || "Failed to delete post");
+    }
+  } catch (err) {
+    console.error(err);
+    alert("Failed to delete post");
+  }
+};
+
   return (
     <div className="flex min-h-screen bg-white text-black justify-center">
+      {/* Sliding Notification Popup */}
+      <div
+        className={`fixed top-[80px] left-1/2 transform -translate-x-1/2 z-[2000] bg-black text-white px-4 py-2 rounded-md shadow-lg transition-all duration-300 ${
+          showNotification ? "translate-y-0 opacity-100" : "-translate-y-20 opacity-0"
+        }`}
+      >
+        {notification}
+      </div>
+
       <main className="w-full max-w-5xl px-4 sm:px-6 md:px-8 py-8">
         {/* User Info */}
         <div className="flex flex-col items-center text-center mb-10">
@@ -131,7 +228,6 @@ const handleFollowToggle = async () => {
           )}
           <h2 className="text-2xl sm:text-3xl font-bold mt-4">{name || "Unnamed User"}</h2>
 
-          {/* ✅ Follow/Unfollow button */}
           {!isOwnProfile && (
             <button
               onClick={handleFollowToggle}
@@ -140,11 +236,7 @@ const handleFollowToggle = async () => {
                 ${isFollowing ? "bg-gray-200 text-black hover:bg-gray-300" : "bg-black text-white hover:bg-gray-800"}
               `}
             >
-              {isProcessing
-                ? "Processing..."
-                : isFollowing
-                ? "Unfollow"
-                : "Follow"}
+              {isProcessing ? "Processing..." : isFollowing ? "Unfollow" : "Follow"}
             </button>
           )}
         </div>
@@ -157,6 +249,16 @@ const handleFollowToggle = async () => {
           >
             Home
           </button>
+
+          {isOwnProfile && (
+            <button
+              className={`pb-2 ${activeTab === "managepost" ? "border-b-2 border-black" : "text-gray-500"}`}
+              onClick={() => setActiveTab("managepost")}
+            >
+              Manage Post
+            </button>
+          )}
+
           <button
             className={`pb-2 ${activeTab === "about" ? "border-b-2 border-black" : "text-gray-500"}`}
             onClick={() => setActiveTab("about")}
@@ -170,40 +272,85 @@ const handleFollowToggle = async () => {
           <div className="flex flex-col gap-6 sm:gap-8">
             {loading ? (
               <p className="text-gray-500 text-center">Loading posts...</p>
-            ) : posts.length === 0 ? (
+            ) : posts.filter(post => post.status === "published").length === 0 ? (
               <p className="text-gray-500 text-center">No posts yet.</p>
             ) : (
-              posts.map((post) => (
-                <Link
-                  key={post.id}
-                  href={`/blogs/${post.id}`}
-                  className="group flex flex-col sm:flex-row justify-between gap-4 sm:gap-6 border-b border-gray-200 pb-6 sm:pb-8 rounded-xl p-4 hover:bg-gray-50 transition-all cursor-pointer"
-                >
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs sm:text-sm text-gray-500 mb-1">
-                      Published on {new Date(post.created_at).toLocaleDateString()}
-                    </p>
-                    <h2 className="text-xl sm:text-2xl font-bold text-gray-900 group-hover:text-black transition-colors break-words">
-                      {post.title}
-                    </h2>
-                    <p className="text-gray-600 text-sm sm:text-base mt-1 line-clamp-2 break-words">
-                      {post.subtitle || "No subtitle provided."}
-                    </p>
-                  </div>
+              posts
+                .filter(post => post.status === "published")
+                .map((post) => (
+                  <div key={post.id} className="relative">
+                    <Link
+                      href={`/blogs/${post.id}`}
+                      className="group flex flex-col sm:flex-row justify-between gap-4 sm:gap-6 border-b border-gray-200 pb-6 sm:pb-8 rounded-xl p-4 hover:bg-gray-50 transition-all cursor-pointer"
+                    >
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs sm:text-sm text-gray-500 mb-1">
+                          Published on {new Date(post.created_at).toLocaleDateString()}
+                        </p>
+                        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 group-hover:text-black transition-colors break-words">
+                          {post.title}
+                        </h2>
+                        <p className="text-gray-600 text-sm sm:text-base mt-1 line-clamp-2 break-words">
+                          {post.subtitle || "No subtitle provided."}
+                        </p>
 
-                  {post.image_url && (
-                    <div className="w-full sm:w-48 h-40 sm:h-32 flex-shrink-0 overflow-hidden rounded-md">
-                      <Image
-                        src={post.image_url}
-                        alt={post.title}
-                        width={400}
-                        height={250}
-                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                      />
-                    </div>
-                  )}
-                </Link>
-              ))
+                        {/* Stats */}
+                        <div className="flex items-center gap-4 mt-3 text-gray-500 text-sm">
+                          <span className="flex items-center gap-1">
+                            <Heart size={16} />
+                            {post.claps_count || 0}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <MessageCircle size={16} />
+                            {post.comments_count || 0}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Bookmark size={16} />
+                            {post.bookmarks_count || 0}
+                          </span>
+                        </div>
+                      </div>
+
+                      {post.image_url && (
+                        <div className="w-full sm:w-48 h-40 sm:h-32 flex-shrink-0 overflow-hidden rounded-md">
+                          <Image
+                            src={post.image_url}
+                            alt={post.title}
+                            width={400}
+                            height={250}
+                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                          />
+                        </div>
+                      )}
+                    </Link>
+
+                    {/* Three Dots Menu (only for own profile) */}
+                    {isOwnProfile && (
+                      <div className="absolute top-4 right-4">
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setOpenDropdown(openDropdown === post.id ? null : post.id);
+                          }}
+                          className="p-2 bg-gray-200 rounded-full transition"
+                        >
+                          <MoreVertical size={20} />
+                        </button>
+
+                        {openDropdown === post.id && (
+                          <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-50">
+                            <button
+                              onClick={() => handleMoveToTrash(post.id)}
+                              className="w-full text-left px-4 py-2 hover:bg-gray-100 transition"
+                            >
+                              Move to Trash
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                ))
             )}
           </div>
         )}
@@ -227,6 +374,153 @@ const handleFollowToggle = async () => {
               <p className="text-gray-700 text-sm sm:text-base mb-4">No bio yet.</p>
             ) : (
               <p className="text-gray-700 text-sm sm:text-base mb-4">{bio}</p>
+            )}
+          </div>
+        )}
+
+        {/* Manage Post Tab */}
+        {activeTab === "managepost" && isOwnProfile && (
+          <div className="mt-4">
+            <div className="flex gap-4 mb-6 border-b border-gray-200">
+              <button
+                className={`pb-2 ${manageTab === "draft" ? "border-b-2 border-black font-semibold" : "text-gray-500"}`}
+                onClick={() => setManageTab("draft")}
+              >
+                Drafts ({draftPosts.length})
+              </button>
+              <button
+                className={`pb-2 ${manageTab === "trash" ? "border-b-2 border-black font-semibold" : "text-gray-500"}`}
+                onClick={() => setManageTab("trash")}
+              >
+                Trash ({trashPosts.length})
+              </button>
+            </div>
+
+            {/* Draft Posts */}
+            {manageTab === "draft" && (
+              <div className="flex flex-col gap-6 sm:gap-8">
+                {draftPosts.length === 0 ? (
+                  <p className="text-gray-500 text-center">No draft posts.</p>
+                ) : (
+                  draftPosts.map((post) => (
+                    <div key={post.id} className="relative">
+                      <Link
+                        href={`/blog-editor/${post.id}`}
+                        className="group flex flex-col sm:flex-row justify-between gap-4 sm:gap-6 border-b border-gray-200 pb-6 sm:pb-8 rounded-xl p-4 hover:bg-gray-50 transition-all cursor-pointer"
+                      >
+                        <div className="flex-1 min-w-0">
+                          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 group-hover:text-black transition-colors break-words">
+                            {post.title}
+                          </h2>
+                          <p className="text-gray-600 text-sm sm:text-base mt-1 line-clamp-2 break-words">
+                            {post.subtitle || "No subtitle provided."}
+                          </p>
+                        </div>
+                        {post.image_url && (
+                          <div className="w-full sm:w-48 h-40 sm:h-32 flex-shrink-0 overflow-hidden rounded-md">
+                            <Image
+                              src={post.image_url}
+                              alt={post.title}
+                              width={400}
+                              height={250}
+                              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                            />
+                          </div>
+                        )}
+                      </Link>
+
+                      {/* Three Dots Menu */}
+                      <div className="absolute top-4 right-4">
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setOpenDropdown(openDropdown === post.id ? null : post.id);
+                          }}
+                          className="p-2 bg-gray-200 rounded-full transition"
+                        >
+                          <MoreVertical size={20} />
+                        </button>
+
+                        {openDropdown === post.id && (
+                          <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-50">
+                            <button
+                              onClick={() => handleMoveToTrash(post.id)}
+                              className="w-full text-left px-4 py-2 hover:bg-gray-100 transition"
+                            >
+                              Move to Trash
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
+
+            {/* Trash Posts */}
+            {manageTab === "trash" && (
+              <div className="flex flex-col gap-6 sm:gap-8">
+                {trashPosts.length === 0 ? (
+                  <p className="text-gray-500 text-center">Trash is empty.</p>
+                ) : (
+                  trashPosts.map((post) => (
+                    <div key={post.id} className="relative">
+                      <div className="group flex flex-col sm:flex-row justify-between gap-4 sm:gap-6 border-b border-gray-200 pb-6 sm:pb-8 rounded-xl p-4 hover:bg-gray-50 transition-all">
+                        <div className="flex-1 min-w-0">
+                          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 group-hover:text-black transition-colors break-words">
+                            {post.title}
+                          </h2>
+                          <p className="text-gray-600 text-sm sm:text-base mt-1 line-clamp-2 break-words">
+                            {post.subtitle || "No subtitle provided."}
+                          </p>
+                        </div>
+                        {post.image_url && (
+                          <div className="w-full sm:w-48 h-40 sm:h-32 flex-shrink-0 overflow-hidden rounded-md">
+                            <Image
+                              src={post.image_url}
+                              alt={post.title}
+                              width={400}
+                              height={250}
+                              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                            />
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Three Dots Menu */}
+                      <div className="absolute top-4 right-4">
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setOpenDropdown(openDropdown === post.id ? null : post.id);
+                          }}
+                          className="p-2 bg-gray-200 rounded-full transition"
+                        >
+                          <MoreVertical size={20} />
+                        </button>
+
+                        {openDropdown === post.id && (
+                          <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-50">
+                            <button
+                              onClick={() => handleMoveToDraft(post.id)}
+                              className="w-full text-left px-4 py-2 hover:bg-gray-100 transition border-b"
+                            >
+                              Move to Drafts
+                            </button>
+                            <button
+                              onClick={() => handleDeletePermanently(post.id)}
+                              className="w-full text-left px-4 py-2 hover:bg-red-50 text-red-600 transition"
+                            >
+                              Delete Permanently
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
             )}
           </div>
         )}

@@ -23,10 +23,12 @@ export default function BlogPage() {
   const [isFollowing, setIsFollowing] = useState(false);
 
   // Fetch blog, claps, and comments
+// Remove this entire useEffect and replace with this one:
 useEffect(() => {
   if (!id) return;
 
   const fetchData = async () => {
+    setLoading(true);
     try {
       const blogRes = await fetch(`/api/blogs/single-blog?id=${id}`);
       const blogData = await blogRes.json();
@@ -59,14 +61,8 @@ useEffect(() => {
     }
   };
 
-  // Fetch immediately once
   fetchData();
-
-  // 🔁 Then refresh every 1 second
-  const interval = setInterval(fetchData, 1000);
-
-  // Cleanup on unmount
-  return () => clearInterval(interval);
+  // REMOVED the setInterval - no more 1-second polling
 }, [id, session]);
 
 
