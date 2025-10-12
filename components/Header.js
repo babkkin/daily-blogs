@@ -185,7 +185,7 @@ export default function Header() {
 
 					<button
 						className="h-10 w-10 rounded-full overflow-hidden bg-purple-600 flex items-center justify-center hover:opacity-90 transition"
-						onClick={() => router.push("/user-profile")}
+						onClick={() => router.push(`/profile/${userData.userId}`)}
 					>
 						{userData?.profile_url ? (
 							<Image

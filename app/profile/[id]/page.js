@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import EditBio from "@/components/Editbio"; // Import the component
+import { useParams } from "next/navigation";
 
 export default function MediumStyleProfile() {
   const [activeTab, setActiveTab] = useState("home");
@@ -13,12 +14,13 @@ export default function MediumStyleProfile() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isEditBioOpen, setIsEditBioOpen] = useState(false);
+  const { id } = useParams();
 
   // Fetch user info
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await fetch("/api/users/me");
+        const res = await fetch(`/api/profile/${id}`);
         const data = await res.json();
 
         if (data.success) {
@@ -40,7 +42,7 @@ export default function MediumStyleProfile() {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const res = await fetch("/api/blogs/user");
+        const res = await fetch(`/api/blogs/user/${id}`);
         const data = await res.json();
 
         if (data.success) {
