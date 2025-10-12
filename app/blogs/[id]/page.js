@@ -23,48 +23,52 @@ export default function BlogPage() {
   const [isFollowing, setIsFollowing] = useState(false);
 
   // Fetch blog, claps, and comments
-  useEffect(() => {
-    if (!id) return;
+useEffect(() => {
+  if (!id) return;
 
-    const fetchData = async () => {
-      setLoading(true);
-      setError("");
-      try {
-        const blogRes = await fetch(`/api/blogs/single-blog?id=${id}`);
-        const blogData = await blogRes.json();
-        if (!blogData.success) throw new Error(blogData.error || "Failed to fetch blog");
-        setBlog(blogData.blog);
+  const fetchData = async () => {
+    try {
+      const blogRes = await fetch(`/api/blogs/single-blog?id=${id}`);
+      const blogData = await blogRes.json();
+      if (blogData.success) setBlog(blogData.blog);
 
-        const commentsRes = await fetch(`/api/blogs/comments?blogId=${id}`);
-        const commentsData = await commentsRes.json();
-        setComments(commentsData.comments || []);
+      const commentsRes = await fetch(`/api/blogs/comments?blogId=${id}`);
+      const commentsData = await commentsRes.json();
+      setComments(commentsData.comments || []);
 
-        const clapsRes = await fetch(`/api/blogs/claps?blogId=${id}`);
-        const clapsData = await clapsRes.json();
-        setClaps(clapsData.claps || 0);
-        setHasClapped(clapsData.hasClapped || false);
+      const clapsRes = await fetch(`/api/blogs/claps?blogId=${id}`);
+      const clapsData = await clapsRes.json();
+      setClaps(clapsData.claps || 0);
+      setHasClapped(clapsData.hasClapped || false);
 
-        // Fetch bookmark and follow status
-        if (session) {
-          const bookmarkRes = await fetch(`/api/blogs/bookmarks?blogId=${id}`);
-          const bookmarkData = await bookmarkRes.json();
-          setIsBookmarked(bookmarkData.isBookmarked || false);
+      if (session) {
+        const bookmarkRes = await fetch(`/api/blogs/bookmarks?blogId=${id}`);
+        const bookmarkData = await bookmarkRes.json();
+        setIsBookmarked(bookmarkData.isBookmarked || false);
 
-          if (blogData.blog?.user_id) {
-            const followRes = await fetch(`/api/blogs/user/follow?authorId=${blogData.blog.user_id}`);
-            const followData = await followRes.json();
-            setIsFollowing(followData.isFollowing || false);
-          }
+        if (blogData.blog?.user_id) {
+          const followRes = await fetch(`/api/blogs/user/follow?authorId=${blogData.blog.user_id}`);
+          const followData = await followRes.json();
+          setIsFollowing(followData.isFollowing || false);
         }
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
       }
-    };
+    } catch (err) {
+      console.error("Error fetching data:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchData();
-  }, [id, session]);
+  // Fetch immediately once
+  fetchData();
+
+  // 🔁 Then refresh every 1 second
+  const interval = setInterval(fetchData, 1000);
+
+  // Cleanup on unmount
+  return () => clearInterval(interval);
+}, [id, session]);
+
 
   const handleClap = async () => {
     try {
