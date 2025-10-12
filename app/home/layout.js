@@ -8,12 +8,15 @@ export default function AppLayout({ children }) {
 
   return (
     <div className="min-h-screen flex flex-col transition-colors duration-300">
-      <Header isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} />
-      
-      <main 
-        className={`flex-1 pt-20 transition-all duration-300 ease-in-out ${
-          isSidebarOpen ? 'ml-64' : 'ml-0'
-        }`}
+      <Header
+        isSidebarOpen={isSidebarOpen}
+        setIsSidebarOpen={setIsSidebarOpen}
+      />
+
+      <main
+        className={`flex-1 pt-20 transition-all duration-300 ease-in-out 
+          ${isSidebarOpen ? "lg:ml-64" : "ml-0"}
+        `}
       >
         {children}
       </main>

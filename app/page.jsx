@@ -11,7 +11,6 @@ export default function HomePage() {
 
   return (
     <div className="relative flex flex-col min-h-screen">
-
       {/* ===== Public Header ===== */}
       <PublicHeader />
 
@@ -23,16 +22,18 @@ export default function HomePage() {
         />
 
         {/* Foreground Content */}
-        <div className="flex flex-col justify-center px-4 md:px-8 lg:mx-[44vh] py-8 md:py-16 relative z-10">
-          <h1 className="text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-black mb-4 md:mb-6 lg:mt-[50px]">
-            Daily Experiences <br /> and Wisdom
+        <div className="flex flex-col justify-center px-4 sm:px-8 lg:mx-[44vh] py-8 md:py-16 relative z-10">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-black mb-4 md:mb-6 lg:mt-[50px] leading-tight">
+            Daily Experiences <br className="hidden sm:block" /> and Wisdom
           </h1>
-          <p className="text-lg md:text-xl lg:text-2xl text-black mb-6 md:mb-8">
+
+          <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-black mb-6 md:mb-8">
             A safe space to read, write, and expand your knowledge
           </p>
+
           <div className="flex flex-col sm:flex-row gap-4">
             <button
-              className="px-8 md:px-12 lg:px-20 py-3 md:py-4 bg-black text-white rounded-full hover:bg-gray-800 transition-colors duration-200 text-xl md:text-2xl lg:text-3xl xl:text-4xl font-medium"
+              className="px-8 md:px-12 lg:px-20 py-3 md:py-4 bg-black text-white rounded-full hover:bg-gray-800 transition-colors duration-200 text-lg sm:text-xl md:text-2xl font-medium"
               onClick={() => openModal("signup")}
             >
               Join us

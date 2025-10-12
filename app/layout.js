@@ -13,10 +13,12 @@ const kalnia = Kalnia({
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={`${kalnia.className} min-h-screen flex flex-col transition-colors duration-300`}>
+      <body
+        className={`${kalnia.className} min-h-screen flex flex-col transition-colors duration-300 bg-white`}
+      >
         <SessionProvider>
           <AuthModalProvider>
-            <main className="flex-1">{children}</main>
+            <main className="flex-1 w-full overflow-x-hidden">{children}</main>
             <AuthModal />
           </AuthModalProvider>
         </SessionProvider>
