@@ -72,7 +72,10 @@ export default function Sidebar({ isOpen, onClose }) {
 
 					{/* Bookmark */}
 					<Link href="#" className="block">
-						<li className="flex items-center gap-3 p-3 border border-transparent text-gray-900/90 hover:mask-r-from-20% hover:border-black border-r-0 border-t-0 border-b-0 hover:bg-gray-100 hover:text-black cursor-pointer transition-all duration-300 ease-in-out">
+						
+						<li
+							onClick={() => alert("Bookmark placeholder")}
+							className="flex items-center gap-3 p-3 border border-transparent text-gray-900/90 hover:mask-r-from-20% hover:border-black border-r-0 border-t-0 border-b-0 hover:bg-gray-100 hover:text-black cursor-pointer transition-all duration-300 ease-in-out">
 							<i className="fi fi-rr-bookmark text-xl flex-shrink-0"></i>
 							<span className="text-xl leading-none">Bookmark</span>
 						</li>
@@ -127,7 +130,7 @@ export default function Sidebar({ isOpen, onClose }) {
 												alt={user.user_name}
 												width={32}
 												height={32}
-												className="w-8 h-8 rounded-full object-cover"
+												className="w-7 h-7 rounded-full object-cover"
 												unoptimized
 											/>
 										) : (
