@@ -191,35 +191,27 @@ export default function Header() {
             <span>Write</span>
           </button>
 
-          <button
-            className="relative text-xl text-gray-800/70 p-1 hover:text-black rounded-full transition"
-            onClick={() => alert("Notifications placeholder")}
-          >
-            <i className="fi fi-rr-bell"></i>
-            <span className="absolute top-1 right-1 h-2 w-2 bg-red-500 rounded-full"></span>
-          </button>
-
-          <button
-            className="h-9 w-9 sm:h-10 sm:w-10 rounded-full overflow-hidden bg-purple-600 flex items-center justify-center hover:opacity-90 transition"
-            onClick={() => router.push("/user-profile")}
-          >
-            {userData?.profile_url ? (
-              <Image
-                src={userData.profile_url}
-                alt="Profile"
-                width={40}
-                height={40}
-                className="w-full h-full object-cover"
-                unoptimized
-              />
-            ) : (
-              <span className="text-white text-sm sm:text-lg font-bold">
-                {userData?.name ? userData.name.charAt(0).toUpperCase() : "U"}
-              </span>
-            )}
-          </button>
-        </div>
-      </header>
-    </>
-  );
+					<button
+						className="h-10 w-10 rounded-full overflow-hidden bg-purple-600 flex items-center justify-center hover:opacity-90 transition"
+						onClick={() => router.push(`/profile/${userData.userId}`)}
+					>
+						{userData?.profile_url ? (
+							<Image
+								src={userData.profile_url}
+								alt="Profile"
+								width={40}
+								height={40}
+								className="w-full h-full object-cover"
+								unoptimized
+							/>
+						) : (
+							<span className="text-white text-lg font-bold">
+								{userData?.name ? userData.name.charAt(0).toUpperCase() : "U"}
+							</span>
+						)}
+					</button>
+				</div>
+			</header>
+		</>
+	);
 }

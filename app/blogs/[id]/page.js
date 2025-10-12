@@ -30,30 +30,26 @@ export default function BlogPage() {
       setLoading(true);
       setError("");
       try {
-        // Fetch blog
         const blogRes = await fetch(`/api/blogs/single-blog?id=${id}`);
         const blogData = await blogRes.json();
         if (!blogData.success) throw new Error(blogData.error || "Failed to fetch blog");
         setBlog(blogData.blog);
 
-        // Fetch comments
         const commentsRes = await fetch(`/api/blogs/comments?blogId=${id}`);
         const commentsData = await commentsRes.json();
         setComments(commentsData.comments || []);
 
-        // Fetch claps
         const clapsRes = await fetch(`/api/blogs/claps?blogId=${id}`);
         const clapsData = await clapsRes.json();
         setClaps(clapsData.claps || 0);
         setHasClapped(clapsData.hasClapped || false);
 
-        // Fetch bookmark status
+        // Fetch bookmark and follow status
         if (session) {
           const bookmarkRes = await fetch(`/api/blogs/bookmarks?blogId=${id}`);
           const bookmarkData = await bookmarkRes.json();
           setIsBookmarked(bookmarkData.isBookmarked || false);
 
-          // Fetch follow status
           if (blogData.blog?.user_id) {
             const followRes = await fetch(`/api/blogs/user/follow?authorId=${blogData.blog.user_id}`);
             const followData = await followRes.json();
@@ -70,13 +66,12 @@ export default function BlogPage() {
     fetchData();
   }, [id, session]);
 
-  // Handle claps
   const handleClap = async () => {
     try {
       const res = await fetch("/api/blogs/claps", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ blogId: id })
+        body: JSON.stringify({ blogId: id }),
       });
       const data = await res.json();
       if (data.success) {
@@ -91,7 +86,6 @@ export default function BlogPage() {
     }
   };
 
-  // Handle bookmark
   const handleBookmark = async () => {
     if (!session) {
       alert("Please login to bookmark");
@@ -102,48 +96,35 @@ export default function BlogPage() {
       const res = await fetch("/api/blogs/bookmarks", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ blogId: id })
+        body: JSON.stringify({ blogId: id }),
       });
       const data = await res.json();
-      if (data.success) {
-        setIsBookmarked(data.isBookmarked);
-      } else {
-        alert(data.error || "Failed to bookmark");
-      }
+      if (data.success) setIsBookmarked(data.isBookmarked);
+      else alert(data.error || "Failed to bookmark");
     } catch (err) {
       console.error(err);
       alert("Failed to bookmark");
     }
   };
 
-  // Handle follow
   const handleFollow = async () => {
-    if (!session) {
-      alert("Please login to follow");
-      return;
-    }
-
-    if (!blog?.user_id) return;
+    if (!session || !blog?.user_id) return alert("Please login to follow");
 
     try {
       const res = await fetch("/api/blogs/user/follow", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ authorId: blog.user_id })
+        body: JSON.stringify({ authorId: blog.user_id }),
       });
       const data = await res.json();
-      if (data.success) {
-        setIsFollowing(data.isFollowing);
-      } else {
-        alert(data.error || "Failed to follow");
-      }
+      if (data.success) setIsFollowing(data.isFollowing);
+      else alert(data.error || "Failed to follow");
     } catch (err) {
       console.error(err);
       alert("Failed to follow");
     }
   };
 
-  // Handle new comment
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
     if (!newComment.trim()) return;
@@ -152,44 +133,35 @@ export default function BlogPage() {
       const res = await fetch("/api/blogs/comments", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ blogId: id, text: newComment })
+        body: JSON.stringify({ blogId: id, text: newComment }),
       });
-
       const data = await res.json();
       if (data.success) {
-        setComments(prev => [data.comment, ...prev]);
+        setComments((prev) => [data.comment, ...prev]);
         setNewComment("");
-      } else {
-        alert(data.error || "Failed to post comment");
-      }
+      } else alert(data.error || "Failed to post comment");
     } catch (err) {
       console.error(err);
       alert("Failed to post comment");
     }
   };
 
-  // Handle delete comment
   const handleDeleteComment = async (commentId) => {
     if (!confirm("Are you sure you want to delete this comment?")) return;
 
     try {
       const res = await fetch(`/api/blogs/comments?commentId=${commentId}`, {
-        method: "DELETE"
+        method: "DELETE",
       });
-
       const data = await res.json();
-      if (data.success) {
-        setComments(prev => prev.filter(c => c.comment_id !== commentId));
-      } else {
-        alert(data.error || "Failed to delete comment");
-      }
+      if (data.success) setComments((prev) => prev.filter((c) => c.comment_id !== commentId));
+      else alert(data.error || "Failed to delete comment");
     } catch (err) {
       console.error(err);
       alert("Failed to delete comment");
     }
   };
 
-  // Handle edit comment
   const startEditComment = (comment) => {
     setEditingCommentId(comment.comment_id);
     setEditingText(comment.text);
@@ -207,43 +179,33 @@ export default function BlogPage() {
       const res = await fetch("/api/blogs/comments", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ commentId, text: editingText })
+        body: JSON.stringify({ commentId, text: editingText }),
       });
-
       const data = await res.json();
       if (data.success) {
-        setComments(prev => prev.map(c => 
-          c.comment_id === commentId ? { ...c, text: editingText } : c
-        ));
+        setComments((prev) =>
+          prev.map((c) => (c.comment_id === commentId ? { ...c, text: editingText } : c))
+        );
         cancelEdit();
-      } else {
-        alert(data.error || "Failed to update comment");
-      }
+      } else alert(data.error || "Failed to update comment");
     } catch (err) {
       console.error(err);
       alert("Failed to update comment");
     }
   };
 
-  // Format time ago
   const timeAgo = (date) => {
     const seconds = Math.floor((new Date() - new Date(date)) / 1000);
-    
     let interval = seconds / 31536000;
     if (interval > 1) return Math.floor(interval) + " years ago";
-    
     interval = seconds / 2592000;
     if (interval > 1) return Math.floor(interval) + " months ago";
-    
     interval = seconds / 86400;
     if (interval > 1) return Math.floor(interval) + " days ago";
-    
     interval = seconds / 3600;
     if (interval > 1) return Math.floor(interval) + " hours ago";
-    
     interval = seconds / 60;
     if (interval > 1) return Math.floor(interval) + " minutes ago";
-    
     return Math.floor(seconds) + " seconds ago";
   };
 
@@ -251,7 +213,6 @@ export default function BlogPage() {
   if (error) return <div className="text-red-500">{error}</div>;
   if (!blog) return <div>No blog found</div>;
 
-  // Check if current user is the author
   const isAuthor = session?.user?.id === blog.user_id;
 
   return (
@@ -263,14 +224,13 @@ export default function BlogPage() {
       {/* Author Info Section */}
       <div className="flex items-center justify-between mb-6 pb-4 border-b">
         <div className="flex items-center gap-3">
-          {/* Author Avatar */}
           {blog.author_profile_url ? (
             <Image
               src={blog.author_profile_url}
               alt={blog.author_name || "Author"}
               width={48}
               height={48}
-               className="w-24 h-24 rounded-full object-cover border-4 border-gray-200"
+              className="w-24 h-24 rounded-full object-cover border-4 border-gray-200"
               unoptimized
             />
           ) : (
@@ -278,51 +238,31 @@ export default function BlogPage() {
               {blog.author_name ? blog.author_name.charAt(0).toUpperCase() : "A"}
             </div>
           )}
-
           <div>
             <Link href={`/profile/${blog.user_id}`} className="font-semibold text-gray-900 hover:underline">
               {blog.author_name || "Anonymous"}
             </Link>
             <p className="text-sm text-gray-500">
-              {new Date(blog.created_at).toLocaleDateString("en-US", { 
-                month: "short", 
-                day: "numeric", 
-                year: "numeric" 
-              })}
+              {new Date(blog.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
             </p>
           </div>
         </div>
 
-        {/* Follow and Bookmark Buttons */}
         {!isAuthor && (
           <div className="flex items-center gap-2">
             <button
               onClick={handleFollow}
               className={`flex items-center gap-2 px-4 py-2 rounded-full transition ${
-                isFollowing
-                  ? "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                  : "bg-black text-white hover:bg-gray-800"
+                isFollowing ? "bg-gray-200 text-gray-700 hover:bg-gray-300" : "bg-black text-white hover:bg-gray-800"
               }`}
             >
-              {isFollowing ? (
-                <>
-                  <UserCheck size={18} />
-                  Following
-                </>
-              ) : (
-                <>
-                  <UserPlus size={18} />
-                  Follow
-                </>
-              )}
+              {isFollowing ? <><UserCheck size={18} /> Following</> : <><UserPlus size={18} /> Follow</>}
             </button>
 
             <button
               onClick={handleBookmark}
               className={`p-2 rounded-full transition ${
-                isBookmarked
-                  ? "bg-yellow-100 text-yellow-600 hover:bg-yellow-200"
-                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                isBookmarked ? "bg-yellow-100 text-yellow-600 hover:bg-yellow-200" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
               }`}
               title={isBookmarked ? "Remove bookmark" : "Bookmark"}
             >
@@ -341,19 +281,14 @@ export default function BlogPage() {
         </div>
       )}
 
-      <div
-        className="text-gray-800 text-lg mb-8 break-words prose prose-lg max-w-none"
-        dangerouslySetInnerHTML={{ __html: blog.content }}
-      />
+      <div className="text-gray-800 text-lg mb-8 break-words prose prose-lg max-w-none" dangerouslySetInnerHTML={{ __html: blog.content }} />
 
       {/* Clap */}
       <div className="flex items-center gap-4 mb-6">
         <button
           onClick={handleClap}
           className={`flex items-center gap-2 px-4 py-2 rounded-full transition ${
-            hasClapped 
-              ? "bg-red-500 text-white hover:bg-red-600" 
-              : "bg-red-100 text-red-600 hover:bg-red-200"
+            hasClapped ? "bg-red-500 text-white hover:bg-red-600" : "bg-red-100 text-red-600 hover:bg-red-200"
           }`}
         >
           <Heart size={20} fill={hasClapped ? "currentColor" : "none"} strokeWidth={2} />
@@ -395,14 +330,14 @@ export default function BlogPage() {
               <div key={c.comment_id} className="border border-gray-200 p-4 rounded-lg bg-white">
                 <div className="flex items-start gap-3">
                   {/* User Avatar */}
-                  <div className="flex-shrink-0">
+                  <Link href={`/profile/${c.user_id}`}>
                     {c.profile_url ? (
                       <Image
                         src={c.profile_url}
                         alt={c.user_name || "User"}
                         width={40}
                         height={40}
-                        className="w-10 h-10 rounded-full object-cover"
+                        className="w-10 h-10 rounded-full object-cover border-2 border-gray-200"
                         unoptimized
                       />
                     ) : (
@@ -410,37 +345,27 @@ export default function BlogPage() {
                         {c.user_name ? c.user_name.charAt(0).toUpperCase() : "U"}
                       </div>
                     )}
-                  </div>
+                  </Link>
 
                   <div className="flex-1">
                     {/* User name and timestamp */}
                     <div className="flex items-center justify-between mb-2">
                       <div>
-                        <p className="font-semibold text-gray-900">{c.user_name || "Anonymous"}</p>
+                        <Link href={`/profile/${c.user_id}`} className="font-semibold text-gray-900 hover:underline">
+                          {c.user_name || "Anonymous"}
+                        </Link>
                         <p className="text-xs text-gray-500">{timeAgo(c.created_at)}</p>
                       </div>
 
-                      {/* Edit/Delete buttons - only show if it's the user's comment */}
-                      {session?.user?.id === c.user_id && (
+                      {/* Edit/Delete buttons */}
+                      {session?.user?.id === c.user_id && editingCommentId !== c.comment_id && (
                         <div className="flex gap-2">
-                          {editingCommentId !== c.comment_id && (
-                            <>
-                              <button
-                                onClick={() => startEditComment(c)}
-                                className="text-blue-600 hover:text-blue-800 p-1"
-                                title="Edit"
-                              >
-                                <Edit2 size={16} />
-                              </button>
-                              <button
-                                onClick={() => handleDeleteComment(c.comment_id)}
-                                className="text-red-600 hover:text-red-800 p-1"
-                                title="Delete"
-                              >
-                                <Trash2 size={16} />
-                              </button>
-                            </>
-                          )}
+                          <button onClick={() => startEditComment(c)} className="text-blue-600 hover:text-blue-800 p-1" title="Edit">
+                            <Edit2 size={16} />
+                          </button>
+                          <button onClick={() => handleDeleteComment(c.comment_id)} className="text-red-600 hover:text-red-800 p-1" title="Delete">
+                            <Trash2 size={16} />
+                          </button>
                         </div>
                       )}
                     </div>
@@ -456,16 +381,10 @@ export default function BlogPage() {
                           maxLength={500}
                         />
                         <div className="flex gap-2 mt-2">
-                          <button
-                            onClick={() => handleEditComment(c.comment_id)}
-                            className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 flex items-center gap-1"
-                          >
+                          <button onClick={() => handleEditComment(c.comment_id)} className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 flex items-center gap-1">
                             <Check size={16} /> Save
                           </button>
-                          <button
-                            onClick={cancelEdit}
-                            className="px-3 py-1 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 flex items-center gap-1"
-                          >
+                          <button onClick={cancelEdit} className="px-3 py-1 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 flex items-center gap-1">
                             <X size={16} /> Cancel
                           </button>
                         </div>

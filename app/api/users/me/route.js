@@ -29,6 +29,7 @@ export async function GET(req) {
     }
 
     const user = {
+      userId,
       name: result.rows[0].user_name,
       bio: result.rows[0].bio || "",
       profile_url: result.rows[0].profile_url || null,
