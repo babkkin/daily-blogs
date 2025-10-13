@@ -14,7 +14,7 @@ export default function AppLayout({ children }) {
       />
 
       <main
-        className={`flex-1 pt-20 transition-all duration-300 ease-in-out 
+        className={`flex-1 pt-10 transition-all duration-300 ease-in-out 
           ${isSidebarOpen ? "lg:ml-64" : "ml-0"}
         `}
       >
