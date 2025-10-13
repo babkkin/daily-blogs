@@ -60,7 +60,7 @@ export default function HomePage() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-8 md:px-16 lg:px-24 py-10 sm:py-16">
-      <h1 className="font-semibold text-2xl sm:text-3xl mb-6 text-gray-900 border-b border-gray-200 pb-3">
+      <h1 className="font-semibold text-xl sm:text-2xl mb-6 text-gray-900 border-b border-gray-200 pb-3">
         For you
       </h1>
 
