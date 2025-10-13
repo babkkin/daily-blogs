@@ -8,28 +8,40 @@ export default function UsersManagement() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [toast, setToast] = useState(null);
+  const [confirmData, setConfirmData] = useState(null);
 
+  // Fetch users
   useEffect(() => {
     const fetchUsers = async () => {
       try {
         const res = await fetch("/api/admin/users");
         const data = await res.json();
-        if (data.success) {
-          setUsers(data.users);
-        }
+        if (data.success) setUsers(data.users);
       } catch (err) {
         console.error("Failed to fetch users:", err);
       } finally {
         setLoading(false);
       }
     };
-
     fetchUsers();
   }, []);
 
-  const handleBanUser = async (userId, currentlyBanned) => {
+  // Toast logic
+  const showToast = (message, type = "success") => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3000);
+  };
+
+  // Confirm modal logic
+  const handleBanUser = (userId, currentlyBanned) => {
     const action = currentlyBanned ? "unban" : "ban";
-    if (!confirm(`Are you sure you want to ${action} this user?`)) return;
+    setConfirmData({ userId, currentlyBanned, action });
+  };
+
+  const confirmAction = async () => {
+    if (!confirmData) return;
+    const { userId, currentlyBanned, action } = confirmData;
 
     try {
       const res = await fetch(`/api/admin/users/${userId}/ban`, {
@@ -43,13 +55,15 @@ export default function UsersManagement() {
         setUsers(prev =>
           prev.map(u => (u.user_id === userId ? { ...u, is_banned: !currentlyBanned } : u))
         );
-        alert(`User ${action}ned successfully`);
+        showToast(`User ${action}ned successfully`, "success");
       } else {
-        alert(data.error || `Failed to ${action} user`);
+        showToast(data.error || `Failed to ${action} user`, "error");
       }
     } catch (err) {
       console.error(err);
-      alert(`Failed to ${action} user`);
+      showToast(`Failed to ${action} user`, "error");
+    } finally {
+      setConfirmData(null);
     }
   };
 
@@ -57,12 +71,48 @@ export default function UsersManagement() {
     user.user_name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  if (loading) {
-    return <div className="text-center py-10">Loading users...</div>;
-  }
+  if (loading) return <div className="text-center py-10">Loading users...</div>;
 
   return (
-    <div className="mt-10">
+    <div className="mt-10 relative">
+      {/* Toast */}
+      {toast && (
+        <div
+          className={`fixed top-5 right-5 px-4 py-2 rounded-lg shadow-md text-white z-50 ${
+            toast.type === "error" ? "bg-red-600" : "bg-green-600"
+          }`}
+        >
+          {toast.message}
+        </div>
+      )}
+
+      {/* Confirm Modal */}
+      {confirmData && (
+        <div className="fixed inset-0 z-50 backdrop-blur-sm bg-white/10 overflow-y-auto flex items-center justify-center">
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full p-6">
+            <h3 className="text-lg font-semibold mb-2">
+              Are you sure you want to {confirmData.action} this user?
+            </h3>
+            <div className="flex justify-end gap-2 mt-4">
+              <button
+                onClick={() => setConfirmData(null)}
+                className="px-4 py-2 text-gray-600 hover:text-gray-800"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmAction}
+                className={`px-3 py-1 rounded text-white ${
+                  confirmData.action === "ban" ? "px-4 py-2 bg-red-400 hover:bg-red-700" : "px-4 py-2bg-green-400 hover:bg-green-700"
+                }`}
+              >
+                {confirmData.action === "ban" ? "Ban" : "Unban"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Search + Header */}
       <div className="flex justify-between items-center mb-6">
         <h3 className="text-2xl font-semibold">User Management</h3>
         <input
@@ -82,7 +132,7 @@ export default function UsersManagement() {
         <p className="text-gray-500 text-center py-10">No users found</p>
       ) : (
         <div className="grid gap-4">
-                  <p className="text-gray-700">Add, remove, or manage user roles.</p>
+          <p className="text-gray-700">Add, remove, or manage user roles.</p>
           {filteredUsers.map((user) => (
             <div
               key={user.user_id}
