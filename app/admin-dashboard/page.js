@@ -1,4 +1,7 @@
 "use client";
+
+import PostsManagement from "@/components/admin/PostsManagement";
+import UsersManagement from "@/components/admin/UsersManagement";
 import { useState, useEffect } from "react";
 import {
 	BarChart,
@@ -17,8 +20,15 @@ export default function AdminDashboard() {
 	const [currentDate, setCurrentDate] = useState("");
 	const [postsData, setPostsData] = useState([]);
 	const [usersData, setUsersData] = useState([]);
+	const [stats, setStats] = useState({
+		totalPosts: 0,
+		activeUsers: 0,
+		totalComments: 0,
+		pendingReviews: 0
+	});
+	const [loading, setLoading] = useState(true);
 
-	// 🕒 Update live date and initialize chart data
+	// Update live date
 	useEffect(() => {
 		const updateDate = () => {
 			const now = new Date();
@@ -33,41 +43,47 @@ export default function AdminDashboard() {
 			setCurrentDate(formatted);
 		};
 		updateDate();
-		const interval = setInterval(updateDate, 1000); // updates every second
+		const interval = setInterval(updateDate, 1000);
 		return () => clearInterval(interval);
 	}, []);
 
-	// 📊 Setup mock analytics data
+	// Fetch real analytics data
 	useEffect(() => {
-		const today = new Date();
-		const dayName = today.toLocaleDateString("en-US", { weekday: "short" }); // "Mon", "Tue", etc.
+		const fetchAnalytics = async () => {
+			try {
+				const res = await fetch("/api/admin/analytics");
+				const data = await res.json();
 
-		const samplePostsData = [
-			{ name: "Mon", posts: 5 },
-			{ name: "Tue", posts: 8 },
-			{ name: "Wed", posts: 6 },
-			{ name: "Thu", posts: 10 },
-			{ name: "Fri", posts: 7 },
-			{ name: "Sat", posts: 4 },
-			{ name: "Sun", posts: 9 },
-		];
+				if (data.success) {
+					setStats({
+						totalPosts: data.stats.totalPosts,
+						activeUsers: data.stats.activeUsers,
+						totalComments: data.stats.totalComments,
+						pendingReviews: data.stats.pendingReviews
+					});
+					setPostsData(data.postsPerDay);
+					setUsersData(data.usersGrowth);
+				}
+			} catch (err) {
+				console.error("Failed to fetch analytics:", err);
+			} finally {
+				setLoading(false);
+			}
+		};
 
-		// Simulate today's live post count
-		const updatedPosts = samplePostsData.map((d) =>
-			d.name === dayName ? { ...d, posts: Math.floor(Math.random() * 10) + 5 } : d
-		);
-		setPostsData(updatedPosts);
-
-		const sampleUsersData = [
-			{ month: "Jan", users: 40 },
-			{ month: "Feb", users: 60 },
-			{ month: "Mar", users: 75 },
-			{ month: "Apr", users: 90 },
-			{ month: "May", users: 120 },
-			{ month: "Jun", users: 150 },
-		];
-		setUsersData(sampleUsersData);
+		fetchAnalytics();
 	}, []);
+
+	if (loading) {
+		return (
+			<div className="flex items-center justify-center h-screen">
+				<div className="text-center">
+					<div className="w-16 h-16 border-4 border-t-black border-gray-300 rounded-full animate-spin mx-auto mb-4" />
+					<p className="text-gray-600">Loading analytics...</p>
+				</div>
+			</div>
+		);
+	}
 
 	return (
 		<div className="flex min-h-screen bg-white text-black justify-center">
@@ -77,8 +93,8 @@ export default function AdminDashboard() {
 					<div className="w-24 h-24 rounded-full bg-black flex items-center justify-center text-white text-4xl font-bold">
 						A
 					</div>
-					<h2 className="text-3xl font-bold mt-4">Admin Dashboard</h2><br></br>					
-					<p className="text-gray-500 text-sm mt-1"> {currentDate}</p>
+					<h2 className="text-3xl font-bold mt-4">Admin Dashboard</h2>
+					<p className="text-gray-500 text-sm mt-1">{currentDate}</p>
 				</div>
 
 				{/* Tabs */}
@@ -105,21 +121,21 @@ export default function AdminDashboard() {
 
 						{/* Summary Cards */}
 						<div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-10">
-							<div className="border rounded-xl p-6">
+							<div className="border rounded-xl p-6 hover:shadow-lg transition">
 								<h4 className="text-lg font-semibold mb-2">Total Posts</h4>
-								<p className="text-gray-800 text-2xl font-bold">124</p>
+								<p className="text-gray-800 text-2xl font-bold">{stats.totalPosts}</p>
 							</div>
-							<div className="border rounded-xl p-6">
+							<div className="border rounded-xl p-6 hover:shadow-lg transition">
 								<h4 className="text-lg font-semibold mb-2">Active Users</h4>
-								<p className="text-gray-800 text-2xl font-bold">58</p>
+								<p className="text-gray-800 text-2xl font-bold">{stats.activeUsers}</p>
 							</div>
-							<div className="border rounded-xl p-6">
+							<div className="border rounded-xl p-6 hover:shadow-lg transition">
 								<h4 className="text-lg font-semibold mb-2">Comments</h4>
-								<p className="text-gray-800 text-2xl font-bold">320</p>
+								<p className="text-gray-800 text-2xl font-bold">{stats.totalComments}</p>
 							</div>
-							<div className="border rounded-xl p-6">
-								<h4 className="text-lg font-semibold mb-2">Pending Reviews</h4>
-								<p className="text-gray-800 text-2xl font-bold">5</p>
+							<div className="border rounded-xl p-6 hover:shadow-lg transition">
+								<h4 className="text-lg font-semibold mb-2">Draft Posts</h4>
+								<p className="text-gray-800 text-2xl font-bold">{stats.pendingReviews}</p>
 							</div>
 						</div>
 
@@ -128,8 +144,7 @@ export default function AdminDashboard() {
 							{/* Posts Activity */}
 							<div>
 								<div className="flex justify-between items-center mb-3">
-									<h4 className="text-xl font-semibold">Posts per Day</h4>
-									<p className="text-gray-500 text-sm">As of {currentDate}</p>
+									<h4 className="text-xl font-semibold">Posts per Day (Last 7 Days)</h4>
 								</div>
 								<div className="w-full h-64 border rounded-lg p-4">
 									<ResponsiveContainer width="100%" height="100%">
@@ -147,8 +162,7 @@ export default function AdminDashboard() {
 							{/* User Growth */}
 							<div>
 								<div className="flex justify-between items-center mb-3">
-									<h4 className="text-xl font-semibold">User Growth</h4>
-									<p className="text-gray-500 text-sm">As of {currentDate}</p>
+									<h4 className="text-xl font-semibold">User Growth (Last 6 Months)</h4>
 								</div>
 								<div className="w-full h-64 border rounded-lg p-4">
 									<ResponsiveContainer width="100%" height="100%">
@@ -171,21 +185,19 @@ export default function AdminDashboard() {
 						</div>
 					</div>
 				)}
+					{/* Other Tabs */}
+					{activeTab === "posts" && (
+					<>
+						<PostsManagement />
+					</>
+					)}
 
-				{/* Other Tabs */}
-				{activeTab === "posts" && (
-					<div className="mt-10">
-						<h3 className="text-2xl font-semibold mb-4">Manage Posts</h3>
-						<p className="text-gray-700">View, edit, or delete posts here.</p>
-					</div>
-				)}
+					{activeTab === "users" && (
+					<>
+						<UsersManagement />
+					</>
+					)}
 
-				{activeTab === "users" && (
-					<div className="mt-10">
-						<h3 className="text-2xl font-semibold mb-4">User Management</h3>
-						<p className="text-gray-700">Add, remove, or manage user roles.</p>
-					</div>
-				)}
 
 				{activeTab === "settings" && (
 					<div className="mt-10">
