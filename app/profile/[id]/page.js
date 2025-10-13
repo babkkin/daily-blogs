@@ -553,7 +553,7 @@ export default function MediumStyleProfile() {
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
         <div className="fixed inset-0 z-50 backdrop-blur-sm bg-white/10 overflow-y-auto flex items-center justify-center">
-          <div className="bg-white border-1 p-6 rounded-lg max-w-md w-full mx-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full p-6">
             <h3 className="text-lg font-bold mb-4">Confirm Delete</h3>
             <p className="text-gray-600 mb-6">Are you sure you want to permanently delete this post? This action cannot be undone.</p>
             <div className="flex justify-end gap-3">

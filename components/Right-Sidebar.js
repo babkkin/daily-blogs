@@ -9,6 +9,8 @@ export default function MediumSidebar() {
   const [visibleCount, setVisibleCount] = useState(9);
   const [suggestedUsers, setSuggestedUsers] = useState([]);
   const [loadingUsers, setLoadingUsers] = useState(true);
+  const [recommendedBlogs, setRecommendedBlogs] = useState([]);
+  const [loadingBlogs, setLoadingBlogs] = useState(true);
 
   // Notification state
   const [showNotification, setShowNotification] = useState(false);
@@ -22,13 +24,7 @@ export default function MediumSidebar() {
     "Music","Gaming","History","Art & Design","News & Politics"
   ];
 
-  const articles = [
-    { id: 1, title: "The Future of Web Development in 2025", author: "John Doe", reads: "5 min read" },
-    { id: 2, title: "How AI is Reshaping Creative Industries", author: "Jane Smith", reads: "8 min read" },
-    { id: 3, title: "Building Better User Experiences", author: "Mike Johnson", reads: "6 min read" },
-    { id: 4, title: "The Art of Clean Code", author: "Emily Davis", reads: "7 min read" },
-  ];
-
+  // Fetch suggested users
   useEffect(() => {
     const fetchSuggestedUsers = async () => {
       try {
@@ -50,55 +46,75 @@ export default function MediumSidebar() {
     fetchSuggestedUsers();
   }, []);
 
- // Updated toggleFollow to include username
-const toggleFollow = async (userId, userName) => {
-  try {
-    const res = await fetch("/api/blogs/user/follow", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ authorId: userId }),
-    });
+  // Fetch recommended blogs
+  useEffect(() => {
+    const fetchRecommendedBlogs = async () => {
+      try {
+        const res = await fetch("/api/blogs/recommended");
+        const data = await res.json();
+        if (data.success) {
+          setRecommendedBlogs(data.blogs);
+        }
+      } catch (err) {
+        console.error("Failed to fetch recommended blogs:", err);
+      } finally {
+        setLoadingBlogs(false);
+      }
+    };
+    fetchRecommendedBlogs();
+  }, []);
 
-    const data = await res.json();
-    if (data.success) {
-      // Update the followedUsers set
-      setFollowedUsers((prev) => {
-        const newSet = new Set(prev);
-        if (data.isFollowing) newSet.add(userId);
-        else newSet.delete(userId);
-        return newSet;
+  // Calculate reading time
+  const calculateReadTime = (content) => {
+    if (!content) return "5 min read";
+    const words = content.replace(/<[^>]*>/g, '').split(/\s+/).length;
+    const minutes = Math.ceil(words / 200); // Average reading speed
+    return `${minutes} min read`;
+  };
+
+  const toggleFollow = async (userId, userName) => {
+    try {
+      const res = await fetch("/api/blogs/user/follow", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ authorId: userId }),
       });
 
-      // Show sliding notification with username
-      const action = data.isFollowing
-        ? `You followed ${userName}`
-        : `You unfollowed ${userName}`;
+      const data = await res.json();
+      if (data.success) {
+        setFollowedUsers((prev) => {
+          const newSet = new Set(prev);
+          if (data.isFollowing) newSet.add(userId);
+          else newSet.delete(userId);
+          return newSet;
+        });
 
-      setNotification(action);
-      setShowNotification(true);
+        const action = data.isFollowing
+          ? `You followed ${userName}`
+          : `You unfollowed ${userName}`;
 
-      // Hide after 2 seconds
-      setTimeout(() => setShowNotification(false), 2000);
-    } else {
-      alert(data.error || "Failed to follow user");
+        setNotification(action);
+        setShowNotification(true);
+        setTimeout(() => setShowNotification(false), 2000);
+      } else {
+        alert(data.error || "Failed to follow user");
+      }
+    } catch (err) {
+      console.error("Failed to follow user:", err);
+      alert("Failed to follow user");
     }
-  } catch (err) {
-    console.error("Failed to follow user:", err);
-    alert("Failed to follow user");
-  }
-};
-
+  };
 
   return (
     <div className="space-y-8 pl-[2vh] relative">
-{/* Sliding Notification Popup */}
-<div
-  className={`fixed top-[80px] left-1/2 transform -translate-x-1/2 z-[2000] bg-black text-white px-4 py-2 rounded-md shadow-lg transition-all duration-300 ${
-    showNotification ? "translate-y-0 opacity-100" : "-translate-y-20 opacity-0"
-  }`}
->
-  {notification}
-</div>
+      {/* Sliding Notification Popup */}
+      <div
+        className={`fixed top-[80px] left-1/2 transform -translate-x-1/2 z-[2000] bg-black text-white px-4 py-2 rounded-md shadow-lg transition-all duration-300 ${
+          showNotification ? "translate-y-0 opacity-100" : "-translate-y-20 opacity-0"
+        }`}
+      >
+        {notification}
+      </div>
 
       {/* Recommended Topics */}
       <div className="mt-[5vh]">
@@ -166,26 +182,26 @@ const toggleFollow = async (userId, userName) => {
                     {user.bio || "No bio available"}
                   </p>
                 </div>
-<button
-  onClick={() => toggleFollow(user.user_id, user.user_name)}
-  className={`px-3 py-1 rounded-full text-xs font-medium transition flex-shrink-0 flex items-center gap-1 ${
-    followedUsers.has(user.user_id)
-      ? "bg-gray-200 text-gray-700 hover:bg-gray-300"
-      : "bg-black text-white hover:bg-gray-800"
-  }`}
->
-  {followedUsers.has(user.user_id) ? (
-    <>
-      <UserCheck size={14} />
-      Following
-    </>
-  ) : (
-    <>
-      <UserPlus size={14} />
-      Follow
-    </>
-  )}
-</button>
+                <button
+                  onClick={() => toggleFollow(user.user_id, user.user_name)}
+                  className={`px-3 py-1 rounded-full text-xs font-medium transition flex-shrink-0 flex items-center gap-1 ${
+                    followedUsers.has(user.user_id)
+                      ? "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                      : "bg-black text-white hover:bg-gray-800"
+                  }`}
+                >
+                  {followedUsers.has(user.user_id) ? (
+                    <>
+                      <UserCheck size={14} />
+                      Following
+                    </>
+                  ) : (
+                    <>
+                      <UserPlus size={14} />
+                      Follow
+                    </>
+                  )}
+                </button>
               </div>
             ))}
           </div>
@@ -198,20 +214,30 @@ const toggleFollow = async (userId, userName) => {
           <BookmarkPlus size={18} />
           Recommended reading
         </h3>
-        <div className="space-y-5">
-          {articles.map((article) => (
-            <div key={article.id} className="group cursor-pointer">
-              <h4 className="font-medium text-gray-900 text-sm leading-snug mb-1 group-hover:text-black line-clamp-2">
-                {article.title}
-              </h4>
-              <div className="flex items-center gap-2 text-xs text-gray-500">
-                <span>{article.author}</span>
-                <span>·</span>
-                <span>{article.reads}</span>
-              </div>
-            </div>
-          ))}
-        </div>
+        {loadingBlogs ? (
+          <p className="text-sm text-gray-500">Loading...</p>
+        ) : recommendedBlogs.length === 0 ? (
+          <p className="text-sm text-gray-500">No recommendations available</p>
+        ) : (
+          <div className="space-y-5">
+            {recommendedBlogs.map((blog) => (
+              <Link
+                key={blog.id}
+                href={`/blogs/${blog.id}`}
+                className="group cursor-pointer block"
+              >
+                <h4 className="font-medium text-gray-900 text-sm leading-snug mb-1 group-hover:text-black line-clamp-2">
+                  {blog.title}
+                </h4>
+                <div className="flex items-center gap-2 text-xs text-gray-500">
+                  <span>{blog.user_name}</span>
+                  <span>·</span>
+                  <span>{calculateReadTime(blog.content)}</span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Footer Links */}
