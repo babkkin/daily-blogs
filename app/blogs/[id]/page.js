@@ -27,8 +27,10 @@ export default function BlogPage() {
 useEffect(() => {
   if (!id) return;
 
+  let timeoutId;
+
   const fetchData = async () => {
-    setLoading(true);
+    setLoading(true); 
     try {
       const blogRes = await fetch(`/api/blogs/single-blog?id=${id}`);
       const blogData = await blogRes.json();
@@ -58,11 +60,14 @@ useEffect(() => {
       console.error("Error fetching data:", err);
     } finally {
       setLoading(false);
+      // Schedule next fetch after current one completes
+      timeoutId = setTimeout(fetchData, 3000);
     }
   };
 
   fetchData();
-  // REMOVED the setInterval - no more 1-second polling
+
+  return () => clearTimeout(timeoutId);
 }, [id, session]);
 
 

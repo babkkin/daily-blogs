@@ -164,11 +164,7 @@ export default function HomePage() {
                     </span>
                   </div>
 
-                  {feedTab === "trending" && blog.total_engagement && (
-                    <span className="ml-2 px-2 py-1 bg-orange-100 text-orange-700 text-xs rounded-full font-medium">
-                      🔥 {blog.total_engagement} interactions
-                    </span>
-                  )}
+                  {feedTab === "trending" }
                 </div>
               </div>
 
