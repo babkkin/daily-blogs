@@ -1,4 +1,5 @@
 "use client";
+
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -79,7 +80,7 @@ const sections = [
   },
 ];
 
-export default function SettingsPage() {
+export default function AccountSettings() {
   const [openIndex, setOpenIndex] = useState(null);
 
   const toggle = (index) => {
@@ -87,18 +88,23 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto p-4 md:p-8 text-gray-900">
-      <h1 className="text-3xl font-bold mb-6 text-center">Blog Settings</h1>
+    <div className="max-w-4xl mx-auto px-6 py-10 text-gray-900">
+      {/* Header */}
+      <h1 className="text-3xl font-bold mb-4 text-center">Account Settings</h1>
+      <p className="text-gray-600 text-center mb-10">
+        Here you can manage your account details, profile info, and other blog-related preferences.
+      </p>
 
+      {/* Animated Settings Sections */}
       {sections.map((section, index) => (
         <div
           key={index}
-          className="border rounded-xl mb-3 overflow-hidden shadow-sm"
+          className="border rounded-xl mb-4 overflow-hidden shadow-sm"
         >
           {/* Section Header */}
           <button
             onClick={() => toggle(index)}
-            className="w-full text-left px-5 py-3 bg-gray-50 hover:bg-gray-100 flex justify-between items-center transition"
+            className="w-full text-left px-5 py-4 bg-gray-50 hover:bg-gray-100 flex justify-between items-center transition"
           >
             <span className="font-medium text-base">{section.title}</span>
             <motion.span
@@ -118,7 +124,7 @@ export default function SettingsPage() {
                 animate={{ height: "auto", opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
                 transition={{ duration: 0.3 }}
-                className="px-6 py-3 bg-white"
+                className="px-6 py-4 bg-white"
               >
                 <ul className="list-disc pl-6 space-y-1 text-sm text-gray-700">
                   {section.items.map((item, i) => (
