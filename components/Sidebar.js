@@ -40,8 +40,9 @@ export default function Sidebar({ isOpen, onClose }) {
       initial={{ x: "-100%" }}
       animate={{ x: isOpen ? 0 : "-100%" }}
       transition={{ type: "tween", duration: 0.5, ease: "easeInOut" }}
-           className="fixed top-0 left-0 h-full max-h-full overflow-y-auto w-[25vh] bg-white text-gray-800 shadow-lg z-50 flex flex-col justify-between"
-      style={{ boxShadow: "2px 0 5px rgba(0,0,0,0.05)" }}
+      className="fixed top-0 left-0 h-full max-h-full overflow-y-auto 
+                w-[14vw] bg-white text-gray-800 shadow-lg z-50 flex flex-col justify-between"
+      style={{ boxShadow: '2px 0 5px rgba(0,0,0,0.05)' }}
     >
       {/* Header */}
       <div>
@@ -127,9 +128,9 @@ export default function Sidebar({ isOpen, onClose }) {
                 className="ml-8 mt-3 space-y-2"
               >
                 {[
-                  { href: "/setting/account", label: "Account" },
-                  { href: "/setting/privacy", label: "Privacy" },
-                  { href: "/setting/notifications", label: "Notifications" },
+                  { href: "/home/setting/account", label: "Account" },
+                  { href: "/home/setting/privacy", label: "Privacy" },
+                  { href: "/home/setting/notifications", label: "Notifications" },
                 ].map(({ href, label }) => (
                   <Link key={href} href={href} onClick={onClose}>
                     <li className="flex items-center gap-3 p-3 border border-transparent  text-gray-900/90 hover:mask-r-from-20% hover:border-black border-r-0 border-t-0 border-b-0 hover:bg-gray-100 hover:text-black cursor-pointer transition-all duration-300 ease-in-out"
