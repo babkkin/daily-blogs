@@ -10,14 +10,14 @@ export default function AboutPage() {
       {/* Public Header */}
       <PublicHeader />
 
-      <h1 className="mt-[8vh] text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-black mb-4 md:mb-6">
+      <h1 className="mt-[8vh] text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-semibold text-black mb-4 md:mb-6">
         How it all Happened?
       </h1>
       <p className="text-lg md:text-xl lg:text-2xl text-black mb-8 md:mb-12">
         The grand purpose of DailyBlogs <br />Written by our Team
       </p>
       
-      <h1 className="text-3xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-black mb-6 md:mb-8">
+      <h1 className="text-3xl md:text-5xl lg:text-6xl xl:text-7xl font-semibold text-black mb-6 md:mb-8">
         Hey there! Welcome to DailyBlogs!
       </h1>
       
@@ -29,7 +29,7 @@ export default function AboutPage() {
         So, whether you&apos;re here to read, write, or just look around, we&apos;re glad you stopped by. Let&apos;s make this journey together, one blog at a time.
       </p>
 
-      <h1 className="text-3xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-black mb-4 md:mb-6">
+      <h1 className="text-3xl md:text-5xl lg:text-6xl xl:text-7xl font-semibold text-black mb-4 md:mb-6">
         Meet Our Team
       </h1>
       <p className="text-lg md:text-xl lg:text-2xl text-black mb-8 md:mb-16">
@@ -48,7 +48,7 @@ export default function AboutPage() {
           />
         </div>
         <div className="flex-1 text-center md:text-left">
-          <p className="text-2xl md:text-3xl font-bold text-black">Ivan Sambat</p>
+          <p className="text-2xl md:text-3xl font-semibold text-black">Ivan Sambat</p>
           <p className="text-lg md:text-xl lg:text-2xl text-black mb-4">Full Stack Developer</p>
           <p className="text-lg md:text-xl lg:text-2xl text-black text-justify">
             About me: I like both coding the front and back end, and I enjoy learning new things along the way. For me, this project is a chance to explore how everything fits together in building a website.
@@ -68,7 +68,7 @@ export default function AboutPage() {
           />
         </div>
         <div className="flex-1 text-center md:text-left">
-          <p className="text-2xl md:text-3xl font-bold text-black">Paul Marasigan</p>
+          <p className="text-2xl md:text-3xl font-semibold text-black">Paul Marasigan</p>
           <p className="text-lg md:text-xl lg:text-2xl text-black mb-4">Frontend Developer</p>
           <p className="text-lg md:text-xl lg:text-2xl text-black text-justify">
             About me: I love working on layouts, colors, and everything that makes a site look good. I enjoy experimenting with designs and making sure the website feels smooth and easy to use.
@@ -88,7 +88,7 @@ export default function AboutPage() {
           />
         </div>
         <div className="flex-1 text-center md:text-left">
-          <p className="text-2xl md:text-3xl font-bold text-black">Jhune Magdurulan</p>
+          <p className="text-2xl md:text-3xl font-semibold text-black">Jhune Magdurulan</p>
           <p className="text-lg md:text-xl lg:text-2xl text-black mb-4">Backend Developer</p>
           <p className="text-lg md:text-xl lg:text-2xl text-black text-justify">
             About me: I&apos;m passionate about problem-solving and making sure everything works behind the scenes. I like figuring out how to connect features and keep things running efficiently
@@ -108,7 +108,7 @@ export default function AboutPage() {
           />
         </div>
         <div className="flex-1 text-center md:text-left">
-          <p className="text-2xl md:text-3xl font-bold text-black">Jhon Alonzo</p>
+          <p className="text-2xl md:text-3xl font-semibold text-black">Jhon Alonzo</p>
           <p className="text-lg md:text-xl lg:text-2xl text-black mb-4">Project Manager</p>
           <p className="text-lg md:text-xl lg:text-2xl text-black text-justify">
             About me: I help organize tasks, keep the group on track, and make sure deadlines are met. I like planning things out and seeing ideas come to life through teamwork.
@@ -128,7 +128,7 @@ export default function AboutPage() {
           />
         </div>
         <div className="flex-1 text-center md:text-left">
-          <p className="text-2xl md:text-3xl font-bold text-black">Nicolette Gonio</p>
+          <p className="text-2xl md:text-3xl font-semibold text-black">Nicolette Gonio</p>
           <p className="text-lg md:text-xl lg:text-2xl text-black mb-4">Content Writer</p>
           <p className="text-lg md:text-xl lg:text-2xl text-black text-justify">
             About me: I enjoy writing and sharing ideas through words. I like exploring different topics, putting them into blogs, and giving our site personality through content.
