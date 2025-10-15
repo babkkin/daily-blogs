@@ -60,7 +60,7 @@ export default function Sidebar({ isOpen, onClose }) {
         <ul className="p-6 space-y-2 mt-[3vh]">
           {/* 🏠 Home */}
           <Link href="/home" className="block">
-            <li className="flex items-center gap-3 p-3 border border-transparent text-gray-900/90 hover:border-black border-r-0 border-t-0 border-b-0 hover:bg-gray-100 hover:text-black cursor-pointer transition-all duration-300 ease-in-out">
+            <li className="flex items-center gap-3 p-3 border border-transparent text-gray-900/90 hover:mask-r-from-20% hover:border-black border-r-0 border-t-0 border-b-0 hover:bg-gray-100 hover:text-black cursor-pointer transition-all duration-300 ease-in-out">
               <i className="fi fi-rr-home text-xl flex-shrink-0"></i>
               <span className="text-xl leading-none">Home</span>
             </li>
@@ -71,7 +71,7 @@ export default function Sidebar({ isOpen, onClose }) {
             href={session?.user?.id ? `/profile/${session.user.id}` : "/profile"}
             className="block"
           >
-            <li className="flex items-center gap-3 p-3 border border-transparent text-gray-900/90 hover:border-black border-r-0 border-t-0 border-b-0 hover:bg-gray-100 hover:text-black cursor-pointer transition-all duration-300 ease-in-out">
+            <li className="flex items-center gap-3 p-3 border border-transparent text-gray-900/90 hover:mask-r-from-20% hover:border-black border-r-0 border-t-0 border-b-0 hover:bg-gray-100 hover:text-black cursor-pointer transition-all duration-300 ease-in-out">
               <i className="fi fi-rr-user text-xl flex-shrink-0"></i>
               <span className="text-xl leading-none">Profile</span>
             </li>
@@ -79,7 +79,7 @@ export default function Sidebar({ isOpen, onClose }) {
 
           {/* 🔖 Bookmark */}
           <Link href="/bookmarks" className="block">
-            <li className="flex items-center gap-3 p-3 border border-transparent text-gray-900/90 hover:border-black border-r-0 border-t-0 border-b-0 hover:bg-gray-100 hover:text-black cursor-pointer transition-all duration-300 ease-in-out">
+            <li className="flex items-center gap-3 p-3 border border-transparent text-gray-900/90 hover:mask-r-from-20% hover:border-black border-r-0 border-t-0 border-b-0 hover:bg-gray-100 hover:text-black cursor-pointer transition-all duration-300 ease-in-out">
               <i className="fi fi-rr-bookmark text-xl flex-shrink-0"></i>
               <span className="text-xl leading-none">Bookmark</span>
             </li>
@@ -87,7 +87,7 @@ export default function Sidebar({ isOpen, onClose }) {
 
           {/* ℹ️ About */}
           <Link href="/about" className="block">
-            <li className="flex items-center gap-3 p-3 border border-transparent text-gray-900/90 hover:border-black border-r-0 border-t-0 border-b-0 hover:bg-gray-100 hover:text-black cursor-pointer transition-all duration-300 ease-in-out">
+            <li className="flex items-center gap-3 p-3 border border-transparent text-gray-900/90 hover:mask-r-from-20% hover:border-black border-r-0 border-t-0 border-b-0 hover:bg-gray-100 hover:text-black cursor-pointer transition-all duration-300 ease-in-out">
               <i className="fi fi-rr-info text-xl flex-shrink-0"></i>
               <span className="text-xl leading-none">About</span>
             </li>
@@ -96,7 +96,7 @@ export default function Sidebar({ isOpen, onClose }) {
           {/* ⚙️ Settings with dropdown */}
           <li
             onClick={() => setSettingsOpen(!settingsOpen)}
-            className="flex items-center justify-between gap-3 p-3 border border-transparent text-gray-900/90 hover:border-black border-r-0 border-t-0 border-b-0 hover:bg-gray-100 hover:text-black cursor-pointer transition-all duration-300 ease-in-out"
+            className="flex items-center justify-between gap-3 p-3 border border-transparent text-gray-900/90 hover:mask-r-from-20% hover:border-black border-r-0 border-t-0 border-b-0 hover:bg-gray-100 hover:text-black cursor-pointer transition-all duration-300 ease-in-out"
           >
             <div className="flex items-center gap-3">
               <i className="fi fi-rr-settings text-xl flex-shrink-0"></i>
@@ -123,7 +123,7 @@ export default function Sidebar({ isOpen, onClose }) {
                   { href: "/home/setting/notifications", label: "Notifications" },
                 ].map(({ href, label }) => (
                   <Link key={href} href={href}>
-                    <li className="flex items-center gap-3 p-3 border border-transparent text-gray-900/90 hover:border-black border-r-0 border-t-0 border-b-0 hover:bg-gray-100 hover:text-black cursor-pointer transition-all duration-300 ease-in-out">
+                    <li className="flex items-center gap-3 p-3 border border-transparent text-gray-900/90 hover:mask-r-from-20% hover:border-black border-r-0 border-t-0 border-b-0 hover:bg-gray-100 hover:text-black cursor-pointer transition-all duration-300 ease-in-out">
                       {label}
                     </li>
                   </Link>
@@ -154,7 +154,7 @@ export default function Sidebar({ isOpen, onClose }) {
                 <Link
                   key={user.user_id}
                   href={`/profile/${user.user_id}`}
-                  className="flex items-center gap-3 p-2 border border-transparent text-gray-900/90 hover:border-black border-r-0 border-t-0 border-b-0 hover:bg-gray-100 hover:text-black cursor-pointer transition-all duration-300 ease-in-out"
+                  className="flex items-center gap-3 p-2 border border-transparent text-gray-900/90 hover:mask-r-from-20% hover:border-black border-r-0 border-t-0 border-b-0 hover:bg-gray-100 hover:text-black cursor-pointer transition-all duration-300 ease-in-out"
                 >
                   {user.profile_url ? (
                     <Image
