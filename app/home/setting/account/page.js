@@ -1,37 +1,135 @@
 "use client";
 
-import { User, Lock, Mail, Palette, Image as ImageIcon } from "lucide-react";
+import { useState } from "react";
+import { User, Lock, Mail, Image as ImageIcon, Bell, CreditCard, Shield } from "lucide-react";
 
-export default function AccountSettings() {
-  const userOptions = [
-    { label: "Edit Username", icon: <User className="w-5 h-5 text-black" /> },
-    { label: "Change Password", icon: <Lock className="w-5 h-5 text-black" /> },
-    { label: "Update Email", icon: <Mail className="w-5 h-5 text-black" /> },
-    { label: "Profile Picture", icon: <ImageIcon className="w-5 h-5 text-black" /> },
+export default function Settings() {
+  const [activeTab, setActiveTab] = useState("account");
+
+  const tabs = [
+    { id: "account", label: "Account" },
+    { id: "notifications", label: "Notifications" },
+    { id: "privacy", label: "Privacy" },
   ];
 
   return (
-    <div className="max-w-3xl mx-auto px-6 py-10 text-gray-900">
+    <div className="max-w-4xl mx-auto px-6 py-10 mt-[8vh]">
       {/* Header */}
-      <h1 className="text-3xl font-bold mb-2 text-left">Account Settings</h1>
-      <p className="text-gray-600 mb-8 text-left">
-        Manage your personal information, password, and appearance preferences.
-      </p>
+      <h1 className="text-4xl font-semibold mb-8">Settings</h1>
 
-      {/* Settings Box */}
-      <div className="bg-white rounded-xl shadow-md border border-gray-200 p-6">
-        <div className="space-y-1">
-          {userOptions.map((item, index) => (
-            <div
-              key={index}
-              className="flex items-center gap-3 p-3 rounded-sm border-l-2 border-transparent hover:border-black hover:bg-gray-100 cursor-pointer transition-all duration-200 ease-in-out"
+      {/* Tabs */}
+      <div className="border-b border-gray-200 mb-8">
+        <div className="flex gap-8 overflow-x-auto">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`pb-3 text-sm whitespace-nowrap transition-colors ${
+                activeTab === tab.id
+                  ? "border-b-2 border-black font-medium text-black"
+                  : "text-gray-600 hover:text-black"
+              }`}
             >
-              {item.icon}
-              <span className="text-base font-medium">{item.label}</span>
-            </div>
+              {tab.label}
+            </button>
           ))}
+        </div>
+      </div>
+
+      {/* Tab Content */}
+      {activeTab === "account" && <AccountTab />}
+      {activeTab === "notifications" && <NotificationsTab />}
+      {activeTab === "privacy" && <PrivacyTab />}
+    </div>
+  );
+}
+
+// Account Tab
+function AccountTab() {
+  return (
+    <div className="space-y-6">
+      {/* Email Address */}
+      <div className="flex justify-between items-center py-4 border-b border-gray-200">
+        <div>
+          <p className="font-medium text-gray-900">Email address</p>
+        </div>
+        <p className="text-gray-600"></p>
+      </div>
+
+      {/* Profile Information */}
+      <div className="flex justify-between items-center py-4 border-b border-gray-200">
+        <div>
+          <p className="font-medium text-gray-900">Profile information</p>
+          <p className="text-sm text-gray-500">Edit your photo, name, pronouns, short bio, etc.</p>
+        </div>
+        <button className="text-gray-600 hover:text-black">
+          <span className="mr-2"></span>
+          <User className="w-5 h-5 inline" />
+        </button>
+      </div>
+
+      {/* Profile Design */}
+      <div className="flex justify-between items-center py-4 border-b border-gray-200 cursor-pointer hover:bg-gray-50">
+        <div>
+          <p className="font-medium text-gray-900">Profile design</p>
+          <p className="text-sm text-gray-500">Customize the appearance of your profile.</p>
+        </div>
+        <span className="text-gray-400">→</span>
+      </div>
+
+      {/* Digest */}
+      <div className="flex justify-between items-center py-4 border-b border-gray-200">
+        <div>
+          <p className="font-medium text-gray-900">Your Medium Digest frequency</p>
+          <p className="text-sm text-gray-500">Adjust how often you see a new Digest.</p>
+        </div>
+        <select className="text-green-600  border-gray-300 rounded px-3 py-1">
+          <option>Daily</option>
+          <option>Weekly</option>
+          <option>Never</option>
+        </select>
+      </div>
+
+
+      {/* Muted Writers */}
+      <div className="flex justify-between items-center py-4 border-b border-gray-200 cursor-pointer hover:bg-gray-50">
+        <div>
+          <p className="font-medium text-gray-900">Muted Authors</p>
+        </div>
+        <span className="text-gray-400">→</span>
+      </div>
+
+      {/* Blocked Users */}
+      <div className="flex justify-between items-center py-4 border-b border-gray-200 cursor-pointer hover:bg-gray-50">
+        <div>
+          <p className="font-medium text-gray-900">Blocked users</p>
+        </div>
+        <span className="text-gray-400">→</span>
+      </div>
+
+      {/* Danger Zone */}
+      <div className="flex justify-between items-center py-4 border-b border-gray-200 cursor-pointer hover:bg-gray-50">
+        <div className="text-red-600 hover:text-red-700 font-medium">
+          Deactivate account
+          <p className="text-sm text-gray-500 font-normal">Deactivating will suspend your account until you sign back in.</p>
+        </div>
+      </div>
+
+        
+      <div className="flex justify-between items-center py-4 border-b border-gray-200 cursor-pointer hover:bg-gray-50">
+        <div className="text-red-600 hover:text-red-700 font-medium">
+          Delete account
+          <p className="text-sm text-gray-500 font-normal">Permanently delete your account and all of your content.</p>
         </div>
       </div>
     </div>
   );
+}
+
+function NotificationsTab() {
+  return <div className="text-gray-600">Notification settings coming soon...</div>;
+}
+
+function PrivacyTab() {
+  return <div className="text-gray-600">Privacy settings coming soon...</div>;
 }

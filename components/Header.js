@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Sidebar from "./Sidebar";
+import SignOut from "@/components/SignOut";
 import Image from "next/image";
 
 export default function Header() {
@@ -15,6 +16,18 @@ export default function Header() {
   const [unreadCount, setUnreadCount] = useState(0);
   const router = useRouter();
   const dropdownRef = useRef(null);
+  const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+
+  // Close profile dropdown if clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (showProfileDropdown && !event.target.closest('.relative')) {
+        setShowProfileDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showProfileDropdown]);
 
   // Fetch user data for profile picture
   useEffect(() => {
@@ -203,6 +216,7 @@ export default function Header() {
         </div>
 
         {/* ===== Right Section ===== */}
+        {/* BLOG WRITING*/}
         <div className="flex items-center gap-3 sm:gap-4 lg:gap-8">
           <button
             onClick={() => router.push("/blog-editor")}
@@ -212,6 +226,7 @@ export default function Header() {
             <span>Write</span>
           </button>
 
+          {/* Notifications*/}
           <div className="relative">
             <button
               className="text-xl text-gray-800/70 p-1  mt-1 hover:text-black rounded-full transition"
@@ -226,25 +241,92 @@ export default function Header() {
             )}
           </div>
 
-          <button
-            className="h-10 w-10 rounded-full overflow-hidden bg-purple-600 flex items-center justify-center hover:opacity-90 transition"
-            onClick={() => router.push(`/profile/${userData.userId}`)}
-          >
-            {userData?.profile_url ? (
-              <Image
-                src={userData.profile_url}
-                alt="Profile"
-                width={40}
-                height={40}
-                className="w-full h-full object-cover"
-                unoptimized
-              />
-            ) : (
-              <span className="text-white text-lg font-bold">
-                {userData?.name ? userData.name.charAt(0).toUpperCase() : "U"}
-              </span>
+          {/* User Profile with Dropdown */}
+          <div className="relative">
+            <button
+              className="h-10 w-10 rounded-full overflow-hidden bg-purple-600 flex items-center justify-center hover:opacity-90 transition"
+              onClick={() => setShowProfileDropdown(!showProfileDropdown)}
+            >
+              {userData?.profile_url ? (
+                <Image
+                  src={userData.profile_url}
+                  alt="Profile"
+                  width={40}
+                  height={40}
+                  className="w-full h-full object-cover"
+                  unoptimized
+                />
+              ) : (
+                <span className="text-white text-lg font-bold">
+                  {userData?.name ? userData.name.charAt(0).toUpperCase() : "U"}
+                </span>
+              )}
+            </button>
+
+            {/* Dropdown Menu */}
+            {showProfileDropdown && (
+              <div className="absolute right-0 mt-2 w-64 p-2 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden z-50">
+                {/* View Profile */}
+                <button
+                  onClick={() => {
+                    router.push(`/profile/${userData?.userId}`);
+                    setShowProfileDropdown(false);
+                  }}
+                  className="w-full px-4 py-3 flex items-center gap-3 transition border-b border-gray-100 text-gray-800/70 hover:text-black"
+                >
+                  <div className="h-10 w-10 rounded-full overflow-hidden bg-purple-600 flex items-center justify-center flex-shrink-0">
+                    {userData?.profile_url ? (
+                      <Image
+                        src={userData.profile_url}
+                        alt="Profile"
+                        width={40}
+                        height={40}
+                        className="w-full h-full object-cover"
+                        unoptimized
+                      />
+                    ) : (
+                      <span className="text-white text-sm font-bold">
+                        {userData?.name ? userData.name.charAt(0).toUpperCase() : "U"}
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-left">
+                    <p className="font-medium text-sm">{userData?.name || "User"}</p>
+                    <p className="text-xs">View Profile</p>
+                  </div>
+                </button>
+
+                {/* Settings */}
+                <button
+                  onClick={() => {
+                    router.push("/home/setting/account");
+                    setShowProfileDropdown(false);
+                  }}
+                  className="w-full px-4 py-3 flex items-center gap-3 text-gray-800/70 hover:text-black transition text-left"
+                >
+                  <i className="fi fi-rr-settings text-xl"></i>
+                  <span className="text-sm">Settings</span>
+                </button>
+
+                {/* Help */}
+                <button
+                  onClick={() => {
+                    router.push("/help");
+                    setShowProfileDropdown(false);
+                  }}
+                  className="w-full px-4 py-3 flex items-center gap-3 text-gray-800/70 hover:text-black transition text-left"
+                >
+                  <i className="fi fi-rr-interrogation text-xl"></i>
+                  <span className="text-sm">Help</span>
+                </button>
+
+                {/* Sign Out */}
+                <div className="border-t border-gray-100">
+                  <SignOut />
+                </div>
+              </div>
             )}
-          </button>
+          </div>
         </div>
       </header>
     </>

@@ -1,17 +1,17 @@
 "use client";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import SignOut from "@/components/SignOut";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
+import { Compass,Bookmark,Info,User,Home} from "lucide-react";
 
 export default function Sidebar({ isOpen, onClose }) {
   const { data: session } = useSession();
   const [following, setFollowing] = useState([]);
   const [showAll, setShowAll] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [settingsOpen, setSettingsOpen] = useState(false);
+  //const [settingsOpen, setSettingsOpen] = useState(false);
 
   useEffect(() => {
     const fetchFollowing = async () => {
@@ -61,7 +61,7 @@ export default function Sidebar({ isOpen, onClose }) {
           {/* 🏠 Home */}
           <Link href="/home" className="block">
             <li className="flex items-center gap-3 p-3 border border-transparent text-gray-900/90 hover:mask-r-from-20% hover:border-black border-r-0 border-t-0 border-b-0 hover:bg-gray-100 hover:text-black cursor-pointer transition-all duration-300 ease-in-out">
-              <i className="fi fi-rr-home text-xl flex-shrink-0"></i>
+                <Home size={18} className="text-xl flex-shrink-0" />
               <span className="text-xl leading-none">Home</span>
             </li>
           </Link>
@@ -72,28 +72,40 @@ export default function Sidebar({ isOpen, onClose }) {
             className="block"
           >
             <li className="flex items-center gap-3 p-3 border border-transparent text-gray-900/90 hover:mask-r-from-20% hover:border-black border-r-0 border-t-0 border-b-0 hover:bg-gray-100 hover:text-black cursor-pointer transition-all duration-300 ease-in-out">
-              <i className="fi fi-rr-user text-xl flex-shrink-0"></i>
+                <User size={18} className="text-xl flex-shrink-0" />
               <span className="text-xl leading-none">Profile</span>
             </li>
           </Link>
 
+           {/* ℹ️ Discovery */}
+            <Link href="#" className="block" onClick={(e) => {e.preventDefault();alert("DI ko pa tapos tol");}}>
+            <li className="flex items-center gap-3 p-3 border border-transparent text-gray-900/90 hover:mask-r-from-20% hover:border-black border-r-0 border-t-0 border-b-0 hover:bg-gray-100 hover:text-black cursor-pointer transition-all duration-300 ease-in-out">
+                <Compass size={18} className="text-xl flex-shrink-0" />
+              <span className="text-xl leading-none">Discovery</span>
+            </li>
+          </Link>         
+
           {/* 🔖 Bookmark */}
           <Link href="/bookmarks" className="block">
             <li className="flex items-center gap-3 p-3 border border-transparent text-gray-900/90 hover:mask-r-from-20% hover:border-black border-r-0 border-t-0 border-b-0 hover:bg-gray-100 hover:text-black cursor-pointer transition-all duration-300 ease-in-out">
-              <i className="fi fi-rr-bookmark text-xl flex-shrink-0"></i>
+                <Bookmark size={18} className="text-xl flex-shrink-0" />
               <span className="text-xl leading-none">Bookmark</span>
             </li>
           </Link>
 
           {/* ℹ️ About */}
-          <Link href="/about" className="block">
+          <Link href="/about" className="block" >
             <li className="flex items-center gap-3 p-3 border border-transparent text-gray-900/90 hover:mask-r-from-20% hover:border-black border-r-0 border-t-0 border-b-0 hover:bg-gray-100 hover:text-black cursor-pointer transition-all duration-300 ease-in-out">
-              <i className="fi fi-rr-info text-xl flex-shrink-0"></i>
+                <Info size={18} className="text-xl flex-shrink-0" />
               <span className="text-xl leading-none">About</span>
             </li>
           </Link>
 
-          {/* ⚙️ Settings with dropdown */}
+
+
+          </ul>
+
+          {/* ⚙️ Settings with dropdown 
           <li
             onClick={() => setSettingsOpen(!settingsOpen)}
             className="flex items-center justify-between gap-3 p-3 border border-transparent text-gray-900/90 hover:mask-r-from-20% hover:border-black border-r-0 border-t-0 border-b-0 hover:bg-gray-100 hover:text-black cursor-pointer transition-all duration-300 ease-in-out"
@@ -107,7 +119,7 @@ export default function Sidebar({ isOpen, onClose }) {
             ></i>
           </li>
 
-          {/* Smooth Dropdown Animation */}
+          {/* Smooth Dropdown Animation *}
           <AnimatePresence>
             {settingsOpen && (
               <motion.ul
@@ -131,7 +143,7 @@ export default function Sidebar({ isOpen, onClose }) {
               </motion.ul>
             )}
           </AnimatePresence>
-        </ul>
+        </ul>*/}
 
         {/* Following Section */}
         <div className="font-medium text-xl text-gray-900/90 border-t border-gray-200 mt-[3vh] ml-[2vh]">
@@ -189,10 +201,6 @@ export default function Sidebar({ isOpen, onClose }) {
         </div>
       </div>
 
-      {/* Logout */}
-      <div className="p-6">
-        <SignOut />
-      </div>
     </motion.div>
   );
 }
