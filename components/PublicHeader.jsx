@@ -25,7 +25,7 @@ export default function PublicHeader() {
       {/* Logo */}
       <Link
         href="/"
-        className="text-2xl md:text-3xl lg:text-4xl font-bold transition-colors text-center mx-auto lg:mx-[44vh]"
+        className="text-2xl md:text-3xl lg:text-4xl font-semibold transition-colors text-center mx-auto lg:mx-[44vh]"
       >
         <h1>        DailyBlogs</h1>
 

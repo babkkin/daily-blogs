@@ -126,7 +126,7 @@ export default function Header() {
             <i className="fi fi-br-menu-burger"></i>
           </button>
 
-          <Link href="/home" className="text-xl sm:text-2xl font-bold whitespace-nowrap">
+          <Link href="/home" className="text-2xl md:text-3xl lg:text-4xl font-semibold whitespace-nowrap mr-[1vh]">
             <h1>DailyBlogs</h1>
           </Link>
 
@@ -136,12 +136,12 @@ export default function Header() {
             <div className="hidden sm:block mt-1">
               <form
                 onSubmit={handleSearchSubmit}
-                className="flex items-center bg-gray-100 rounded-full px-3 py-1 w-[250px] focus-within:ring-2 focus-within:ring-black transition"
+                className="flex items-center bg-gray-100/30 rounded-full px-3 py-3 w-[250px] focus-within:ring-1 focus-within:ring-black transition"
               >
-                <i className="fi fi-rr-search text-gray-500 text-lg"></i>
+                <i className="fi fi-rr-search text-gray-500 text-2xl mt-1"></i>
                 <input
                   type="text"
-                  placeholder="Search blogs or authors"
+                  placeholder="Search"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onFocus={() => {
@@ -156,12 +156,12 @@ export default function Header() {
             <div className="block sm:hidden">
               <form
                 onSubmit={handleSearchSubmit}
-                className="flex items-center bg-gray-100 rounded-full px-3 py-2 w-full focus-within:ring-2 focus-within:ring-black transition"
+                className="flex items-center bg-gray-100/30 rounded-full px-3 py-2 w-full focus-within:ring-1 focus-within:ring-black transition"
               >
                 <i className="fi fi-rr-search text-gray-500 text-lg"></i>
                 <input
                   type="text"
-                  placeholder="Search blogs or authors"
+                  placeholder="Search"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="bg-transparent outline-none px-2 w-full text-sm"
