@@ -121,7 +121,7 @@ export default function Header() {
         <div className="flex items-center gap-3 flex-1 min-w-[180px] sm:min-w-[220px] md:min-w-[300px]">
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="text-xl p-1 text-gray-800/70 rounded-md hover:text-black transition"
+            className="text-xl p-1 text-gray-800/70 rounded-md hover:text-black transition mt-1"
           >
             <i className="fi fi-br-menu-burger"></i>
           </button>
@@ -133,7 +133,7 @@ export default function Header() {
           {/* ===== Search Section ===== */}
           <div className="relative flex-1">
             {/* Desktop search */}
-            <div className="hidden sm:block">
+            <div className="hidden sm:block mt-1">
               <form
                 onSubmit={handleSearchSubmit}
                 className="flex items-center bg-gray-100 rounded-full px-3 py-1 w-[250px] focus-within:ring-2 focus-within:ring-black transition"
@@ -203,21 +203,21 @@ export default function Header() {
         </div>
 
         {/* ===== Right Section ===== */}
-        <div className="flex items-center gap-3 sm:gap-4 lg:gap-5">
+        <div className="flex items-center gap-3 sm:gap-4 lg:gap-8">
           <button
             onClick={() => router.push("/blog-editor")}
             className="flex items-center gap-1 text-sm sm:text-base md:text-lg text-gray-800/70 hover:text-black"
           >
-            <i className="fi fi-rr-edit"></i>
+            <i className="fi fi-rr-edit text-2xl mt-1 mr-1.5"></i>
             <span>Write</span>
           </button>
 
           <div className="relative">
             <button
-              className="text-xl text-gray-800/70 p-1 hover:text-black rounded-full transition"
+              className="text-xl text-gray-800/70 p-1  mt-1 hover:text-black rounded-full transition"
               onClick={() => router.push("/notifications")}
             >
-              <i className="fi fi-rr-bell"></i>
+              <i className="fi fi-rr-bell text-2xl"></i>
             </button>
             {unreadCount > 0 && (
               <span className="absolute -top-1 -right-1 h-5 w-5 bg-red-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
