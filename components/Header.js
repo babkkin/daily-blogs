@@ -133,12 +133,12 @@ export default function Header() {
           {/* ===== Search Section ===== */}
           <div className="relative flex-1">
             {/* Desktop search */}
-            <div className="hidden sm:block mt-1">
+            <div className="hidden sm:block mt-1 ">
               <form
                 onSubmit={handleSearchSubmit}
                 className="flex items-center bg-gray-100/30 rounded-full px-3 py-3 w-[250px] focus-within:ring-1 focus-within:ring-black transition"
               >
-                <i className="fi fi-rr-search text-gray-500 text-2xl mt-1"></i>
+                <i className="fi fi-rr-search text-gray-500 text-2xl mt-1 hover:font-extrabold" ></i>
                 <input
                   type="text"
                   placeholder="Search"
@@ -158,7 +158,7 @@ export default function Header() {
                 onSubmit={handleSearchSubmit}
                 className="flex items-center bg-gray-100/30 rounded-full px-3 py-2 w-full focus-within:ring-1 focus-within:ring-black transition"
               >
-                <i className="fi fi-rr-search text-gray-500 text-lg"></i>
+                <i className="fi fi-rr-search text-gray-500 text-lg mt-1" ></i>
                 <input
                   type="text"
                   placeholder="Search"
