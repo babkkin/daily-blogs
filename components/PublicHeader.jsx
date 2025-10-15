@@ -27,7 +27,8 @@ export default function PublicHeader() {
         href="/"
         className="text-2xl md:text-3xl lg:text-4xl font-bold transition-colors text-center mx-auto lg:mx-[44vh]"
       >
-        DailyBlogs
+        <h1>        DailyBlogs</h1>
+
       </Link>
 
       {/* Right-side links */}

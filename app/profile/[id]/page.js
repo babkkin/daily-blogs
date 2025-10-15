@@ -33,6 +33,11 @@ export default function MediumStyleProfile() {
 
   const draftPosts = posts.filter(post => post.status === "draft");
   const trashPosts = posts.filter(post => post.status === "trash");
+  const options = {
+  year: "numeric",
+  month: "short",
+  day: "numeric",
+};
 
   // Fetch user info
   useEffect(() => {
@@ -237,7 +242,7 @@ export default function MediumStyleProfile() {
               unoptimized
             />
           ) : (
-            <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-full bg-purple-600 flex items-center justify-center text-white text-4xl sm:text-5xl font-bold border-4 border-gray-200">
+            <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-full bg-gradient-to-br from-pink-400 to-pink-600  flex items-center justify-center text-white text-4xl sm:text-5xl font-bold border-4 border-gray-200">
               {name ? name.charAt(0).toUpperCase() : "U"}
             </div>
           )}
@@ -300,7 +305,7 @@ export default function MediumStyleProfile() {
                     >
                       <div className="flex-1 min-w-0">
                         <p className="text-xs sm:text-sm text-gray-500 mb-1">
-                          Published on {new Date(post.created_at).toLocaleDateString()}
+                          Published on {new Date(post.created_at).toLocaleDateString("en-US", options)}
                         </p>
                         <h2 className="text-xl sm:text-2xl font-bold text-gray-900 group-hover:text-black transition-colors break-words">
                           {post.title}

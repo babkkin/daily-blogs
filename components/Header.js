@@ -127,7 +127,7 @@ export default function Header() {
           </button>
 
           <Link href="/home" className="text-xl sm:text-2xl font-bold whitespace-nowrap">
-            DailyBlogs
+            <h1>DailyBlogs</h1>
           </Link>
 
           {/* ===== Search Section ===== */}

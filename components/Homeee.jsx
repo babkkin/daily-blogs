@@ -11,6 +11,11 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [feedTab, setFeedTab] = useState("latest");
+  const options = {
+  year: "numeric",
+  month: "short",
+  day: "numeric",
+};
 
   useEffect(() => {
     const fetchBlogs = async () => {
@@ -145,7 +150,7 @@ export default function HomePage() {
 
                 <div className="flex items-center gap-4 mt-3">
                   <p className="text-gray-400 text-sm">
-                    {new Date(blog.created_at).toLocaleDateString()}
+                    {new Date(blog.created_at).toLocaleDateString("en-US", options)}
                   </p>
 
                   {/* Stats */}

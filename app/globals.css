@@ -3,15 +3,15 @@
 @import url("https://cdn-uicons.flaticon.com/uicons-regular-rounded/css/uicons-regular-rounded.css");
 @import url('https://fonts.googleapis.com/css2?family=Kalnia:wght@400;600;700&display=swap');
 
-.font-kalnia {
-  font-family: 'Kalnia', sans-serif;
-}
-
+/* Set Lato as the base font */
 body {
-  color: var(--foreground, #000); /* fallback black */
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-poppins), sans-serif;
 }
 
+/* Override for headings */
+h1, h2 {
+  font-family: var(--font-kalnia), serif;
+}
 
 @keyframes progressBar {
   0% { width: 0%; }

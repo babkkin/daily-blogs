@@ -27,7 +27,7 @@ export default function BlogPage() {
 useEffect(() => {
   if (!id) return;
 
-  let timeoutId;
+//  let timeoutId;
 
   const fetchData = async () => {
     setLoading(true); 
@@ -61,13 +61,13 @@ useEffect(() => {
     } finally {
       setLoading(false);
       // Schedule next fetch after current one completes
-      timeoutId = setTimeout(fetchData, 3000);
+      //timeoutId = setTimeout(fetchData, 3000);
     }
   };
 
   fetchData();
 
-  return () => clearTimeout(timeoutId);
+  //return () => clearTimeout(timeoutId);
 }, [id, session]);
 
 
