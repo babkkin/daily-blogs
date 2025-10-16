@@ -7,7 +7,7 @@ import Sidebar from "./Sidebar";
 import SignOut from "./SignOut";
 import Image from "next/image";
 import { Menu, SquarePen, Bell } from "lucide-react";
-import BetterSearchUI from "./BetterSearchUI";
+import BetterSearchUI from "./BetterSearchUi";
 
 export default function Header() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
