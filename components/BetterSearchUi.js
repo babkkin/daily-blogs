@@ -256,7 +256,7 @@ export default function BetterSearchUI() {
             className="absolute left-0 right-0 bg-white border mt-1 rounded-md shadow-lg p-4 z-50"
           >
             <p className="text-center text-gray-500 text-sm">
-              No results found for "{searchQuery}"
+              No results found for `{searchQuery}`
             </p>
           </div>
         )}

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Sidebar from "./Sidebar";
-import SignOut from "@/components/SignOut";
+import SignOut from "./SignOut";
 import Image from "next/image";
 import { Menu, SquarePen, Bell } from "lucide-react";
 import BetterSearchUI from "./BetterSearchUI";
