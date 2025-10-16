@@ -22,54 +22,45 @@ export default function BlogPage() {
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
 
-  // Fetch blog, claps, and comments
-// Remove this entire useEffect and replace with this one:
-useEffect(() => {
-  if (!id) return;
+  useEffect(() => {
+    if (!id) return;
 
-//  let timeoutId;
+    const fetchData = async () => {
+      setLoading(true); 
+      try {
+        const blogRes = await fetch(`/api/blogs/single-blog?id=${id}`);
+        const blogData = await blogRes.json();
+        if (blogData.success) setBlog(blogData.blog);
 
-  const fetchData = async () => {
-    setLoading(true); 
-    try {
-      const blogRes = await fetch(`/api/blogs/single-blog?id=${id}`);
-      const blogData = await blogRes.json();
-      if (blogData.success) setBlog(blogData.blog);
+        const commentsRes = await fetch(`/api/blogs/comments?blogId=${id}`);
+        const commentsData = await commentsRes.json();
+        setComments(commentsData.comments || []);
 
-      const commentsRes = await fetch(`/api/blogs/comments?blogId=${id}`);
-      const commentsData = await commentsRes.json();
-      setComments(commentsData.comments || []);
+        const clapsRes = await fetch(`/api/blogs/claps?blogId=${id}`);
+        const clapsData = await clapsRes.json();
+        setClaps(clapsData.claps || 0);
+        setHasClapped(clapsData.hasClapped || false);
 
-      const clapsRes = await fetch(`/api/blogs/claps?blogId=${id}`);
-      const clapsData = await clapsRes.json();
-      setClaps(clapsData.claps || 0);
-      setHasClapped(clapsData.hasClapped || false);
+        if (session) {
+          const bookmarkRes = await fetch(`/api/blogs/bookmarks?blogId=${id}`);
+          const bookmarkData = await bookmarkRes.json();
+          setIsBookmarked(bookmarkData.isBookmarked || false);
 
-      if (session) {
-        const bookmarkRes = await fetch(`/api/blogs/bookmarks?blogId=${id}`);
-        const bookmarkData = await bookmarkRes.json();
-        setIsBookmarked(bookmarkData.isBookmarked || false);
-
-        if (blogData.blog?.user_id) {
-          const followRes = await fetch(`/api/blogs/user/follow?authorId=${blogData.blog.user_id}`);
-          const followData = await followRes.json();
-          setIsFollowing(followData.isFollowing || false);
+          if (blogData.blog?.user_id) {
+            const followRes = await fetch(`/api/blogs/user/follow?authorId=${blogData.blog.user_id}`);
+            const followData = await followRes.json();
+            setIsFollowing(followData.isFollowing || false);
+          }
         }
+      } catch (err) {
+        console.error("Error fetching data:", err);
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      console.error("Error fetching data:", err);
-    } finally {
-      setLoading(false);
-      // Schedule next fetch after current one completes
-      //timeoutId = setTimeout(fetchData, 3000);
-    }
-  };
+    };
 
-  fetchData();
-
-  //return () => clearTimeout(timeoutId);
-}, [id, session]);
-
+    fetchData();
+  }, [id, session]);
 
   const handleClap = async () => {
     try {
@@ -214,179 +205,180 @@ useEffect(() => {
     return Math.floor(seconds) + " seconds ago";
   };
 
-  if (loading) return 	  <div className="flex items-center justify-center h-screen">
-      <div className="mx-auto w-[90%] overflow-hidden drop-shadow-2xl">
-
-        {/* Main Spinner Area */}
-        <div className="flex p-8 justify-center items-center h-[350px] sm:h-[450px]">
-          <div className="text-center space-y-6">
-            <div className="w-20 h-20 sm:w-24 sm:h-24 border-4 border-t-[#101010] border-[#dfdfdf] rounded-full animate-spin mx-auto" />
-            <div className="text-[#000000] font-semibold text-3xl sm:text-4xl opacity-90 animate-fadeIn">
+  if (loading) return (
+    <div className="flex items-center justify-center min-h-screen px-4">
+      <div className="w-full max-w-md">
+        <div className="flex flex-col justify-center items-center py-12 sm:py-16">
+          <div className="text-center space-y-4 sm:space-y-6">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 border-4 border-t-[#101010] border-[#dfdfdf] rounded-full animate-spin mx-auto" />
+            <div className="text-[#000000] font-semibold text-2xl sm:text-3xl opacity-90">
               Almost There...
             </div>
-            <div className="text-black text-sm opacity-80 animate-fadeIn">
-              <p>Wet&apos;re getting everything ready for you...</p>
+            <div className="text-black text-xs sm:text-sm opacity-80">
+              <p>We&apos;re getting everything ready for you...</p>
               <p>Sit tight for just a moment.</p>
             </div>
           </div>
         </div>
       </div>
-    </div>;
-  if (error) return <div className="text-red-500">{error}</div>;
-  if (!blog) return <div>No blog found</div>;
+    </div>
+  );
+  
+  if (error) return <div className="text-red-500 px-4 py-8 text-sm sm:text-base">{error}</div>;
+  if (!blog) return <div className="px-4 py-8 text-sm sm:text-base">No blog found</div>;
 
   const isAuthor = session?.user?.id === blog.user_id;
 
   return (
-    <div className="max-w-4xl mx-auto px-6 py-12">
-      <Link href="/home" className="text-emerald-600 hover:underline mb-4 block">
+    <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8 lg:py-12">
+      <Link href="/home" className="text-emerald-600 hover:underline mb-4 block text-sm sm:text-base">
         ← Back to Blogs
       </Link>
 
       {/* Author Info Section */}
-      <div className="flex items-center justify-between mb-6 pb-4 border-b">
-        <div className="flex items-center gap-3">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 sm:mb-6 pb-4 border-b gap-3">
+        <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
           {blog.author_profile_url ? (
             <Image
               src={blog.author_profile_url}
               alt={blog.author_name || "Author"}
               width={48}
               height={48}
-              className="w-24 h-24 rounded-full object-cover border-4 border-gray-200"
+              className="w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-full object-cover border-2 sm:border-4 border-gray-200 flex-shrink-0"
               unoptimized
             />
           ) : (
-            <div className="w-12 h-12 rounded-full bg-purple-600 flex items-center justify-center text-white font-bold text-lg">
+            <div className="w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-full bg-purple-600 flex items-center justify-center text-white font-bold text-base sm:text-lg flex-shrink-0">
               {blog.author_name ? blog.author_name.charAt(0).toUpperCase() : "A"}
             </div>
           )}
-          <div>
-            <Link href={`/profile/${blog.user_id}`} className="font-semibold text-gray-900 hover:underline">
+          <div className="min-w-0 flex-1">
+            <Link href={`/profile/${blog.user_id}`} className="font-semibold text-gray-900 hover:underline text-sm sm:text-base block truncate">
               {blog.author_name || "Anonymous"}
             </Link>
-            <p className="text-sm text-gray-500">
+            <p className="text-xs sm:text-sm text-gray-500">
               {new Date(blog.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
             </p>
           </div>
         </div>
 
         {!isAuthor && (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 w-full sm:w-auto">
             <button
               onClick={handleFollow}
-              className={`flex items-center gap-2 px-4 py-2 rounded-full transition ${
+              className={`flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full transition text-xs sm:text-sm flex-1 sm:flex-initial ${
                 isFollowing ? "bg-gray-200 text-gray-700 hover:bg-gray-300" : "bg-black text-white hover:bg-gray-800"
               }`}
             >
-              {isFollowing ? <><UserCheck size={18} /> Following</> : <><UserPlus size={18} /> Follow</>}
+              {isFollowing ? <><UserCheck size={16} className="sm:w-[18px] sm:h-[18px]" /> Following</> : <><UserPlus size={16} className="sm:w-[18px] sm:h-[18px]" /> Follow</>}
             </button>
 
             <button
               onClick={handleBookmark}
-              className={`p-2 rounded-full transition ${
+              className={`p-1.5 sm:p-2 rounded-full transition ${
                 isBookmarked ? "bg-yellow-100 text-yellow-600 hover:bg-yellow-200" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
               }`}
               title={isBookmarked ? "Remove bookmark" : "Bookmark"}
             >
-              <Bookmark size={20} fill={isBookmarked ? "currentColor" : "none"} />
+              <Bookmark size={16} className="sm:w-5 sm:h-5" fill={isBookmarked ? "currentColor" : "none"} />
             </button>
           </div>
         )}
       </div>
 
-      <h1 className="text-4xl font-semibold mb-4 break-words">{blog.title}</h1>
-      <p className="text-gray-500 text-sm mb-6 break-words italic">{blog.subtitle}</p>
+      <h1 className="text-2xl sm:text-3xl lg:text-4xl font-semibold mb-3 sm:mb-4 break-words leading-tight">{blog.title}</h1>
+      <p className="text-gray-500 text-xs sm:text-sm mb-4 sm:mb-6 break-words italic">{blog.subtitle}</p>
 
       {blog.image_url && (
-        <div className="relative w-full aspect-[16/9] mb-6 rounded-lg overflow-hidden">
+        <div className="relative w-full aspect-[16/9] mb-4 sm:mb-6 rounded-lg overflow-hidden">
           <Image src={blog.image_url} alt={blog.title} fill className="object-cover" />
         </div>
       )}
 
-      <div className="text-gray-800 text-lg mb-8 break-words prose prose-lg max-w-none" dangerouslySetInnerHTML={{ __html: blog.content }} />
+      <div className="text-gray-800 text-sm sm:text-base lg:text-lg mb-6 sm:mb-8 break-words prose prose-sm sm:prose-base lg:prose-lg max-w-none" dangerouslySetInnerHTML={{ __html: blog.content }} />
 
       {/* Clap */}
-      <div className="flex items-center gap-4 mb-6">
+      <div className="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
         <button
           onClick={handleClap}
-          className={`flex items-center gap-2 px-4 py-2 rounded-full transition ${
+          className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full transition text-sm sm:text-base ${
             hasClapped ? "bg-red-500 text-white hover:bg-red-600" : "bg-red-100 text-red-600 hover:bg-red-200"
           }`}
         >
-          <Heart size={20} fill={hasClapped ? "currentColor" : "none"} strokeWidth={2} />
+          <Heart size={16} className="sm:w-5 sm:h-5" fill={hasClapped ? "currentColor" : "none"} strokeWidth={2} />
           <span>{claps}</span>
         </button>
       </div>
 
       {/* Comments */}
-      <div className="mt-8">
-        <h2 className="text-2xl font-bold mb-4">Comments ({comments.length})</h2>
+      <div className="mt-6 sm:mt-8">
+        <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">Comments ({comments.length})</h2>
 
-        <form onSubmit={handleCommentSubmit} className="mb-6">
+        <form onSubmit={handleCommentSubmit} className="mb-4 sm:mb-6">
           <textarea
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
             rows={3}
             placeholder={session ? "Write a comment..." : "Please login to comment"}
-            className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-gray-400"
+            className="w-full border border-gray-300 rounded-lg p-2.5 sm:p-3 focus:outline-none focus:ring-2 focus:ring-gray-400 text-sm sm:text-base"
             maxLength={500}
             disabled={!session}
           />
-          <div className="flex items-center justify-between mt-2">
-            <p className="text-sm text-gray-500">{newComment.length}/500 characters</p>
+          <div className="flex items-center justify-between mt-2 flex-wrap gap-2">
+            <p className="text-xs sm:text-sm text-gray-500">{newComment.length}/500 characters</p>
             <button
               type="submit"
-              className="px-5 py-2 bg-black text-white rounded-full hover:bg-gray-800 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-3 sm:px-5 py-1.5 sm:py-2 bg-black text-white rounded-full hover:bg-gray-800 flex items-center gap-1.5 sm:gap-2 disabled:opacity-50 disabled:cursor-not-allowed text-xs sm:text-sm"
               disabled={!newComment.trim() || !session}
             >
-              <MessageCircle  size={18} /> Post Comment
+              <MessageCircle size={16} className="sm:w-[18px] sm:h-[18px]" /> Post Comment
             </button>
           </div>
         </form>
 
         {comments.length === 0 ? (
-          <p className="text-gray-500 italic">No comments yet. Be the first to comment!</p>
+          <p className="text-gray-500 italic text-sm sm:text-base">No comments yet. Be the first to comment!</p>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             {comments.map((c) => (
-              <div key={c.comment_id} className="border border-gray-200 p-4 rounded-lg bg-white">
-                <div className="flex items-start gap-3">
+              <div key={c.comment_id} className="border border-gray-200 p-3 sm:p-4 rounded-lg bg-white">
+                <div className="flex items-start gap-2 sm:gap-3">
                   {/* User Avatar */}
-                  <Link href={`/profile/${c.user_id}`}>
+                  <Link href={`/profile/${c.user_id}`} className="flex-shrink-0">
                     {c.profile_url ? (
                       <Image
                         src={c.profile_url}
                         alt={c.user_name || "User"}
                         width={40}
                         height={40}
-                        className="w-10 h-10 rounded-full object-cover border-2 border-gray-200"
+                        className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover border-2 border-gray-200"
                         unoptimized
                       />
                     ) : (
-                      <div className="w-10 h-10 rounded-full bg-purple-600 flex items-center justify-center text-white font-bold">
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-purple-600 flex items-center justify-center text-white font-bold text-xs sm:text-sm">
                         {c.user_name ? c.user_name.charAt(0).toUpperCase() : "U"}
                       </div>
                     )}
                   </Link>
 
-                  <div className="flex-1">
+                  <div className="flex-1 min-w-0">
                     {/* User name and timestamp */}
-                    <div className="flex items-center justify-between mb-2">
-                      <div>
-                        <Link href={`/profile/${c.user_id}`} className="font-semibold text-gray-900 hover:underline">
+                    <div className="flex items-start justify-between mb-1.5 sm:mb-2 gap-2">
+                      <div className="min-w-0 flex-1">
+                        <Link href={`/profile/${c.user_id}`} className="font-semibold text-gray-900 hover:underline text-sm sm:text-base block truncate">
                           {c.user_name || "Anonymous"}
                         </Link>
-                        <p className="text-xs text-gray-500">{timeAgo(c.created_at)}</p>
+                        <p className="text-[10px] sm:text-xs text-gray-500">{timeAgo(c.created_at)}</p>
                       </div>
 
                       {/* Edit/Delete buttons */}
                       {session?.user?.id === c.user_id && editingCommentId !== c.comment_id && (
-                        <div className="flex gap-2">
+                        <div className="flex gap-1 sm:gap-2 flex-shrink-0">
                           <button onClick={() => startEditComment(c)} className="text-blue-600 hover:text-blue-800 p-1" title="Edit">
-                            <Edit2 size={16} />
+                            <Edit2 size={14} className="sm:w-4 sm:h-4" />
                           </button>
                           <button onClick={() => handleDeleteComment(c.comment_id)} className="text-red-600 hover:text-red-800 p-1" title="Delete">
-                            <Trash2 size={16} />
+                            <Trash2 size={14} className="sm:w-4 sm:h-4" />
                           </button>
                         </div>
                       )}
@@ -398,21 +390,21 @@ useEffect(() => {
                         <textarea
                           value={editingText}
                           onChange={(e) => setEditingText(e.target.value)}
-                          className="w-full border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                          className="w-full border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm sm:text-base"
                           rows={3}
                           maxLength={500}
                         />
                         <div className="flex gap-2 mt-2">
-                          <button onClick={() => handleEditComment(c.comment_id)} className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 flex items-center gap-1">
-                            <Check size={16} /> Save
+                          <button onClick={() => handleEditComment(c.comment_id)} className="px-2 sm:px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 flex items-center gap-1 text-xs sm:text-sm">
+                            <Check size={14} className="sm:w-4 sm:h-4" /> Save
                           </button>
-                          <button onClick={cancelEdit} className="px-3 py-1 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 flex items-center gap-1">
-                            <X size={16} /> Cancel
+                          <button onClick={cancelEdit} className="px-2 sm:px-3 py-1 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 flex items-center gap-1 text-xs sm:text-sm">
+                            <X size={14} className="sm:w-4 sm:h-4" /> Cancel
                           </button>
                         </div>
                       </div>
                     ) : (
-                      <p className="text-gray-700 break-words">{c.text}</p>
+                      <p className="text-gray-700 break-words text-sm sm:text-base">{c.text}</p>
                     )}
                   </div>
                 </div>
