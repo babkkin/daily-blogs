@@ -41,7 +41,7 @@ export default function Sidebar({ isOpen, onClose }) {
       animate={{ x: isOpen ? 0 : "-100%" }}
       transition={{ type: "tween", duration: 0.5, ease: "easeInOut" }}
       className="fixed top-0 left-0 h-full max-h-full overflow-y-auto 
-                w-[14vw] bg-white text-gray-800 shadow-lg z-50 flex flex-col justify-between"
+                w-full lg:w-[20%] bg-white text-gray-800 shadow-lg z-50 flex flex-col justify-between"
       style={{ boxShadow: '2px 0 5px rgba(0,0,0,0.05)' }}
     >
       {/* Header */}
@@ -105,7 +105,7 @@ export default function Sidebar({ isOpen, onClose }) {
 
           </ul>
 
-          {/* ⚙️ Settings with dropdown 
+          {/*  PURPOSEDLY COMMENTED ⚙️ Settings with dropdown 
           <li
             onClick={() => setSettingsOpen(!settingsOpen)}
             className="flex items-center justify-between gap-3 p-3 border border-transparent text-gray-900/90 hover:mask-r-from-20% hover:border-black border-r-0 border-t-0 border-b-0 hover:bg-gray-100 hover:text-black cursor-pointer transition-all duration-300 ease-in-out"
@@ -146,7 +146,7 @@ export default function Sidebar({ isOpen, onClose }) {
         </ul>*/}
 
         {/* Following Section */}
-        <div className="font-medium text-xl text-gray-900/90 border-t border-gray-200 mt-[3vh] ml-[2vh]">
+        <div className="font-medium text-xl text-gray-900/90 border-t border-gray-200 mt-[3vh] ml-[5%]">
           <div className="flex items-center gap-3 p-3 pt-10 pb-4">
             <i className="fi fi-rr-following text-xl flex-shrink-0"></i>
             <span className="text-xl leading-none">

@@ -77,35 +77,37 @@ export default function Header() {
         />
 
         {/* ===== Left Section ===== */}
-        <div className="flex items-center gap-3 flex-1 min-w-[180px] sm:min-w-[220px] md:min-w-[300px]">
+        <div className="flex items-center gap-3 flex-1 min-w-0">
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="text-xl p-1 text-gray-800/70 rounded-md hover:text-black transition mt-1"
+            className="text-xl p-1 text-gray-800/70 rounded-md hover:text-black transition mt-1 flex-shrink-0"
           >
             <Menu size={18} className="text-xl flex-shrink-0" />
           </button>
 
-          <Link href="/home" className="text-2xl md:text-3xl lg:text-4xl font-semibold whitespace-nowrap mr-[1vh]">
+          <Link href="/home" className="text-2xl md:text-3xl lg:text-4xl font-semibold whitespace-nowrap mr-4 flex-shrink-0">
             <h1>DailyBlogs</h1>
           </Link>
 
           {/* ===== Search Section (Extracted Component) ===== */}
-          <BetterSearchUI />
+          <div className="flex-1 min-w-0">
+            <BetterSearchUI />
+          </div>
         </div>
 
         {/* ===== Right Section ===== */}
-        <div className="flex items-center gap-3 sm:gap-4 lg:gap-8">
+        <div className="flex items-center gap-2 sm:gap-3 md:gap-4 lg:gap-8 flex-wrap">
           {/* BLOG WRITING */}
           <button
             onClick={() => router.push("/blog-editor")}
-            className="flex items-center gap-1 text-sm sm:text-base md:text-lg text-gray-800/70 hover:text-black"
+            className="flex items-center gap-1 text-sm sm:text-base md:text-lg text-gray-800/70 hover:text-black order-1"
           >
-            <SquarePen className="fi fi-rr-edit text-2xl mt-1 mr-1.5" />
-            <span>Write</span>
+            <SquarePen className="fi fi-rr-edit text-xl sm:text-2xl mt-1 mr-1.5 flex-shrink-0" />
+            <span className="hidden sm:inline">Write</span>
           </button>
 
           {/* Notifications */}
-          <div className="relative">
+          <div className="relative flex-shrink-0 order-2">
             <button
               className="text-xl text-gray-800/70 p-1 mt-1 hover:text-black rounded-full transition"
               onClick={() => router.push("/notifications")}
@@ -120,7 +122,7 @@ export default function Header() {
           </div>
 
           {/* User Profile with Dropdown */}
-          <div className="relative profile-dropdown-container">
+          <div className="relative profile-dropdown-container flex-shrink-0 order-3">
             <button
               className="h-10 w-10 rounded-full overflow-hidden bg-purple-600 flex items-center justify-center hover:opacity-90 transition"
               onClick={() => setShowProfileDropdown(!showProfileDropdown)}
@@ -143,7 +145,7 @@ export default function Header() {
 
             {/* Dropdown Menu */}
             {showProfileDropdown && (
-              <div className="absolute right-0 mt-2 w-64 p-2 bg-white border  border-gray-200 rounded-lg shadow-lg overflow-hidden z-50">
+              <div className="absolute right-0 mt-2 w-full sm:w-64 p-2 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden z-50 max-w-[90vw]">
                 {/* View Profile */}
                 <button
                   onClick={() => {
@@ -168,8 +170,8 @@ export default function Header() {
                       </span>
                     )}
                   </div>
-                  <div className="text-left">
-                    <p className="font-medium text-sm">{userData?.name || "User"}</p>
+                  <div className="text-left min-w-0">
+                    <p className="font-medium text-sm truncate">{userData?.name || "User"}</p>
                     <p className="text-xs">View Profile</p>
                   </div>
                 </button>
@@ -182,7 +184,7 @@ export default function Header() {
                   }}
                   className="w-full px-4 py-3 flex items-center gap-3 text-gray-800/70 hover:text-black transition text-left"
                 >
-                  <i className="fi fi-rr-settings text-xl"></i>
+                  <i className="fi fi-rr-settings text-xl flex-shrink-0"></i>
                   <span className="text-sm">Settings</span>
                 </button>
 
@@ -194,7 +196,7 @@ export default function Header() {
                   }}
                   className="w-full px-4 py-3 flex items-center gap-3 text-gray-800/70 hover:text-black transition text-left"
                 >
-                  <i className="fi fi-rr-interrogation text-xl"></i>
+                  <i className="fi fi-rr-interrogation text-xl flex-shrink-0"></i>
                   <span className="text-sm">Help</span>
                 </button>
 
