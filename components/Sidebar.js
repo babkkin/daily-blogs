@@ -78,7 +78,7 @@ export default function Sidebar({ isOpen, onClose }) {
           </Link>
 
            {/* ℹ️ Discovery */}
-            <Link href="#" className="block" onClick={(e) => {e.preventDefault();alert("DI ko pa tapos tol");}}>
+            <Link href="#" className="block" onClick={() => alert("Discovery placeholder")}>
             <li className="flex items-center gap-3 p-3 border border-transparent text-gray-900/90 hover:mask-r-from-20% hover:border-black border-r-0 border-t-0 border-b-0 hover:bg-gray-100 hover:text-black cursor-pointer transition-all duration-300 ease-in-out">
                 <Compass size={18} className="text-xl flex-shrink-0" />
               <span className="text-xl leading-none">Discovery</span>

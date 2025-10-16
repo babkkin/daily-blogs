@@ -140,7 +140,7 @@ export default function HomePage() {
                   </span>
                 </p>
 
-                <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 group-hover:text-black transition-colors break-words">
+                <h2 className="text-2xl sm:text-3xl font-semibold text-gray-900 group-hover:text-black transition-colors break-words">
                   {blog.title}
                 </h2>
 

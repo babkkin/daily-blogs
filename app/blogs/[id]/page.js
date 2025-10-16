@@ -294,7 +294,7 @@ useEffect(() => {
         )}
       </div>
 
-      <h1 className="text-4xl font-bold mb-4 break-words">{blog.title}</h1>
+      <h1 className="text-4xl font-semibold mb-4 break-words">{blog.title}</h1>
       <p className="text-gray-500 text-sm mb-6 break-words italic">{blog.subtitle}</p>
 
       {blog.image_url && (
@@ -339,7 +339,7 @@ useEffect(() => {
               className="px-5 py-2 bg-black text-white rounded-full hover:bg-gray-800 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={!newComment.trim() || !session}
             >
-              <MessageCircle size={18} /> Post Comment
+              <MessageCircle  size={18} /> Post Comment
             </button>
           </div>
         </form>
