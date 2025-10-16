@@ -85,7 +85,7 @@ export default function Header() {
             <Menu size={16} className="sm:size-8 text-xl flex-shrink-0" />
           </button>
 
-          <Link href="/home" className="text-xl sm:text-xl md:text-3xl lg:text-4xl font-semibold whitespace-nowrap mr-1 sm:mr-2 md:mr-4 flex-shrink-0">
+          <Link href="/home" className="text-xl sm:text-sm md:text-3xl lg:text-4xl font-semibold whitespace-nowrap mr-1 sm:mr-2 md:mr-4 flex-shrink-0">
             <h1>DailyBlogs</h1>
           </Link>
 
