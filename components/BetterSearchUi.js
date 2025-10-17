@@ -141,26 +141,26 @@ export default function BetterSearchUI() {
       </div>
 
       {/* ===== Discovery Dropdown ===== */}
-      {showSearchDropdown && (
-        <div className="absolute left-0 mt-2 w-80 pt-8 pb-8 pl-5 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
-          <Link
-            href="#"
-            onClick={() => {
-              setShowSearchDropdown(false);
-              alert("Discovery Placeholder");
-            }}
-            className="flex items-center gap-2 text-gray-700 hover:text-black transition w-full"
-          >
-            <div className="flex items-center justify-between w-full px-3 py-1 text-gray-800/70 hover:text-black">
-              <div className="flex items-center gap-2">
-                <Compass size={18} className="flex-shrink-0" />
-                <p className="text-sm">Explore Discovery</p>
-              </div>
-              <MoveUpRight size={16} className="flex-shrink-0 mr-3" />
-            </div>
-          </Link>
+{showSearchDropdown && (
+  <div className="absolute left-0 mt-2 w-full sm:w-80 pt-8 pb-8 pl-5 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-w-[90vw]">
+    <Link
+      href="#"
+      onClick={() => {
+        setShowSearchDropdown(false);
+        alert("Discovery Placeholder");
+      }}
+      className="flex items-center gap-2 text-gray-700 hover:text-black transition w-full"
+    >
+      <div className="flex items-center justify-between w-full px-3 py-1 text-gray-800/70 hover:text-black">
+        <div className="flex items-center gap-2">
+          <Compass size={18} className="flex-shrink-0" />
+          <p className="text-sm">Explore Discovery</p>
         </div>
-      )}
+        <MoveUpRight size={16} className="flex-shrink-0 mr-3" />
+      </div>
+    </Link>
+  </div>
+)}
 
       {/* ===== Search Results Dropdown ===== */}
       {showDropdown && (searchResults.authors.length > 0 || searchResults.blogs.length > 0) && (
