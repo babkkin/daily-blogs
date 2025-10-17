@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Heart, MessageCircle, Trash2, Edit2, X, Check, Bookmark, UserPlus, UserCheck } from "lucide-react";
 import { useSession } from "next-auth/react";
+import BetterComments from "@/components/BetterComments";
 
 export default function BlogPage() {
   const { id } = useParams();
@@ -312,106 +313,7 @@ export default function BlogPage() {
 
       {/* Comments */}
       <div className="mt-6 sm:mt-8">
-        <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">Comments ({comments.length})</h2>
-
-        <form onSubmit={handleCommentSubmit} className="mb-4 sm:mb-6">
-          <textarea
-            value={newComment}
-            onChange={(e) => setNewComment(e.target.value)}
-            rows={3}
-            placeholder={session ? "Write a comment..." : "Please login to comment"}
-            className="w-full border border-gray-300 rounded-lg p-2.5 sm:p-3 focus:outline-none focus:ring-2 focus:ring-gray-400 text-sm sm:text-base"
-            maxLength={500}
-            disabled={!session}
-          />
-          <div className="flex items-center justify-between mt-2 flex-wrap gap-2">
-            <p className="text-xs sm:text-sm text-gray-500">{newComment.length}/500 characters</p>
-            <button
-              type="submit"
-              className="px-3 sm:px-5 py-1.5 sm:py-2 bg-black text-white rounded-full hover:bg-gray-800 flex items-center gap-1.5 sm:gap-2 disabled:opacity-50 disabled:cursor-not-allowed text-xs sm:text-sm"
-              disabled={!newComment.trim() || !session}
-            >
-              <MessageCircle size={16} className="sm:w-[18px] sm:h-[18px]" /> Post Comment
-            </button>
-          </div>
-        </form>
-
-        {comments.length === 0 ? (
-          <p className="text-gray-500 italic text-sm sm:text-base">No comments yet. Be the first to comment!</p>
-        ) : (
-          <div className="space-y-3 sm:space-y-4">
-            {comments.map((c) => (
-              <div key={c.comment_id} className="border border-gray-200 p-3 sm:p-4 rounded-lg bg-white">
-                <div className="flex items-start gap-2 sm:gap-3">
-                  {/* User Avatar */}
-                  <Link href={`/profile/${c.user_id}`} className="flex-shrink-0">
-                    {c.profile_url ? (
-                      <Image
-                        src={c.profile_url}
-                        alt={c.user_name || "User"}
-                        width={40}
-                        height={40}
-                        className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover border-2 border-gray-200"
-                        unoptimized
-                      />
-                    ) : (
-                      <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-purple-600 flex items-center justify-center text-white font-bold text-xs sm:text-sm">
-                        {c.user_name ? c.user_name.charAt(0).toUpperCase() : "U"}
-                      </div>
-                    )}
-                  </Link>
-
-                  <div className="flex-1 min-w-0">
-                    {/* User name and timestamp */}
-                    <div className="flex items-start justify-between mb-1.5 sm:mb-2 gap-2">
-                      <div className="min-w-0 flex-1">
-                        <Link href={`/profile/${c.user_id}`} className="font-semibold text-gray-900 hover:underline text-sm sm:text-base block truncate">
-                          {c.user_name || "Anonymous"}
-                        </Link>
-                        <p className="text-[10px] sm:text-xs text-gray-500">{timeAgo(c.created_at)}</p>
-                      </div>
-
-                      {/* Edit/Delete buttons */}
-                      {session?.user?.id === c.user_id && editingCommentId !== c.comment_id && (
-                        <div className="flex gap-1 sm:gap-2 flex-shrink-0">
-                          <button onClick={() => startEditComment(c)} className="text-blue-600 hover:text-blue-800 p-1" title="Edit">
-                            <Edit2 size={14} className="sm:w-4 sm:h-4" />
-                          </button>
-                          <button onClick={() => handleDeleteComment(c.comment_id)} className="text-red-600 hover:text-red-800 p-1" title="Delete">
-                            <Trash2 size={14} className="sm:w-4 sm:h-4" />
-                          </button>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Comment text or edit form */}
-                    {editingCommentId === c.comment_id ? (
-                      <div>
-                        <textarea
-                          value={editingText}
-                          onChange={(e) => setEditingText(e.target.value)}
-                          className="w-full border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm sm:text-base"
-                          rows={3}
-                          maxLength={500}
-                        />
-                        <div className="flex gap-2 mt-2">
-                          <button onClick={() => handleEditComment(c.comment_id)} className="px-2 sm:px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 flex items-center gap-1 text-xs sm:text-sm">
-                            <Check size={14} className="sm:w-4 sm:h-4" /> Save
-                          </button>
-                          <button onClick={cancelEdit} className="px-2 sm:px-3 py-1 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 flex items-center gap-1 text-xs sm:text-sm">
-                            <X size={14} className="sm:w-4 sm:h-4" /> Cancel
-                          </button>
-                        </div>
-                      </div>
-                    ) : (
-                      <p className="text-gray-700 break-words text-sm sm:text-base">{c.text}</p>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+         <BetterComments blogId={id} initialComments={comments} />
       </div>
     </div>
   );
