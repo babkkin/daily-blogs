@@ -142,7 +142,7 @@ export default function BetterSearchUI() {
 
       {/* ===== Discovery Dropdown ===== */}
 {showSearchDropdown && (
-  <div className="absolute left-0 mt-2 w-full sm:w-80 pt-8 pb-8 pl-5 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-w-[90vw]">
+  <div className="absolute left-0 mt-2 w-full sm:w-80 pt-2 sm:pt-8 pb-8 pl-2 sm:pl-5 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-w-[90vw] overflow-hidden">
     <Link
       href="#"
       onClick={() => {
@@ -151,17 +151,16 @@ export default function BetterSearchUI() {
       }}
       className="flex items-center gap-2 text-gray-700 hover:text-black transition w-full"
     >
-      <div className="flex items-center justify-between w-full px-3 py-1 text-gray-800/70 hover:text-black">
+      <div className="flex items-center justify-between w-full px-2 sm:px-3 py-1 text-gray-800/70 hover:text-black">
         <div className="flex items-center gap-2">
           <Compass size={18} className="flex-shrink-0" />
-          <p className="relative text-sm sm:text-xs">Explore Discovery</p>
+          <p className="text-xs sm:text-sm">Explore Discovery</p>
         </div>
-        <MoveUpRight size={16} className="flex-shrink-0 mr-3" />
+        <MoveUpRight size={16} className="flex-shrink-0 mr-2 sm:mr-3" />
       </div>
     </Link>
   </div>
 )}
-
       {/* ===== Search Results Dropdown ===== */}
       {showDropdown && (searchResults.authors.length > 0 || searchResults.blogs.length > 0) && (
         <div
