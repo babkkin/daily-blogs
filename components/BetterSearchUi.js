@@ -154,7 +154,7 @@ export default function BetterSearchUI() {
       <div className="flex items-center justify-between w-full px-3 py-1 text-gray-800/70 hover:text-black">
         <div className="flex items-center gap-2">
           <Compass size={18} className="flex-shrink-0" />
-          <p className="text-sm">Explore Discovery</p>
+          <p className="relative text-sm sm:text-xs">Explore Discovery</p>
         </div>
         <MoveUpRight size={16} className="flex-shrink-0 mr-3" />
       </div>
