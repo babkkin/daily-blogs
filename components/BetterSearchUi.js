@@ -142,7 +142,7 @@ export default function BetterSearchUI() {
 
       {/* ===== Discovery Dropdown ===== */}
 {showSearchDropdown && (
-  <div className="absolute left-1/2 -translate-x-1/2 sm:left-0 sm:translate-x-0 mt-2 w-[90vw] sm:w-80 pt-2 sm:pt-8 pb-8 px-3 sm:pl-5 bg-white border border-gray-200 rounded-lg shadow-lg z-50 overflow-hidden">
+  <div className="absolute left-1/2 -translate-x-1/2 sm:left-0 sm:translate-x-0 mt-2 w-[90vw] sm:w-60 pt-2 sm:pt-8 sm:pb-4 pb-8 px-3 sm:pl-2 bg-white border border-gray-200 rounded-lg shadow-lg z-50 overflow-hidden">
     <Link
       href="#"
       onClick={() => {
