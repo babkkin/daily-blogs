@@ -10,7 +10,7 @@ import { Menu, SquarePen, Bell } from "lucide-react";
 import BetterSearchUI from "./BetterSearchUi";
 
 export default function Header() {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [userData, setUserData] = useState(null);
   const [unreadCount, setUnreadCount] = useState(0);
   const router = useRouter();
