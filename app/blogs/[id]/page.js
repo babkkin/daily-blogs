@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -22,45 +22,113 @@ export default function BlogPage() {
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
 
+  // Fetch functions wrapped in useCallback to prevent recreation
+  const fetchBlog = useCallback(async () => {
+    try {
+      const blogRes = await fetch(`/api/blogs/single-blog?id=${id}`);
+      const blogData = await blogRes.json();
+      if (blogData.success) setBlog(blogData.blog);
+    } catch (err) {
+      console.error("Error fetching blog:", err);
+    }
+  }, [id]);
+
+  const fetchComments = useCallback(async () => {
+    try {
+      const commentsRes = await fetch(`/api/blogs/comments?blogId=${id}`);
+      const commentsData = await commentsRes.json();
+      setComments(commentsData.comments || []);
+    } catch (err) {
+      console.error("Error fetching comments:", err);
+    }
+  }, [id]);
+
+  const fetchClaps = useCallback(async () => {
+    try {
+      const clapsRes = await fetch(`/api/blogs/claps?blogId=${id}`);
+      const clapsData = await clapsRes.json();
+      setClaps(clapsData.claps || 0);
+      setHasClapped(clapsData.hasClapped || false);
+    } catch (err) {
+      console.error("Error fetching claps:", err);
+    }
+  }, [id]);
+
+  const fetchBookmark = useCallback(async () => {
+    if (!session) return;
+    try {
+      const bookmarkRes = await fetch(`/api/blogs/bookmarks?blogId=${id}`);
+      const bookmarkData = await bookmarkRes.json();
+      setIsBookmarked(bookmarkData.isBookmarked || false);
+    } catch (err) {
+      console.error("Error fetching bookmark:", err);
+    }
+  }, [id, session]);
+
+  const fetchFollowStatus = useCallback(async (authorId) => {
+    if (!session || !authorId) return;
+    try {
+      const followRes = await fetch(`/api/blogs/user/follow?authorId=${authorId}`);
+      const followData = await followRes.json();
+      setIsFollowing(followData.isFollowing || false);
+    } catch (err) {
+      console.error("Error fetching follow status:", err);
+    }
+  }, [session]);
+
+  // Initial data fetch
   useEffect(() => {
     if (!id) return;
 
     const fetchData = async () => {
-      setLoading(true); 
+      setLoading(true);
       try {
-        const blogRes = await fetch(`/api/blogs/single-blog?id=${id}`);
-        const blogData = await blogRes.json();
-        if (blogData.success) setBlog(blogData.blog);
-
-        const commentsRes = await fetch(`/api/blogs/comments?blogId=${id}`);
-        const commentsData = await commentsRes.json();
-        setComments(commentsData.comments || []);
-
-        const clapsRes = await fetch(`/api/blogs/claps?blogId=${id}`);
-        const clapsData = await clapsRes.json();
-        setClaps(clapsData.claps || 0);
-        setHasClapped(clapsData.hasClapped || false);
-
-        if (session) {
-          const bookmarkRes = await fetch(`/api/blogs/bookmarks?blogId=${id}`);
-          const bookmarkData = await bookmarkRes.json();
-          setIsBookmarked(bookmarkData.isBookmarked || false);
-
-          if (blogData.blog?.user_id) {
-            const followRes = await fetch(`/api/blogs/user/follow?authorId=${blogData.blog.user_id}`);
-            const followData = await followRes.json();
-            setIsFollowing(followData.isFollowing || false);
-          }
+        await Promise.all([
+          fetchBlog(),
+          fetchComments(),
+          fetchClaps(),
+          fetchBookmark()
+        ]);
+        
+        // Fetch follow status after blog is loaded
+        if (blog?.user_id) {
+          await fetchFollowStatus(blog.user_id);
         }
       } catch (err) {
         console.error("Error fetching data:", err);
+        setError("Failed to load blog data");
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, [id, session]);
+  }, [id, session]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Fetch follow status when blog data is loaded
+  useEffect(() => {
+    if (blog?.user_id) {
+      fetchFollowStatus(blog.user_id);
+    }
+  }, [blog?.user_id, fetchFollowStatus]);
+
+  // Auto-refresh data every 5 seconds (except blog content)
+  useEffect(() => {
+    if (!id || loading) return;
+
+    const interval = setInterval(() => {
+      fetchComments();
+      fetchClaps();
+      if (session) {
+        fetchBookmark();
+        if (blog?.user_id) {
+          fetchFollowStatus(blog.user_id);
+        }
+      }
+    }, 5000); // Refresh every 5 seconds
+
+    return () => clearInterval(interval);
+  }, [id, loading, session, blog?.user_id, fetchComments, fetchClaps, fetchBookmark, fetchFollowStatus]);
 
   const handleClap = async () => {
     try {
@@ -95,8 +163,12 @@ export default function BlogPage() {
         body: JSON.stringify({ blogId: id }),
       });
       const data = await res.json();
-      if (data.success) setIsBookmarked(data.isBookmarked);
-      else alert(data.error || "Failed to bookmark");
+      if (data.success) {
+        setIsBookmarked(data.isBookmarked);
+        await fetchBookmark(); // Refresh bookmark status
+      } else {
+        alert(data.error || "Failed to bookmark");
+      }
     } catch (err) {
       console.error(err);
       alert("Failed to bookmark");
@@ -113,8 +185,12 @@ export default function BlogPage() {
         body: JSON.stringify({ authorId: blog.user_id }),
       });
       const data = await res.json();
-      if (data.success) setIsFollowing(data.isFollowing);
-      else alert(data.error || "Failed to follow");
+      if (data.success) {
+        setIsFollowing(data.isFollowing);
+        await fetchFollowStatus(blog.user_id); // Refresh follow status
+      } else {
+        alert(data.error || "Failed to follow");
+      }
     } catch (err) {
       console.error(err);
       alert("Failed to follow");
@@ -133,9 +209,11 @@ export default function BlogPage() {
       });
       const data = await res.json();
       if (data.success) {
-        setComments((prev) => [data.comment, ...prev]);
         setNewComment("");
-      } else alert(data.error || "Failed to post comment");
+        await fetchComments(); // Refresh comments
+      } else {
+        alert(data.error || "Failed to post comment");
+      }
     } catch (err) {
       console.error(err);
       alert("Failed to post comment");
@@ -150,8 +228,11 @@ export default function BlogPage() {
         method: "DELETE",
       });
       const data = await res.json();
-      if (data.success) setComments((prev) => prev.filter((c) => c.comment_id !== commentId));
-      else alert(data.error || "Failed to delete comment");
+      if (data.success) {
+        await fetchComments(); // Refresh comments
+      } else {
+        alert(data.error || "Failed to delete comment");
+      }
     } catch (err) {
       console.error(err);
       alert("Failed to delete comment");
@@ -179,11 +260,11 @@ export default function BlogPage() {
       });
       const data = await res.json();
       if (data.success) {
-        setComments((prev) =>
-          prev.map((c) => (c.comment_id === commentId ? { ...c, text: editingText } : c))
-        );
         cancelEdit();
-      } else alert(data.error || "Failed to update comment");
+        await fetchComments(); // Refresh comments
+      } else {
+        alert(data.error || "Failed to update comment");
+      }
     } catch (err) {
       console.error(err);
       alert("Failed to update comment");
