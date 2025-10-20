@@ -14,6 +14,7 @@ export default function BlogEditor() {
 	const [title, setTitle] = useState("");
 	const [subtitle, setSubtitle] = useState("");
 	const [content, setContent] = useState("");
+	const [category, setCategory] = useState("");
 	const [thumbnail, setThumbnail] = useState(null);
 	const [thumbnailUrl, setThumbnailUrl] = useState("");
 	const [isUploading, setIsUploading] = useState(false);
@@ -22,6 +23,25 @@ export default function BlogEditor() {
 	const [isPublishing, setIsPublishing] = useState(false);
 	const [showNotification, setShowNotification] = useState(false);
 	const [notification, setNotification] = useState("");
+
+	const allCategories = [
+		"Technology",
+		"Health & Wellness",
+		"Travel",
+		"Food",
+		"Lifestyle",
+		"Education",
+		"Finance",
+		"Entertainment",
+		"Science",
+		"Sports",
+		"Music",
+		"Gaming",
+		"History",
+		"Art & Design",
+		"News & Politics",
+		"Others",
+	];
 
 	const showNotificationMsg = (msg, redirectPath = null) => {
 		setNotification(msg);
@@ -43,11 +63,10 @@ export default function BlogEditor() {
 	};
 
 	const handleSubmit = async (status = "published") => {
-		if (!title.trim() || !content.trim()) return; // title & content required for both
+		if (!title.trim() || !content.trim()) return;
 
-		if (status === "published" && (!subtitle.trim() || !thumbnail)) return;
+		if (status === "published" && (!subtitle.trim() || !thumbnail || !category)) return;
 
-		// Set the proper loading state
 		if (status === "draft") setIsSavingDraft(true);
 		else setIsPublishing(true);
 
@@ -56,6 +75,7 @@ export default function BlogEditor() {
 		formData.append("title", title);
 		formData.append("subtitle", subtitle);
 		formData.append("content", content);
+		formData.append("category", category);
 		formData.append("status", status);
 
 		try {
@@ -66,6 +86,7 @@ export default function BlogEditor() {
 				setTitle("");
 				setSubtitle("");
 				setContent("");
+				setCategory("");
 				setThumbnail(null);
 				setThumbnailUrl("");
 				if (fileInputRef.current) fileInputRef.current.value = "";
@@ -171,6 +192,34 @@ export default function BlogEditor() {
 					{subtitle.length}/200 characters
 				</p>
 
+				{/* Category Selector - Clickable Buttons */}
+				<div className="mb-6">
+					<label className="block text-sm font-semibold text-gray-700 mb-3">
+						Select Category <span className="text-red-500">*</span>
+					</label>
+					<div className="flex flex-wrap gap-2">
+						{allCategories.map((cat) => (
+							<button
+								key={cat}
+								type="button"
+								onClick={() => setCategory(cat)}
+								className={`px-3 py-2 rounded-full text-xs sm:text-sm font-medium transition-all ${
+									category === cat
+										? "bg-black text-white shadow-md scale-105"
+										: "bg-gray-100 text-gray-700 hover:bg-gray-200 hover:scale-105"
+								}`}
+							>
+								{cat}
+							</button>
+						))}
+					</div>
+					{category && (
+						<p className="text-xs sm:text-sm text-gray-600 mt-2">
+							Selected: <span className="font-semibold text-black">{category}</span>
+						</p>
+					)}
+				</div>
+
 				{/* Blog Content Editor */}
 				<div className="bg-white rounded-lg shadow-md mb-4 overflow-hidden">
 					<ReactQuill
@@ -185,23 +234,30 @@ export default function BlogEditor() {
 					<button
 						onClick={() => handleSubmit("draft")}
 						disabled={isSavingDraft || !title.trim() || !content.trim()}
-						className="px-6 py-3 rounded-lg text-base sm:text-lg font-medium bg-gray-500 text-white hover:bg-gray-600 transition"
+						className="px-6 py-3 rounded-lg text-base sm:text-lg font-medium bg-gray-500 text-white hover:bg-gray-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
 					>
 						{isSavingDraft ? "Saving..." : "Save Draft"}
 					</button>
 
 					<button
 						onClick={() => handleSubmit("published")}
-						disabled={isPublishing || !title.trim() || !subtitle.trim() || !content.trim() || !thumbnail}
+						disabled={isPublishing || !title.trim() || !subtitle.trim() || !content.trim() || !thumbnail || !category}
 						className={`px-6 py-3 rounded-lg text-base sm:text-lg font-medium ${
-							isPublishing
+							isPublishing || !category
 								? "bg-gray-500 text-white cursor-not-allowed"
 								: "bg-black text-white hover:bg-gray-800"
-						} transition`}
+						} transition disabled:opacity-50`}
 					>
 						{isPublishing ? "Publishing..." : "Publish"}
 					</button>
 				</div>
+
+				{/* Validation Message */}
+				{!category && (
+					<p className="text-red-500 text-sm mt-2">
+						Please select a category before publishing
+					</p>
+				)}
 			</div>
 
 			{/* Sliding Notification Popup */}

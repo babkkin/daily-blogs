@@ -18,10 +18,11 @@ export async function POST(req) {
     const title = formData.get("title");
     const content = formData.get("content");
     const subtitle = formData.get("subtitle");
+    const category = formData.get("category");
     const status = formData.get("status") || "published"; // ✅ important
 
     let imageUrl = null;
-
+ 
     if (file) {
       const fileName = `${Date.now()}-${file.name}`;
       const { data, error } = await supabase.storage
@@ -41,9 +42,9 @@ export async function POST(req) {
     const client = await pool.connect();
     try {
       await client.query(
-        `INSERT INTO blogs (user_id, title, content, image_url, subtitle, status)
-         VALUES ($1, $2, $3, $4, $5, $6)`,
-        [userId, title, content, imageUrl, subtitle, status]
+        `INSERT INTO blogs (user_id, title, content, image_url, subtitle, status, category)
+         VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+        [userId, title, content, imageUrl, subtitle, status, category]
       );
     } finally {
       client.release();

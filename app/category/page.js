@@ -20,6 +20,7 @@ export default function CategorySelector() {
     "History",
     "Art & Design",
     "News & Politics",
+    "Others",
   ];
 
   const [step, setStep] = useState(1);
