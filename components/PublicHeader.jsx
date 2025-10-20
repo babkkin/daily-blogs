@@ -13,7 +13,7 @@ export default function PublicHeader() {
 
   useEffect(() => {
     if (status === "authenticated" && pathname === "/") {
-      router.push("/home");
+      router.push("/landing");
     }
   }, [status, router, pathname]);
 
