@@ -4,7 +4,7 @@ import { Users, BookmarkPlus, UserPlus, UserCheck } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
-export default function MediumSidebar() {
+export default function MediumSidebar({ onCategorySelect, selectedCategory }) {
   const [followedUsers, setFollowedUsers] = useState(new Set());
   const [visibleCount, setVisibleCount] = useState(9);
   const [suggestedUsers, setSuggestedUsers] = useState([]);
@@ -21,7 +21,7 @@ export default function MediumSidebar() {
   const topics = [
     "Technology","Health & Wellness","Travel","Food","Lifestyle",
     "Education","Finance","Entertainment","Science","Sports",
-    "Music","Gaming","History","Art & Design","News & Politics"
+    "Music","Gaming","History","Art & Design","News & Politics", "Others"
   ];
 
   // Fetch suggested users
@@ -68,7 +68,7 @@ export default function MediumSidebar() {
   const calculateReadTime = (content) => {
     if (!content) return "5 min read";
     const words = content.replace(/<[^>]*>/g, '').split(/\s+/).length;
-    const minutes = Math.ceil(words / 200); // Average reading speed
+    const minutes = Math.ceil(words / 200);
     return `${minutes} min read`;
   };
 
@@ -105,6 +105,16 @@ export default function MediumSidebar() {
     }
   };
 
+  const handleCategoryClick = (category) => {
+    // Toggle category selection
+    const newCategory = selectedCategory === category ? null : category;
+    
+    // Notify parent component
+    if (onCategorySelect) {
+      onCategorySelect(newCategory);
+    }
+  };
+
   return (
     <div className="space-y-8 pl-[2vh] relative">
       {/* Sliding Notification Popup */}
@@ -124,9 +134,13 @@ export default function MediumSidebar() {
         <div className="flex flex-wrap gap-2 mb-3">
           {topics.slice(0, visibleCount).map((topic) => (
             <button
-              onClick={() => alert("Discovery placeholder")}
+              onClick={() => handleCategoryClick(topic)}
               key={topic}
-              className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-full text-sm text-gray-700 transition"
+              className={`px-4 py-2 rounded-full text-sm transition ${
+                selectedCategory === topic
+                  ? "bg-black text-white font-semibold"
+                  : "bg-gray-100 hover:bg-gray-200 text-gray-700"
+              }`}
             >
               {topic}
             </button>
@@ -138,6 +152,14 @@ export default function MediumSidebar() {
             className="text-sm text-blue-600 hover:text-blue-800 font-medium transition"
           >
             Load more
+          </button>
+        )}
+        {selectedCategory && (
+          <button
+            onClick={() => handleCategoryClick(null)}
+            className="text-sm text-red-600 hover:text-red-800 font-medium transition mt-2"
+          >
+            Clear filter
           </button>
         )}
       </div>
