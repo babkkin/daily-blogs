@@ -16,6 +16,7 @@ export default function BlogEditor() {
   const [title, setTitle] = useState("");
   const [subtitle, setSubtitle] = useState("");
   const [content, setContent] = useState("");
+  const [category, setCategory] = useState("");
   const [thumbnail, setThumbnail] = useState(null);
   const [thumbnailUrl, setThumbnailUrl] = useState("");
   const [isSavingDraft, setIsSavingDraft] = useState(false);
@@ -24,6 +25,25 @@ export default function BlogEditor() {
   const [notification, setNotification] = useState("");
 
   const fileInputRef = useRef(null);
+
+  const allCategories = [
+    "Technology",
+    "Health & Wellness",
+    "Travel",
+    "Food",
+    "Lifestyle",
+    "Education",
+    "Finance",
+    "Entertainment",
+    "Science",
+    "Sports",
+    "Music",
+    "Gaming",
+    "History",
+    "Art & Design",
+    "News & Politics",
+    "Others",
+  ];
 
   // Fetch existing blog if id exists
   useEffect(() => {
@@ -37,6 +57,7 @@ export default function BlogEditor() {
           setTitle(data.blog.title);
           setSubtitle(data.blog.subtitle);
           setContent(data.blog.content);
+          setCategory(data.blog.category || "");
           setThumbnailUrl(data.blog.image_url || "");
         }
       } catch (err) {
@@ -66,55 +87,56 @@ export default function BlogEditor() {
     }
   };
 
- const handleSubmit = async (status = "published") => {
-  if (!title.trim() || !content.trim()) return;
-  if (status === "published" && (!subtitle.trim() || (!thumbnail && !thumbnailUrl)))
-    return;
+  const handleSubmit = async (status = "published") => {
+    if (!title.trim() || !content.trim()) return;
+    if (status === "published" && (!subtitle.trim() || !category || (!thumbnail && !thumbnailUrl)))
+      return;
 
-  if (status === "draft") setIsSavingDraft(true);
-  else setIsPublishing(true);
+    if (status === "draft") setIsSavingDraft(true);
+    else setIsPublishing(true);
 
-  const formData = new FormData();
-if (thumbnail) {
-  formData.append("file", thumbnail); // new file
-} else if (thumbnailUrl) {
-  formData.append("existingImageUrl", thumbnailUrl); // send existing URL
-}
-  formData.append("title", title);
-  formData.append("subtitle", subtitle);
-  formData.append("content", content);
-  formData.append("status", status);
-
-  try {
-    const endpoint = id ? `/api/blogs/${id}` : "/api/upload";
-    const method = id ? "PUT" : "POST";
-
-    const res = await fetch(endpoint, { method, body: formData });
-    const data = await res.json();
-
-    if (data.success) {
-      const successMsg = status === "draft" ? "Draft saved!" : "Post published!";
-      let redirectPath = null;
-      
-      if (status === "draft") {
-        // Redirect to the "Manage Post" tab instead of the blog page
-        redirectPath = `/profile/${data.blog?.user_id }?tab=managepost`;
-      } else {
-        redirectPath = id ? `/blogs/${id}` : "/";
-      }
-      
-      showNotificationMsg(successMsg, redirectPath);
-    } else {
-      showNotificationMsg(data.error || "Failed to save post");
+    const formData = new FormData();
+    if (thumbnail) {
+      formData.append("file", thumbnail); // new file
+    } else if (thumbnailUrl) {
+      formData.append("existingImageUrl", thumbnailUrl); // send existing URL
     }
-  } catch (err) {
-    console.error("Save error:", err);
-    showNotificationMsg("Failed to save post");
-  } finally {
-    if (status === "draft") setIsSavingDraft(false);
-    else setIsPublishing(false);
-  }
-};
+    formData.append("title", title);
+    formData.append("subtitle", subtitle);
+    formData.append("content", content);
+    formData.append("category", category);
+    formData.append("status", status);
+
+    try {
+      const endpoint = id ? `/api/blogs/${id}` : "/api/upload";
+      const method = id ? "PUT" : "POST";
+
+      const res = await fetch(endpoint, { method, body: formData });
+      const data = await res.json();
+
+      if (data.success) {
+        const successMsg = status === "draft" ? "Draft saved!" : "Post published!";
+        let redirectPath = null;
+        
+        if (status === "draft") {
+          // Redirect to the "Manage Post" tab instead of the blog page
+          redirectPath = `/profile/${data.blog?.user_id}?tab=managepost`;
+        } else {
+          redirectPath = id ? `/blogs/${id}` : "/";
+        }
+        
+        showNotificationMsg(successMsg, redirectPath);
+      } else {
+        showNotificationMsg(data.error || "Failed to save post");
+      }
+    } catch (err) {
+      console.error("Save error:", err);
+      showNotificationMsg("Failed to save post");
+    } finally {
+      if (status === "draft") setIsSavingDraft(false);
+      else setIsPublishing(false);
+    }
+  };
 
   return (
     <>
@@ -186,6 +208,34 @@ if (thumbnail) {
           className="w-full mb-4 p-3 border border-gray-300 rounded-lg text-sm sm:text-base italic focus:outline-none focus:ring-2 focus:ring-black"
         />
 
+        {/* Category Selector - Clickable Buttons */}
+        <div className="mb-6">
+          <label className="block text-sm font-semibold text-gray-700 mb-3">
+            Select Category <span className="text-red-500">*</span>
+          </label>
+          <div className="flex flex-wrap gap-2">
+            {allCategories.map((cat) => (
+              <button
+                key={cat}
+                type="button"
+                onClick={() => setCategory(cat)}
+                className={`px-3 py-2 rounded-full text-xs sm:text-sm font-medium transition-all ${
+                  category === cat
+                    ? "bg-black text-white shadow-md scale-105"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200 hover:scale-105"
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+          {category && (
+            <p className="text-xs sm:text-sm text-gray-600 mt-2">
+              Selected: <span className="font-semibold text-black">{category}</span>
+            </p>
+          )}
+        </div>
+
         {/* Content */}
         <div className="bg-white rounded-lg shadow-md mb-4 overflow-hidden">
           <ReactQuill
@@ -201,7 +251,7 @@ if (thumbnail) {
           <button
             onClick={() => handleSubmit("draft")}
             disabled={isSavingDraft || !title.trim() || !content.trim()}
-            className="px-6 py-3 rounded-lg text-base sm:text-lg font-medium bg-gray-500 text-white hover:bg-gray-600 transition"
+            className="px-6 py-3 rounded-lg text-base sm:text-lg font-medium bg-gray-500 text-white hover:bg-gray-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSavingDraft ? "Saving..." : "Save Draft"}
           </button>
@@ -209,17 +259,24 @@ if (thumbnail) {
           <button
             onClick={() => handleSubmit("published")}
             disabled={
-              isPublishing || !title.trim() || !subtitle.trim() || !content.trim() || (!thumbnail && !thumbnailUrl)
+              isPublishing || !title.trim() || !subtitle.trim() || !content.trim() || !category || (!thumbnail && !thumbnailUrl)
             }
             className={`px-6 py-3 rounded-lg text-base sm:text-lg font-medium ${
-              isPublishing
+              isPublishing || !category
                 ? "bg-gray-500 text-white cursor-not-allowed"
                 : "bg-black text-white hover:bg-gray-800"
-            } transition`}
+            } transition disabled:opacity-50`}
           >
             {isPublishing ? "Publishing..." : "Publish"}
           </button>
         </div>
+
+        {/* Validation Message */}
+        {!category && (
+          <p className="text-red-500 text-sm mt-2">
+            Please select a category before publishing
+          </p>
+        )}
       </div>
 
       {/* Sliding Notification Popup */}
