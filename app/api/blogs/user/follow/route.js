@@ -75,7 +75,7 @@ export async function POST(request) {
 
       const actorRes = await pool.query(
           "SELECT user_name FROM users_profile WHERE user_id=$1",
-          [userId]
+          [token.userId]
         );
         const actorName = actorRes.rows[0]?.user_name || "Someone";
 
