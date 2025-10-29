@@ -71,6 +71,35 @@ export async function POST(request) {
         "INSERT INTO claps (blog_id, user_id) VALUES ($1, $2)",
         [blogId, userId]
       );
+
+      // --- Create notification safely ---
+      const blogOwnerRes = await pool.query(
+        "SELECT user_id FROM blogs WHERE blog_id=$1",
+        [blogId]
+      );
+      const blogOwnerId = blogOwnerRes.rows[0]?.user_id;
+
+      if (blogOwnerId && blogOwnerId !== userId) {
+        const actorRes = await pool.query(
+          "SELECT user_name FROM users_profile WHERE user_id=$1",
+          [userId]
+        );
+        const actorName = actorRes.rows[0]?.user_name || "Someone";
+
+        await pool.query(
+          `INSERT INTO notifications (user_id, actor_id, type, message, location_id)
+           VALUES ($1, $2, $3, $4, $5)
+           ON CONFLICT DO NOTHING`,
+          [
+            blogOwnerId,                     // recipient
+            userId,                           // actor
+            "liked",                          // type
+            `${actorName} liked your blog`,   // message
+            blogId                             // location reference
+          ]
+        );
+      }
+
       const countRes = await pool.query("SELECT COUNT(*) FROM claps WHERE blog_id=$1", [blogId]);
       return NextResponse.json({ 
         success: true, 
