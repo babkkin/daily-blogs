@@ -36,7 +36,7 @@ export async function GET(request) {
   }
 }
 
-// POST a new comment
+// POST a new comment + create notification
 export async function POST(request) {
   try {
     // Get user from JWT
@@ -54,6 +54,7 @@ export async function POST(request) {
       return NextResponse.json({ success: false, error: "Missing data" }, { status: 400 });
     }
 
+    // Insert comment
     const res = await pool.query(
       `INSERT INTO comments (blog_id, user_id, text) 
        VALUES ($1, $2, $3) 
@@ -73,12 +74,36 @@ export async function POST(request) {
       profile_url: userRes.rows[0]?.profile_url
     };
 
+    // --- New: create notification for the blog owner ---
+    const blogOwnerRes = await pool.query(
+      `SELECT user_id FROM blogs WHERE blog_id = $1`,
+      [blogId]
+    );
+
+    const blogOwnerId = blogOwnerRes.rows[0]?.user_id;
+
+    if (blogOwnerId && blogOwnerId !== userId) {
+      // Insert notification
+      await pool.query(
+        `INSERT INTO notifications (user_id, actor_id, type, message, location_id)
+         VALUES ($1, $2, $3, $4, $5) ON CONFLICT DO NOTHING`,
+        [
+          blogOwnerId,                 // recipient
+          userId,                      // actor
+          'commented',                 // type
+          `${userRes.rows[0]?.user_name} commented on your blog`, // message
+          blogId                        // location reference
+        ]
+      );
+    }
+
     return NextResponse.json({ success: true, comment });
   } catch (err) {
     console.error(err);
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });
   }
 }
+
 
 // DELETE a comment
 export async function DELETE(request) {

@@ -8,14 +8,12 @@ const SECRET = process.env.NEXTAUTH_SECRET;
 export async function GET(request) {
   try {
     const token = await getToken({ req: request, secret: SECRET });
-    
     if (!token || !token.userId) {
       return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
     }
 
     const { searchParams } = new URL(request.url);
     const authorId = searchParams.get("authorId");
-    
     if (!authorId) {
       return NextResponse.json({ success: false, error: "Missing authorId" }, { status: 400 });
     }
@@ -35,17 +33,15 @@ export async function GET(request) {
   }
 }
 
-// POST - Toggle follow
+// POST - Toggle follow + notification
 export async function POST(request) {
   try {
     const token = await getToken({ req: request, secret: SECRET });
-    
     if (!token || !token.userId) {
       return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
     }
 
     const { authorId } = await request.json();
-    
     if (!authorId) {
       return NextResponse.json({ success: false, error: "Missing authorId" }, { status: 400 });
     }
@@ -69,11 +65,20 @@ export async function POST(request) {
       );
       return NextResponse.json({ success: true, isFollowing: false });
     } else {
-      // Follow
+      // Follow + notification
       await pool.query(
         "INSERT INTO follows (follower_id, following_id) VALUES ($1, $2)",
         [token.userId, authorId]
       );
+
+      // 🔔 Create notification (do nothing if it already exists)
+      await pool.query(
+        `INSERT INTO notifications (user_id, actor_id, type, message, status, location_id)
+         VALUES ($1, $2, 'follow', $3, 'unread', NULL)
+         ON CONFLICT (user_id, actor_id, type) DO NOTHING`,
+        [authorId, token.userId, 'started following you']
+      );
+
       return NextResponse.json({ success: true, isFollowing: true });
     }
   } catch (err) {
