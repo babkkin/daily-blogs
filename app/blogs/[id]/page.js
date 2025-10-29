@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -12,6 +12,7 @@ export default function BlogPage() {
   const [blog, setBlog] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const initialLoadComplete = useRef(false);
 
   const [claps, setClaps] = useState(0);
   const [hasClapped, setHasClapped] = useState(false);
@@ -76,9 +77,9 @@ export default function BlogPage() {
     }
   }, [session]);
 
-  // Initial data fetch
+  // Initial data fetch - only runs once
   useEffect(() => {
-    if (!id) return;
+    if (!id || initialLoadComplete.current) return;
 
     const fetchData = async () => {
       setLoading(true);
@@ -89,46 +90,76 @@ export default function BlogPage() {
           fetchClaps(),
           fetchBookmark()
         ]);
-        
-        // Fetch follow status after blog is loaded
-        if (blog?.user_id) {
-          await fetchFollowStatus(blog.user_id);
-        }
       } catch (err) {
         console.error("Error fetching data:", err);
         setError("Failed to load blog data");
       } finally {
         setLoading(false);
+        initialLoadComplete.current = true;
       }
     };
 
     fetchData();
-  }, [id, session]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [id, fetchBlog, fetchComments, fetchClaps, fetchBookmark]);
 
   // Fetch follow status when blog data is loaded
   useEffect(() => {
-    if (blog?.user_id) {
+    if (blog?.user_id && initialLoadComplete.current) {
       fetchFollowStatus(blog.user_id);
     }
   }, [blog?.user_id, fetchFollowStatus]);
 
   // Auto-refresh data every 5 seconds (except blog content)
+  // Pauses when tab is not visible
   useEffect(() => {
-    if (!id || loading) return;
+    if (!id || !initialLoadComplete.current) return;
 
-    const interval = setInterval(() => {
-      fetchComments();
-      fetchClaps();
-      if (session) {
-        fetchBookmark();
-        if (blog?.user_id) {
-          fetchFollowStatus(blog.user_id);
+    let interval;
+
+    const startInterval = () => {
+      interval = setInterval(() => {
+        if (!document.hidden) {
+          fetchComments();
+          fetchClaps();
+          if (session) {
+            fetchBookmark();
+            if (blog?.user_id) {
+              fetchFollowStatus(blog.user_id);
+            }
+          }
         }
-      }
-    }, 5000); // Refresh every 5 seconds
+      }, 5000);
+    };
 
-    return () => clearInterval(interval);
-  }, [id, loading, session, blog?.user_id, fetchComments, fetchClaps, fetchBookmark, fetchFollowStatus]);
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        // Tab is hidden, clear interval
+        if (interval) clearInterval(interval);
+      } else {
+        // Tab is visible again, fetch fresh data and restart interval
+        fetchComments();
+        fetchClaps();
+        if (session) {
+          fetchBookmark();
+          if (blog?.user_id) {
+            fetchFollowStatus(blog.user_id);
+          }
+        }
+        startInterval();
+      }
+    };
+
+    // Start the interval initially
+    startInterval();
+
+    // Listen for visibility changes
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      if (interval) clearInterval(interval);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [id, session, blog?.user_id, fetchComments, fetchClaps, fetchBookmark, fetchFollowStatus]);
 
   const handleClap = async () => {
     try {
@@ -165,7 +196,7 @@ export default function BlogPage() {
       const data = await res.json();
       if (data.success) {
         setIsBookmarked(data.isBookmarked);
-        await fetchBookmark(); // Refresh bookmark status
+        await fetchBookmark();
       } else {
         alert(data.error || "Failed to bookmark");
       }
@@ -187,7 +218,7 @@ export default function BlogPage() {
       const data = await res.json();
       if (data.success) {
         setIsFollowing(data.isFollowing);
-        await fetchFollowStatus(blog.user_id); // Refresh follow status
+        await fetchFollowStatus(blog.user_id);
       } else {
         alert(data.error || "Failed to follow");
       }
@@ -210,7 +241,7 @@ export default function BlogPage() {
       const data = await res.json();
       if (data.success) {
         setNewComment("");
-        await fetchComments(); // Refresh comments
+        await fetchComments();
       } else {
         alert(data.error || "Failed to post comment");
       }
@@ -229,7 +260,7 @@ export default function BlogPage() {
       });
       const data = await res.json();
       if (data.success) {
-        await fetchComments(); // Refresh comments
+        await fetchComments();
       } else {
         alert(data.error || "Failed to delete comment");
       }
@@ -261,7 +292,7 @@ export default function BlogPage() {
       const data = await res.json();
       if (data.success) {
         cancelEdit();
-        await fetchComments(); // Refresh comments
+        await fetchComments();
       } else {
         alert(data.error || "Failed to update comment");
       }
@@ -286,7 +317,7 @@ export default function BlogPage() {
     return Math.floor(seconds) + " seconds ago";
   };
 
-  if (loading) return (
+  if (loading && !initialLoadComplete.current) return (
     <div className="flex items-center justify-center min-h-screen px-4">
       <div className="w-full max-w-md">
         <div className="flex flex-col justify-center items-center py-12 sm:py-16">
