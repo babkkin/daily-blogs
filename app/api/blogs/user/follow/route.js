@@ -72,11 +72,18 @@ export async function POST(request) {
       );
 
       // 🔔 Create notification (do nothing if it already exists)
+
+      const actorRes = await pool.query(
+          "SELECT user_name FROM users_profile WHERE user_id=$1",
+          [userId]
+        );
+        const actorName = actorRes.rows[0]?.user_name || "Someone";
+
       await pool.query(
         `INSERT INTO notifications (user_id, actor_id, type, message, status, location_id)
          VALUES ($1, $2, 'follow', $3, 'unread', NULL)
          ON CONFLICT (user_id, actor_id, type) DO NOTHING`,
-        [authorId, token.userId, 'started following you']
+        [authorId, token.userId, `${actorName} started following you`]
       );
 
       return NextResponse.json({ success: true, isFollowing: true });
