@@ -9,13 +9,17 @@ export async function POST(request) {
     const token = await getToken({ req: request, secret: SECRET });
 
     if (!token || !token.userId) {
-      return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json(
+        { success: false, error: "Unauthorized" },
+        { status: 401 }
+      );
     }
 
     const { notificationId } = await request.json();
 
+    // Update the status column to 'read' instead of using is_read
     await pool.query(
-      "UPDATE notifications SET is_read = TRUE WHERE notification_id = $1 AND user_id = $2",
+      "UPDATE notifications SET status = 'read' WHERE id = $1 AND user_id = $2",
       [notificationId, token.userId]
     );
 

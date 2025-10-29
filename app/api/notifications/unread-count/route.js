@@ -12,8 +12,9 @@ export async function GET(request) {
       return NextResponse.json({ success: true, count: 0 });
     }
 
+    // Count notifications where status is not 'read'
     const { rows } = await pool.query(
-      "SELECT COUNT(*) FROM notifications WHERE user_id = $1 AND is_read = FALSE",
+      "SELECT COUNT(*) FROM notifications WHERE user_id = $1 AND status <> 'read'",
       [token.userId]
     );
 
