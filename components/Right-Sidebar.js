@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { Users, BookmarkPlus, UserPlus, UserCheck } from "lucide-react";
+import { Users, BookmarkPlus, UserPlus, UserCheck, Sparkles } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -243,20 +243,29 @@ export default function MediumSidebar({ onCategorySelect, selectedCategory }) {
         ) : (
           <div className="space-y-5">
             {recommendedBlogs.map((blog) => (
-              <Link
-                key={blog.id}
-                href={`/blogs/${blog.id}`}
-                className="group cursor-pointer block"
-              >
-                <h4 className="font-medium text-gray-900 text-sm leading-snug mb-1 group-hover:text-black line-clamp-2">
-                  {blog.title}
-                </h4>
-                <div className="flex items-center gap-2 text-xs text-gray-500">
-                  <span>{blog.user_name}</span>
-                  <span>·</span>
-                  <span>{calculateReadTime(blog.content)}</span>
-                </div>
-              </Link>
+              <div key={blog.id} className="group">
+                <Link
+                  href={`/blogs/${blog.id}`}
+                  className="cursor-pointer block"
+                >
+                  <h4 className="font-medium text-gray-900 text-sm leading-snug mb-1 group-hover:text-black line-clamp-2">
+                    {blog.title}
+                  </h4>
+                  <div className="flex items-center gap-2 text-xs text-gray-500 mb-2">
+                    <span>{blog.user_name}</span>
+                    <span>·</span>
+                    <span>{calculateReadTime(blog.content)}</span>
+                  </div>
+                </Link>
+                
+                {/* Recommendation Reason Badge */}
+                {blog.reason && (
+                  <div className="flex items-center gap-1 text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded-full w-fit">
+                    <Sparkles size={12} />
+                    <span className="font-medium">{blog.reason}</span>
+                  </div>
+                )}
+              </div>
             ))}
           </div>
         )}
