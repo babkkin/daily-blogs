@@ -4,6 +4,64 @@ import { getToken } from "next-auth/jwt";
 
 const SECRET = process.env.NEXTAUTH_SECRET;
 
+// Helper function to update user history
+async function updateUserHistory(userId, type, itemId) {
+  try {
+    // Get blog details (category needed for recommendation system)
+    const blogRes = await pool.query(
+      "SELECT category FROM blogs WHERE blog_id = $1",
+      [itemId]
+    );
+
+    if (!blogRes.rows[0]) {
+      console.error("Blog not found for history update");
+      return;
+    }
+
+    const category = blogRes.rows[0].category;
+
+    // Ensure user_id exists in users_history
+    await pool.query(
+      `INSERT INTO users_history (user_id, history) 
+       VALUES ($1, '{"like": [], "comment": []}') 
+       ON CONFLICT (user_id) DO NOTHING`,
+      [userId]
+    );
+
+    // Get current history
+    const historyRes = await pool.query(
+      "SELECT history FROM users_history WHERE user_id = $1",
+      [userId]
+    );
+
+    let history = historyRes.rows[0]?.history || { like: [], comment: [] };
+
+    // Check if item already exists and remove it (to avoid duplicates)
+    history[type] = history[type].filter(entry => entry.post_id !== itemId);
+
+    // Add new entry with timestamp at the beginning (compatible with recommendation system)
+    const newEntry = {
+      post_id: itemId,
+      category: category,
+      timestamp: new Date().toISOString()
+    };
+
+    history[type].unshift(newEntry);
+
+    // Keep only newest 100 entries
+    history[type] = history[type].slice(0, 100);
+
+    // Update in database
+    await pool.query(
+      "UPDATE users_history SET history = $1 WHERE user_id = $2",
+      [JSON.stringify(history), userId]
+    );
+  } catch (err) {
+    console.error("Error updating user history:", err);
+    // Don't throw - history update shouldn't break the main operation
+  }
+}
+
 // GET all comments for a blog with user info
 export async function GET(request) {
   try {
@@ -36,7 +94,7 @@ export async function GET(request) {
   }
 }
 
-// POST a new comment + create notification
+// POST a new comment + create notification + save to history
 export async function POST(request) {
   try {
     // Get user from JWT
@@ -62,6 +120,8 @@ export async function POST(request) {
       [blogId, userId, text]
     );
 
+    const commentId = res.rows[0].comment_id;
+
     // Get user info for the new comment
     const userRes = await pool.query(
       `SELECT user_name, profile_url FROM users_profile WHERE user_id = $1`,
@@ -74,7 +134,10 @@ export async function POST(request) {
       profile_url: userRes.rows[0]?.profile_url
     };
 
-    // --- New: create notification for the blog owner ---
+    // Save to user history
+    await updateUserHistory(userId, 'comment', blogId);
+
+    // Create notification for the blog owner
     const blogOwnerRes = await pool.query(
       `SELECT user_id FROM blogs WHERE blog_id = $1`,
       [blogId]
@@ -83,16 +146,15 @@ export async function POST(request) {
     const blogOwnerId = blogOwnerRes.rows[0]?.user_id;
 
     if (blogOwnerId && blogOwnerId !== userId) {
-      // Insert notification
       await pool.query(
         `INSERT INTO notifications (user_id, actor_id, type, message, location_id)
          VALUES ($1, $2, $3, $4, $5) ON CONFLICT DO NOTHING`,
         [
-          blogOwnerId,                 // recipient
-          userId,                      // actor
-          'commented',                 // type
-          `${userRes.rows[0]?.user_name} commented on your blog`, // message
-          blogId                        // location reference
+          blogOwnerId,
+          userId,
+          'commented',
+          `${userRes.rows[0]?.user_name} commented on your blog`,
+          blogId
         ]
       );
     }
@@ -103,7 +165,6 @@ export async function POST(request) {
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });
   }
 }
-
 
 // DELETE a comment
 export async function DELETE(request) {
