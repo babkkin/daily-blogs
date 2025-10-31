@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import InteractiveGridPattern from "@/components/ui/interactive-grid-pattern";
 import PublicHeader from "@/components/PublicHeader";
 import PublicFooter from "@/components/PublicFooter";
+import Preview from "@/components/Preview";
 
 export default function HomePage() {
   const { openModal } = useAuthModal();
@@ -40,7 +41,10 @@ export default function HomePage() {
             </button>
           </div>
         </div>
+        
+
       </main>
+      <Preview/>
 
       {/* ===== Public Footer ===== */}
       <PublicFooter />
