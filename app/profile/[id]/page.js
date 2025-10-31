@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import EditBio from "@/components/Editbio";
 import { useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { Heart, MessageCircle, Bookmark, MoreVertical } from "lucide-react";
+import { Heart, MessageCircle, Bookmark, MoreVertical, Camera, X } from "lucide-react";
 
 export default function MediumStyleProfile() {
   const { data: session } = useSession();
@@ -27,6 +27,11 @@ export default function MediumStyleProfile() {
   const [openDropdown, setOpenDropdown] = useState(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [postToDelete, setPostToDelete] = useState(null);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [showPhotoModal, setShowPhotoModal] = useState(false);
+  const [previewPhoto, setPreviewPhoto] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const fileInputRef = useRef(null);
 
   const currentUserId = session?.user?.userId || session?.user?.id;
   const isOwnProfile = currentUserId === profileUserId;
@@ -34,57 +39,55 @@ export default function MediumStyleProfile() {
   const draftPosts = posts.filter(post => post.status === "draft");
   const trashPosts = posts.filter(post => post.status === "trash");
   const options = {
-  year: "numeric",
-  month: "short",
-  day: "numeric",
-};
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  };
 
   // Fetch user info
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const res = await fetch(`/api/profile/${id}`);
-        const data = await res.json();
-        if (data.success) {
-          setName(data.user.name);
-          setBio(data.user.bio || "");
-          setPhoto(data.user.profile_url || null);
-          setProfileUserId(data.user.userId);
-        } else {
-          console.error("Failed to load user info:", data.error);
-        }
-      } catch (err) {
-        console.error("Failed to fetch user info:", err);
-      }
-    };
-    fetchUser();
-  }, [id]);
-
-  // Fetch posts
- useEffect(() => {
-  const fetchPosts = async () => {
-    setLoading(true);
-    try {
-      // Fetch all user posts with counts in a single query
-      const res = await fetch(`/api/blogs/user/${id}`);
-      const data = await res.json();
-
-      if (data.success) {
-        // Posts now already include claps_count, comments_count, bookmarks_count
-        setPosts(data.blogs);
-      } else {
-        console.error("Failed to load posts:", data.error);
-      }
-    } catch (err) {
-      console.error("Failed to load posts:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (id) fetchPosts();
+  fetchUser();
 }, [id]);
 
+const fetchUser = async () => {
+  try {
+    const res = await fetch(`/api/profile/${id}`);
+    const data = await res.json();
+    if (data.success) {
+      setName(data.user.name);
+      setBio(data.user.bio || "");
+      setPhoto(data.user.profile_url || null);
+      setProfileUserId(data.user.userId);
+    } else {
+      console.error("Failed to load user info:", data.error);
+    }
+  } catch (err) {
+    console.error("Failed to fetch user info:", err);
+  }
+};
+
+  // Fetch posts
+  useEffect(() => {
+    const fetchPosts = async () => {
+      setLoading(true);
+      try {
+        const res = await fetch(`/api/blogs/user/${id}`);
+        const data = await res.json();
+
+        if (data.success) {
+          setPosts(data.blogs);
+        } else {
+          console.error("Failed to load posts:", data.error);
+        }
+      } catch (err) {
+        console.error("Failed to load posts:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (id) fetchPosts();
+  }, [id]);
 
   // Check follow status
   useEffect(() => {
@@ -132,6 +135,93 @@ export default function MediumStyleProfile() {
   };
 
   const handleBioSave = (newBio) => setBio(newBio);
+
+  const handlePhotoClick = () => {
+    if (isOwnProfile) {
+      fileInputRef.current?.click();
+    }
+  };
+
+  const handlePhotoChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      setNotification("Please select an image file");
+      setShowNotification(true);
+      setTimeout(() => setShowNotification(false), 2000);
+      return;
+    }
+
+    // Validate file size (e.g., 5MB max)
+    if (file.size > 5 * 1024 * 1024) {
+      setNotification("Image size should be less than 5MB");
+      setShowNotification(true);
+      setTimeout(() => setShowNotification(false), 2000);
+      return;
+    }
+
+    // Create preview
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPreviewPhoto(reader.result);
+      setSelectedFile(file);
+      setShowPhotoModal(true);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleCancelPhotoChange = () => {
+    setShowPhotoModal(false);
+    setPreviewPhoto(null);
+    setSelectedFile(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const handleConfirmPhotoChange = async () => {
+    if (!selectedFile) return;
+
+    setUploadingPhoto(true);
+    setShowPhotoModal(false);
+
+    try {
+      const formData = new FormData();
+      formData.append('photo', selectedFile);
+
+      const res = await fetch('/api/save-username', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        fetchUser();
+        setNotification("Profile photo updated successfully");
+        setShowNotification(true);
+        setTimeout(() => setShowNotification(false), 2000);
+      } else {
+        setNotification(data.error || "Failed to upload photo");
+        setShowNotification(true);
+        setTimeout(() => setShowNotification(false), 2000);
+      }
+    } catch (err) {
+      console.error("Failed to upload photo:", err);
+      setNotification("Failed to upload photo");
+      setShowNotification(true);
+      setTimeout(() => setShowNotification(false), 2000);
+    } finally {
+      setUploadingPhoto(false);
+      setPreviewPhoto(null);
+      setSelectedFile(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
 
   const handleMoveToTrash = async (postId) => {
     setOpenDropdown(null);
@@ -194,9 +284,7 @@ export default function MediumStyleProfile() {
 
     try {
       const res = await fetch(`/api/blogs/${postToDelete}`, { method: "DELETE" });
-      console.log("Response status:", res.status);
       const data = await res.json();
-      console.log("Response data:", data);
 
       if (data.success) {
         setPosts(prev => prev.filter(p => p.id !== postToDelete));
@@ -232,20 +320,49 @@ export default function MediumStyleProfile() {
       <main className="w-full max-w-5xl px-4 sm:px-6 md:px-8 py-8">
         {/* User Info */}
         <div className="flex flex-col items-center text-center mb-10">
-          {photo ? (
-            <Image
-              src={photo}
-              alt="Profile"
-              width={128}
-              height={128}
-              className="w-28 h-28 sm:w-32 sm:h-32 rounded-full object-cover border-4 border-gray-200"
-              unoptimized
-            />
-          ) : (
-            <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-full bg-gradient-to-br from-pink-400 to-pink-600  flex items-center justify-center text-white text-4xl sm:text-5xl font-bold border-4 border-gray-200">
-              {name ? name.charAt(0).toUpperCase() : "U"}
-            </div>
-          )}
+          <div className="relative group">
+            {photo ? (
+              <Image
+                src={photo}
+                alt="Profile"
+                width={128}
+                height={128}
+                className="w-28 h-28 sm:w-32 sm:h-32 rounded-full object-cover border-4 border-gray-200"
+                unoptimized
+              />
+            ) : (
+              <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-full bg-gradient-to-br from-pink-400 to-pink-600 flex items-center justify-center text-white text-4xl sm:text-5xl font-bold border-4 border-gray-200">
+                {name ? name.charAt(0).toUpperCase() : "U"}
+              </div>
+            )}
+            
+            {/* Camera Overlay for Own Profile */}
+            {isOwnProfile && !uploadingPhoto && (
+              <>
+                <button
+                  onClick={handlePhotoClick}
+                  className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                >
+                  <Camera className="w-8 h-8 text-white" />
+                </button>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handlePhotoChange}
+                  className="hidden"
+                />
+              </>
+            )}
+
+            {/* Uploading Spinner */}
+            {uploadingPhoto && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full">
+                <div className="w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+              </div>
+            )}
+          </div>
+
           <h2 className="text-2xl sm:text-3xl font-bold mt-4">{name || "Unnamed User"}</h2>
 
           {!isOwnProfile && (
@@ -553,6 +670,54 @@ export default function MediumStyleProfile() {
           currentBio={bio}
           onSave={handleBioSave}
         />
+      )}
+
+      {/* Photo Preview Modal */}
+      {showPhotoModal && (
+        <div className="fixed inset-0 z-[60] backdrop-blur-sm bg-black/50 overflow-y-auto flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-bold">Change Profile Photo</h3>
+              <button
+                onClick={handleCancelPhotoChange}
+                className="p-1 hover:bg-gray-100 rounded-full transition"
+              >
+                <X size={24} />
+              </button>
+            </div>
+
+            {/* Preview */}
+            <div className="flex justify-center mb-6">
+              {previewPhoto && (
+                <img
+                  src={previewPhoto}
+                  alt="Preview"
+                  className="w-48 h-48 rounded-full object-cover border-4 border-gray-200"
+                />
+              )}
+            </div>
+
+            <p className="text-gray-600 text-sm text-center mb-6">
+              This will be your new profile photo. Do you want to continue?
+            </p>
+
+            {/* Actions */}
+            <div className="flex gap-3">
+              <button
+                onClick={handleCancelPhotoChange}
+                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition font-medium"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmPhotoChange}
+                className="flex-1 px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition font-medium"
+              >
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Delete Confirmation Modal */}
