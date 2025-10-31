@@ -1,24 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useAuthModal } from "@/components/AuthModalProvider";
+import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { useRouter, usePathname } from "next/navigation";
-import { useEffect } from "react";
 
 export default function PublicHeader() {
-	const { openModal } = useAuthModal();
-	const { data: session, status } = useSession();
-	const router = useRouter();
+	const { status } = useSession();
 	const pathname = usePathname();
 
-	useEffect(() => {
-		if (status === "authenticated" && pathname === "/") {
-			router.push("/landing");
-		}
-	}, [status, router, pathname]);
-
-	if (status === "loading") return null;
 	if (status === "authenticated" && pathname !== "/about") return null;
 
 	return (
@@ -28,32 +17,21 @@ export default function PublicHeader() {
 				href="/"
 				className="text-2xl md:text-3xl lg:text-4xl font-semibold transition-colors text-gray-900 hover:text-gray-700 text-center md:text-left w-full md:w-auto"
 			>
-				<h1>DailyBlogs</h1>
+				DailyBlogs
 			</Link>
 
-			{/* Right-side links */}
-			<div className="flex flex-wrap justify-center md:justify-end gap-3 md:gap-4 lg:gap-6 items-center w-full md:w-auto">
-				<Link href="/about" className="text-base sm:text-lg lg:text-xl">
-					About us
+			{/* Navigation Links (right / bottom on mobile) */}
+			<nav className="flex flex-wrap justify-center md:justify-end gap-4 w-full md:w-auto">
+				<Link href="/" className="text-gray-700 hover:text-gray-900 font-medium transition-colors">
+					Home
 				</Link>
-
-				{status !== "authenticated" && (
-					<>
-						<button
-							className="text-base sm:text-lg lg:text-xl"
-							onClick={() => openModal("login")}
-						>
-							Sign in
-						</button>
-						<button
-							className="px-3 sm:px-4 lg:px-6 py-2 text-base sm:text-lg lg:text-xl bg-black text-white rounded-full hover:bg-gray-800 transition-colors duration-200"
-							onClick={() => openModal("signup")}
-						>
-							Get Started
-						</button>
-					</>
-				)}
-			</div>
+				<Link href="/about" className="text-gray-700 hover:text-gray-900 font-medium transition-colors">
+					About
+				</Link>
+				<Link href="/login" className="text-gray-700 hover:text-gray-900 font-medium transition-colors">
+					Login
+				</Link>
+			</nav>
 		</header>
 	);
 }
