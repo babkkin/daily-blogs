@@ -56,57 +56,6 @@ function AccountTab() {
         <p className="text-gray-600"></p>
       </div>
 
-      {/* Profile Information */}
-      <div className="flex justify-between items-center py-4 border-b border-gray-200">
-        <div>
-          <p className="font-medium text-gray-900">Profile information</p>
-          <p className="text-sm text-gray-500">Edit your photo, name, pronouns, short bio, etc.</p>
-        </div>
-        <button className="text-gray-600 hover:text-black">
-          <span className="mr-2"></span>
-          <User className="w-5 h-5 inline" />
-        </button>
-      </div>
-
-      {/* Profile Design */}
-      <div className="flex justify-between items-center py-4 border-b border-gray-200 cursor-pointer hover:bg-gray-50">
-        <div>
-          <p className="font-medium text-gray-900">Profile design</p>
-          <p className="text-sm text-gray-500">Customize the appearance of your profile.</p>
-        </div>
-        <span className="text-gray-400">→</span>
-      </div>
-
-      {/* Digest */}
-      <div className="flex justify-between items-center py-4 border-b border-gray-200">
-        <div>
-          <p className="font-medium text-gray-900">Your Medium Digest frequency</p>
-          <p className="text-sm text-gray-500">Adjust how often you see a new Digest.</p>
-        </div>
-        <select className="text-green-600  border-gray-300 rounded px-3 py-1">
-          <option>Daily</option>
-          <option>Weekly</option>
-          <option>Never</option>
-        </select>
-      </div>
-
-
-      {/* Muted Writers */}
-      <div className="flex justify-between items-center py-4 border-b border-gray-200 cursor-pointer hover:bg-gray-50">
-        <div>
-          <p className="font-medium text-gray-900">Muted Authors</p>
-        </div>
-        <span className="text-gray-400">→</span>
-      </div>
-
-      {/* Blocked Users */}
-      <div className="flex justify-between items-center py-4 border-b border-gray-200 cursor-pointer hover:bg-gray-50">
-        <div>
-          <p className="font-medium text-gray-900">Blocked users</p>
-        </div>
-        <span className="text-gray-400">→</span>
-      </div>
-
       {/* Danger Zone */}
       <div className="flex justify-between items-center py-4 border-b border-gray-200 cursor-pointer hover:bg-gray-50">
         <div className="text-red-600 hover:text-red-700 font-medium">
