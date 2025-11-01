@@ -8,11 +8,13 @@ import SignOut from "./SignOut";
 import Image from "next/image";
 import { Menu, SquarePen, Bell } from "lucide-react";
 import BetterSearchUI from "./BetterSearchUi";
+import HelpSupportModal from "./HelpSupportModal";
 
 export default function Header() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [userData, setUserData] = useState(null);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [showHelpModal, setShowHelpModal] = useState(false);
   const router = useRouter();
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
 
@@ -65,6 +67,7 @@ export default function Header() {
   return (
     <>
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <HelpSupportModal isOpen={showHelpModal} onClose={() => setShowHelpModal(false)} />
 
       <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 px-2 sm:px-4 md:px-8 py-2 sm:py-3 flex items-center justify-between gap-1 sm:gap-3">
         <link
@@ -191,7 +194,7 @@ export default function Header() {
                 {/* Help */}
                 <button
                   onClick={() => {
-                    router.push("/help");
+                    setShowHelpModal(true);
                     setShowProfileDropdown(false);
                   }}
                   className="w-full px-2 sm:px-4 py-2 sm:py-3 flex items-center gap-2 sm:gap-3 text-gray-800/70 hover:text-black transition text-left"
