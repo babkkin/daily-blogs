@@ -115,11 +115,34 @@ export default function BlogEditor() {
 			<div className="max-w-3xl mx-auto p-4 sm:p-6">
 				<h1 className="text-2xl sm:text-3xl font-bold mb-4 text-center sm:text-left">Write a Blog</h1>
 
-				{/* Thumbnail Upload Section */}
-				<div className="mb-4 relative">
+				{/* Thumbnail Upload Section (Drag & Drop) */}
+				<div
+					className={`mb-4 relative border-2 border-dashed rounded-lg transition-all ${
+						thumbnailUrl
+							? "border-transparent"
+							: "border-gray-400 hover:border-black/70 bg-gray-100 hover:bg-gray-200"
+					}`}
+					onDragOver={(e) => {
+						e.preventDefault();
+						e.currentTarget.classList.add("border-black", "bg-gray-200");
+					}}
+					onDragLeave={(e) => {
+						e.preventDefault();
+						e.currentTarget.classList.remove("border-black", "bg-gray-200");
+					}}
+					onDrop={(e) => {
+						e.preventDefault();
+						e.currentTarget.classList.remove("border-black", "bg-gray-200");
+						const file = e.dataTransfer.files[0];
+						if (file && file.type.startsWith("image/")) {
+							setThumbnail(file);
+							setThumbnailUrl(URL.createObjectURL(file));
+						}
+					}}
+				>
 					<label
 						htmlFor="thumbnail-upload"
-						className="w-full h-40 sm:h-60 flex flex-col items-center justify-center bg-gray-200 border-2 border-dashed border-gray-400 rounded-lg cursor-pointer hover:bg-black/10 transition"
+						className="w-full h-40 sm:h-60 flex flex-col items-center justify-center rounded-lg cursor-pointer overflow-hidden transition"
 					>
 						{thumbnailUrl ? (
 							<Image
@@ -130,7 +153,12 @@ export default function BlogEditor() {
 								className="w-full h-full object-cover rounded-lg"
 							/>
 						) : (
-							<span className="text-gray-500 text-base sm:text-lg">Upload Thumbnail</span>
+							<div className="flex flex-col items-center justify-center text-center p-4">
+								<span className="text-gray-700 text-base sm:text-lg font-medium">
+									Drag & Drop Thumbnail Here
+								</span>
+								<span className="text-gray-500 text-sm mt-1">or click to upload</span>
+							</div>
 						)}
 					</label>
 

@@ -6,41 +6,54 @@ import { useSession } from "next-auth/react";
 export default function PublicHeader() {
   const { openModal } = useAuthModal();
   const { data: session, status } = useSession();
+	const router = useRouter();
+	const pathname = usePathname();
 
-  return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 px-4 md:px-8 py-3 flex flex-wrap items-center justify-center lg:justify-between">
-      {/* Logo */}
-      <Link
-        href="/"
-        className="text-2xl md:text-3xl lg:text-4xl font-semibold transition-colors text-center mx-auto lg:mx-[44vh]"
-      >
-        <h1>        DailyBlogs</h1>
+	useEffect(() => {
+		if (status === "authenticated" && pathname === "/") {
+			router.push("/landing");
+		}
+	}, [status, router, pathname]);
 
-      </Link>
+	if (status === "loading") return null;
+	if (status === "authenticated" && pathname !== "/about") return null;
 
-      {/* Right-side links */}
-      <div className="flex flex-wrap justify-center lg:justify-end gap-3 md:gap-4 lg:gap-6 items-center w-full lg:w-auto mt-2 lg:mt-0 lg:mr-[44vh]">
-        <Link href="/about" className="text-base sm:text-lg lg:text-xl">
-          About us
-        </Link>
+	return (
+		<header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 px-4 sm:px-6 md:px-10 py-3 flex flex-col sm:flex-row items-center justify-between gap-3">
+			{/* Logo */}
+			<Link
+				href="/"
+				className="text-3xl md:text-4xl font-semibold transition-colors text-gray-900 hover:text-gray-700 text-center sm:text-left"
+			>
+				<h1 className="font-serif tracking-tight">DailyBlogs</h1>
+			</Link>
 
-        {status !== "authenticated" && (
-          <>
-            <button
-              className="text-base sm:text-lg lg:text-xl"
-              onClick={() => openModal("login")}
-            >
-              Sign in
-            </button>
-            <button
-              className="px-3 sm:px-4 lg:px-6 py-2 text-base sm:text-lg lg:text-xl bg-black text-white rounded-full hover:bg-gray-800 transition-colors duration-200"
-              onClick={() => openModal("signup")}
-            >
-              Get Started
-            </button>
-          </>
-        )}
-      </div>
-    </header>
-  );
+			{/* Navigation / Buttons */}
+			<div className="flex flex-wrap justify-center sm:justify-end items-center gap-3 sm:gap-4 md:gap-6">
+				<Link
+					href="/about"
+					className="text-gray-700 hover:text-gray-900 text-base sm:text-lg font-medium transition-colors"
+				>
+					About us
+				</Link>
+
+				{status !== "authenticated" && (
+					<>
+						<button
+							className="text-gray-700 hover:text-gray-900 text-base sm:text-lg font-medium transition-colors"
+							onClick={() => openModal("login")}
+						>
+							Sign in
+						</button>
+						<button
+							className="px-4 sm:px-5 md:px-6 py-2 text-base sm:text-lg bg-black text-white rounded-full hover:bg-gray-800 transition-all duration-200"
+							onClick={() => openModal("signup")}
+						>
+							Get Started
+						</button>
+					</>
+				)}
+			</div>
+		</header>
+	);
 }
