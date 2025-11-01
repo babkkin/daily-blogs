@@ -2,23 +2,10 @@
 import Link from "next/link";
 import { useAuthModal } from "@/components/AuthModalProvider";
 import { useSession } from "next-auth/react";
-import { useRouter, usePathname } from "next/navigation";
-import { useEffect } from "react";
 
 export default function PublicHeader() {
   const { openModal } = useAuthModal();
   const { data: session, status } = useSession();
-  const router = useRouter();
-  const pathname = usePathname();
-
-  useEffect(() => {
-    if (status === "authenticated" && pathname === "/") {
-      router.push("/landing");
-    }
-  }, [status, router, pathname]);
-
-  if (status === "loading") return null;
-  if (status === "authenticated" && pathname !== "/about") return null;
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 px-4 md:px-8 py-3 flex flex-wrap items-center justify-center lg:justify-between">
