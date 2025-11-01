@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import ChangeEmailForm from "@/components/ChangeEmailForm";
+import NotificationsTab from "@/components/NotificationsTab";
+import PrivacyTab from "@/components/PrivacyTab";
 import {
   User,
   Lock,
@@ -49,6 +51,7 @@ export default function Settings() {
       {activeTab === "account" && <AccountTab />}
       {activeTab === "notifications" && <NotificationsTab />}
       {activeTab === "privacy" && <PrivacyTab />}
+
     </div>
   );
 }
