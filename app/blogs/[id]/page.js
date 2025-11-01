@@ -22,6 +22,10 @@ export default function BlogPage() {
   const [editingText, setEditingText] = useState("");
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
+  const [replyingTo, setReplyingTo] = useState(null);
+  const [replyText, setReplyText] = useState("");
+  const [collapsedComments, setCollapsedComments] = useState(new Set());
+  const [showAllComments, setShowAllComments] = useState(false);
 
   // Fetch functions wrapped in useCallback to prevent recreation
   const fetchBlog = useCallback(async () => {
@@ -251,6 +255,29 @@ export default function BlogPage() {
     }
   };
 
+  const handleReplySubmit = async (parentCommentId) => {
+    if (!replyText.trim()) return;
+
+    try {
+      const res = await fetch("/api/blogs/comments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ blogId: id, text: replyText, parentCommentId }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setReplyText("");
+        setReplyingTo(null);
+        await fetchComments();
+      } else {
+        alert(data.error || "Failed to post reply");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Failed to post reply");
+    }
+  };
+
   const handleDeleteComment = async (commentId) => {
     if (!confirm("Are you sure you want to delete this comment?")) return;
 
@@ -315,6 +342,306 @@ export default function BlogPage() {
     interval = seconds / 60;
     if (interval > 1) return Math.floor(interval) + " minutes ago";
     return Math.floor(seconds) + " seconds ago";
+  };
+
+  // Organize comments into parent-child structure
+  const organizeComments = () => {
+    const commentMap = {};
+    const rootComments = [];
+
+    // First pass: create a map of all comments
+    comments.forEach(comment => {
+      commentMap[comment.comment_id] = { ...comment, replies: [] };
+    });
+
+    // Second pass: organize into tree structure
+    comments.forEach(comment => {
+      if (comment.parent_comment_id) {
+        // This is a reply
+        if (commentMap[comment.parent_comment_id]) {
+          commentMap[comment.parent_comment_id].replies.push(commentMap[comment.comment_id]);
+        }
+      } else {
+        // This is a root comment
+        rootComments.push(commentMap[comment.comment_id]);
+      }
+    });
+
+    return rootComments;
+  };
+
+  const toggleCollapse = (commentId) => {
+    setCollapsedComments(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(commentId)) {
+        newSet.delete(commentId);
+      } else {
+        newSet.add(commentId);
+      }
+      return newSet;
+    });
+  };
+
+  const countReplies = (comment) => {
+    let count = comment.replies?.length || 0;
+    comment.replies?.forEach(reply => {
+      count += countReplies(reply);
+    });
+    return count;
+  };
+
+  const renderComment = (c, depth = 0) => {
+    const isDeleted = c.is_deleted || c.text === "[deleted]";
+    const isCollapsed = collapsedComments.has(c.comment_id);
+    const replyCount = c.replies?.length || 0;
+    
+    // For TikTok-style: only show direct replies, not nested ones
+    return (
+      <div key={c.comment_id} className="comment-thread">
+        <div className={`${depth > 0 ? 'border-l-2 border-gray-300 pl-3 sm:pl-4' : ''}`}>
+          <div className={`border border-gray-200 p-3 sm:p-4 rounded-lg ${isDeleted ? 'bg-gray-50' : 'bg-white'} mb-3`}>
+            <div className="flex items-start gap-2 sm:gap-3">
+              {/* User Avatar */}
+              {!isDeleted ? (
+                <Link href={`/profile/${c.user_id}`} className="flex-shrink-0">
+                  {c.profile_url ? (
+                    <Image
+                      src={c.profile_url}
+                      alt={c.user_name || "User"}
+                      width={40}
+                      height={40}
+                      className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover border-2 border-gray-200"
+                      unoptimized
+                    />
+                  ) : (
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-purple-600 flex items-center justify-center text-white font-bold text-xs sm:text-sm">
+                      {c.user_name ? c.user_name.charAt(0).toUpperCase() : "U"}
+                    </div>
+                  )}
+                </Link>
+              ) : (
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gray-400 flex items-center justify-center text-white font-bold text-xs sm:text-sm flex-shrink-0">
+                  ?
+                </div>
+              )}
+
+              <div className="flex-1 min-w-0">
+                {/* User name and timestamp */}
+                <div className="flex items-start justify-between mb-1.5 sm:mb-2 gap-2">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      {!isDeleted ? (
+                        <Link href={`/profile/${c.user_id}`} className="font-semibold text-gray-900 hover:underline text-sm sm:text-base">
+                          {c.user_name || "Anonymous"}
+                        </Link>
+                      ) : (
+                        <span className="font-semibold text-gray-500 text-sm sm:text-base">
+                          [deleted user]
+                        </span>
+                      )}
+                      <span className="text-gray-400">•</span>
+                      <p className="text-[10px] sm:text-xs text-gray-500">{timeAgo(c.created_at)}</p>
+                    </div>
+                  </div>
+
+                  {/* Edit/Delete buttons - only show if not deleted */}
+                  {!isDeleted && session?.user?.id === c.user_id && editingCommentId !== c.comment_id && (
+                    <div className="flex gap-1 sm:gap-2 flex-shrink-0">
+                      <button onClick={() => startEditComment(c)} className="text-blue-600 hover:text-blue-800 p-1" title="Edit">
+                        <Edit2 size={14} className="sm:w-4 sm:h-4" />
+                      </button>
+                      <button onClick={() => handleDeleteComment(c.comment_id)} className="text-red-600 hover:text-red-800 p-1" title="Delete">
+                        <Trash2 size={14} className="sm:w-4 sm:h-4" />
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Comment text or edit form */}
+                {editingCommentId === c.comment_id && !isDeleted ? (
+                  <div>
+                    <textarea
+                      value={editingText}
+                      onChange={(e) => setEditingText(e.target.value)}
+                      className="w-full border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm sm:text-base"
+                      rows={3}
+                      maxLength={500}
+                    />
+                    <div className="flex gap-2 mt-2">
+                      <button onClick={() => handleEditComment(c.comment_id)} className="px-2 sm:px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 flex items-center gap-1 text-xs sm:text-sm">
+                        <Check size={14} className="sm:w-4 sm:h-4" /> Save
+                      </button>
+                      <button onClick={cancelEdit} className="px-2 sm:px-3 py-1 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 flex items-center gap-1 text-xs sm:text-sm">
+                        <X size={14} className="sm:w-4 sm:h-4" /> Cancel
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <p className={`break-words text-sm sm:text-base mb-2 ${isDeleted ? 'text-gray-500 italic' : 'text-gray-700'}`}>
+                      {c.text}
+                    </p>
+                    
+                    {/* Action buttons */}
+                    <div className="flex items-center gap-3 sm:gap-4 text-xs sm:text-sm">
+                      {/* Reply button - only available on top-level comments */}
+                      {session && !isDeleted && depth === 0 && (
+                        <button
+                          onClick={() => {
+                            setReplyingTo(c.comment_id);
+                            setReplyText("");
+                          }}
+                          className="text-gray-600 hover:text-gray-900 font-medium"
+                        >
+                          Reply
+                        </button>
+                      )}
+
+                      {/* View replies button if has replies */}
+                      {replyCount > 0 && depth === 0 && (
+                        <button
+                          onClick={() => toggleCollapse(c.comment_id)}
+                          className="text-blue-600 hover:text-blue-800 font-medium flex items-center gap-1"
+                        >
+                          <MessageCircle size={14} />
+                          {isCollapsed ? `View ${replyCount} ${replyCount === 1 ? 'reply' : 'replies'}` : `Hide ${replyCount} ${replyCount === 1 ? 'reply' : 'replies'}`}
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Reply form */}
+                    {replyingTo === c.comment_id && !isDeleted && (
+                      <div className="mt-3">
+                        <textarea
+                          value={replyText}
+                          onChange={(e) => setReplyText(e.target.value)}
+                          rows={2}
+                          placeholder="Write a reply..."
+                          className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-gray-400 text-sm"
+                          maxLength={500}
+                        />
+                        <div className="flex gap-2 mt-2">
+                          <button
+                            onClick={() => handleReplySubmit(c.comment_id)}
+                            className="px-3 py-1 bg-black text-white rounded-full hover:bg-gray-800 text-xs sm:text-sm disabled:opacity-50"
+                            disabled={!replyText.trim()}
+                          >
+                            Reply
+                          </button>
+                          <button
+                            onClick={() => {
+                              setReplyingTo(null);
+                              setReplyText("");
+                            }}
+                            className="px-3 py-1 bg-gray-200 text-gray-700 rounded-full hover:bg-gray-300 text-xs sm:text-sm"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Render only DIRECT replies (1 level deep) - TikTok style */}
+          {!isCollapsed && c.replies && c.replies.length > 0 && depth === 0 && (
+            <div>
+              {c.replies.map(reply => (
+                <div key={reply.comment_id} className="border-l-2 border-gray-300 pl-3 sm:pl-4 mb-3">
+                  <div className={`border border-gray-200 p-3 sm:p-4 rounded-lg ${reply.is_deleted || reply.text === "[deleted]" ? 'bg-gray-50' : 'bg-white'}`}>
+                    <div className="flex items-start gap-2 sm:gap-3">
+                      {/* Reply Avatar */}
+                      {!(reply.is_deleted || reply.text === "[deleted]") ? (
+                        <Link href={`/profile/${reply.user_id}`} className="flex-shrink-0">
+                          {reply.profile_url ? (
+                            <Image
+                              src={reply.profile_url}
+                              alt={reply.user_name || "User"}
+                              width={40}
+                              height={40}
+                              className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover border-2 border-gray-200"
+                              unoptimized
+                            />
+                          ) : (
+                            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-purple-600 flex items-center justify-center text-white font-bold text-xs sm:text-sm">
+                              {reply.user_name ? reply.user_name.charAt(0).toUpperCase() : "U"}
+                            </div>
+                          )}
+                        </Link>
+                      ) : (
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gray-400 flex items-center justify-center text-white font-bold text-xs sm:text-sm flex-shrink-0">
+                          ?
+                        </div>
+                      )}
+
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between mb-1.5 sm:mb-2 gap-2">
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              {!(reply.is_deleted || reply.text === "[deleted]") ? (
+                                <Link href={`/profile/${reply.user_id}`} className="font-semibold text-gray-900 hover:underline text-sm sm:text-base">
+                                  {reply.user_name || "Anonymous"}
+                                </Link>
+                              ) : (
+                                <span className="font-semibold text-gray-500 text-sm sm:text-base">
+                                  [deleted user]
+                                </span>
+                              )}
+                              <span className="text-gray-400">•</span>
+                              <p className="text-[10px] sm:text-xs text-gray-500">{timeAgo(reply.created_at)}</p>
+                            </div>
+                          </div>
+
+                          {/* Edit/Delete for replies */}
+                          {!(reply.is_deleted || reply.text === "[deleted]") && session?.user?.id === reply.user_id && editingCommentId !== reply.comment_id && (
+                            <div className="flex gap-1 sm:gap-2 flex-shrink-0">
+                              <button onClick={() => startEditComment(reply)} className="text-blue-600 hover:text-blue-800 p-1" title="Edit">
+                                <Edit2 size={14} className="sm:w-4 sm:h-4" />
+                              </button>
+                              <button onClick={() => handleDeleteComment(reply.comment_id)} className="text-red-600 hover:text-red-800 p-1" title="Delete">
+                                <Trash2 size={14} className="sm:w-4 sm:h-4" />
+                              </button>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Reply text or edit form */}
+                        {editingCommentId === reply.comment_id && !(reply.is_deleted || reply.text === "[deleted]") ? (
+                          <div>
+                            <textarea
+                              value={editingText}
+                              onChange={(e) => setEditingText(e.target.value)}
+                              className="w-full border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm sm:text-base"
+                              rows={3}
+                              maxLength={500}
+                            />
+                            <div className="flex gap-2 mt-2">
+                              <button onClick={() => handleEditComment(reply.comment_id)} className="px-2 sm:px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 flex items-center gap-1 text-xs sm:text-sm">
+                                <Check size={14} className="sm:w-4 sm:h-4" /> Save
+                              </button>
+                              <button onClick={cancelEdit} className="px-2 sm:px-3 py-1 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 flex items-center gap-1 text-xs sm:text-sm">
+                                <X size={14} className="sm:w-4 sm:h-4" /> Cancel
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <p className={`break-words text-sm sm:text-base ${(reply.is_deleted || reply.text === "[deleted]") ? 'text-gray-500 italic' : 'text-gray-700'}`}>
+                            {reply.text}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    );
   };
 
   if (loading && !initialLoadComplete.current) return (
@@ -451,78 +778,23 @@ export default function BlogPage() {
         {comments.length === 0 ? (
           <p className="text-gray-500 italic text-sm sm:text-base">No comments yet. Be the first to comment!</p>
         ) : (
-          <div className="space-y-3 sm:space-y-4">
-            {comments.map((c) => (
-              <div key={c.comment_id} className="border border-gray-200 p-3 sm:p-4 rounded-lg bg-white">
-                <div className="flex items-start gap-2 sm:gap-3">
-                  {/* User Avatar */}
-                  <Link href={`/profile/${c.user_id}`} className="flex-shrink-0">
-                    {c.profile_url ? (
-                      <Image
-                        src={c.profile_url}
-                        alt={c.user_name || "User"}
-                        width={40}
-                        height={40}
-                        className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover border-2 border-gray-200"
-                        unoptimized
-                      />
-                    ) : (
-                      <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-purple-600 flex items-center justify-center text-white font-bold text-xs sm:text-sm">
-                        {c.user_name ? c.user_name.charAt(0).toUpperCase() : "U"}
-                      </div>
-                    )}
-                  </Link>
-
-                  <div className="flex-1 min-w-0">
-                    {/* User name and timestamp */}
-                    <div className="flex items-start justify-between mb-1.5 sm:mb-2 gap-2">
-                      <div className="min-w-0 flex-1">
-                        <Link href={`/profile/${c.user_id}`} className="font-semibold text-gray-900 hover:underline text-sm sm:text-base block truncate">
-                          {c.user_name || "Anonymous"}
-                        </Link>
-                        <p className="text-[10px] sm:text-xs text-gray-500">{timeAgo(c.created_at)}</p>
-                      </div>
-
-                      {/* Edit/Delete buttons */}
-                      {session?.user?.id === c.user_id && editingCommentId !== c.comment_id && (
-                        <div className="flex gap-1 sm:gap-2 flex-shrink-0">
-                          <button onClick={() => startEditComment(c)} className="text-blue-600 hover:text-blue-800 p-1" title="Edit">
-                            <Edit2 size={14} className="sm:w-4 sm:h-4" />
-                          </button>
-                          <button onClick={() => handleDeleteComment(c.comment_id)} className="text-red-600 hover:text-red-800 p-1" title="Delete">
-                            <Trash2 size={14} className="sm:w-4 sm:h-4" />
-                          </button>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Comment text or edit form */}
-                    {editingCommentId === c.comment_id ? (
-                      <div>
-                        <textarea
-                          value={editingText}
-                          onChange={(e) => setEditingText(e.target.value)}
-                          className="w-full border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm sm:text-base"
-                          rows={3}
-                          maxLength={500}
-                        />
-                        <div className="flex gap-2 mt-2">
-                          <button onClick={() => handleEditComment(c.comment_id)} className="px-2 sm:px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 flex items-center gap-1 text-xs sm:text-sm">
-                            <Check size={14} className="sm:w-4 sm:h-4" /> Save
-                          </button>
-                          <button onClick={cancelEdit} className="px-2 sm:px-3 py-1 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 flex items-center gap-1 text-xs sm:text-sm">
-                            <X size={14} className="sm:w-4 sm:h-4" /> Cancel
-                          </button>
-                        </div>
-                      </div>
-                    ) : (
-                      <p className="text-gray-700 break-words text-sm sm:text-base">{c.text}</p>
-                    )}
-                  </div>
-                </div>
+          <>
+            <div className="space-y-4">
+              {organizeComments().slice(0, showAllComments ? undefined : 5).map((c) => renderComment(c))}
+            </div>
+            
+            {/* Show More/Less button */}
+            {organizeComments().length > 5 && (
+              <div className="mt-6 text-center">
+                <button
+                  onClick={() => setShowAllComments(!showAllComments)}
+                  className="px-6 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full font-medium text-sm sm:text-base transition"
+                >
+                  {showAllComments ? 'Show Less Comments' : `Show All ${organizeComments().length} Comments`}
+                </button>
               </div>
-            ))}
-          </div>
+            )}
+          </>
         )}
       </div>
     </div>
