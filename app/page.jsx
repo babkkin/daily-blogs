@@ -1,14 +1,28 @@
 "use client";
 import { useAuthModal } from "@/components/AuthModalProvider";
-import { useRouter } from "next/navigation";
 import InteractiveGridPattern from "@/components/ui/interactive-grid-pattern";
 import PublicHeader from "@/components/PublicHeader";
 import PublicFooter from "@/components/PublicFooter";
 import Preview from "@/components/Preview";
 
+import { useSession } from "next-auth/react";
+import { useRouter, usePathname } from "next/navigation";
+import { useEffect } from "react";
+
 export default function HomePage() {
   const { openModal } = useAuthModal();
+  const { data: session, status } = useSession();
   const router = useRouter();
+  const pathname = usePathname();
+
+  useEffect(() => {
+    if (status === "authenticated" && pathname === "/") {
+      router.push("/landing");
+    }
+  }, [status, router, pathname]);
+
+  if (status === "loading") return null;
+  if (status === "authenticated") return null;
 
   return (
     <div className="relative flex flex-col min-h-screen">

@@ -2,12 +2,10 @@
 import Link from "next/link";
 import { useAuthModal } from "@/components/AuthModalProvider";
 import { useSession } from "next-auth/react";
-import { useRouter, usePathname } from "next/navigation";
-import { useEffect } from "react";
 
 export default function PublicHeader() {
-	const { openModal } = useAuthModal();
-	const { data: session, status } = useSession();
+  const { openModal } = useAuthModal();
+  const { data: session, status } = useSession();
 	const router = useRouter();
 	const pathname = usePathname();
 
