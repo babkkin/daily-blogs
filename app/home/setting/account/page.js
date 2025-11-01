@@ -218,3 +218,20 @@ function AccountTab() {
     </div>
   );
 }
+
+function NotificationsTab() {
+  return (
+    <div className="space-y-4">
+      <p className="text-gray-700">Notifications settings Coming Soon.</p>
+    </div>
+  );
+}
+
+function PrivacyTab() {
+  return (
+    <div className="space-y-4">
+      <p className="text-gray-700">Privacy settings Coming Soon.</p>
+    </div>
+  );
+}
+
