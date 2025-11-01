@@ -62,7 +62,7 @@ async function updateUserHistory(userId, type, itemId) {
   }
 }
 
-// GET all comments for a blog with user info
+// GET all comments for a blog with user info (including replies)
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -78,12 +78,13 @@ export async function GET(request) {
         c.user_id, 
         c.text, 
         c.created_at,
+        c.parent_comment_id,
         up.user_name,
         up.profile_url
       FROM comments c
       LEFT JOIN users_profile up ON c.user_id = up.user_id
       WHERE c.blog_id = $1 
-      ORDER BY c.created_at DESC`,
+      ORDER BY c.created_at ASC`,
       [blogId]
     );
 
@@ -94,7 +95,7 @@ export async function GET(request) {
   }
 }
 
-// POST a new comment + create notification + save to history
+// POST a new comment or reply + create notification + save to history
 export async function POST(request) {
   try {
     // Get user from JWT
@@ -106,18 +107,18 @@ export async function POST(request) {
 
     const userId = token.userId;
 
-    // Get blogId and text from request body
-    const { blogId, text } = await request.json();
+    // Get blogId, text, and optional parentCommentId from request body
+    const { blogId, text, parentCommentId } = await request.json();
     if (!blogId || !text) {
       return NextResponse.json({ success: false, error: "Missing data" }, { status: 400 });
     }
 
-    // Insert comment
+    // Insert comment with optional parent_comment_id
     const res = await pool.query(
-      `INSERT INTO comments (blog_id, user_id, text) 
-       VALUES ($1, $2, $3) 
-       RETURNING comment_id, blog_id, user_id, text, created_at`,
-      [blogId, userId, text]
+      `INSERT INTO comments (blog_id, user_id, text, parent_comment_id) 
+       VALUES ($1, $2, $3, $4) 
+       RETURNING comment_id, blog_id, user_id, text, created_at, parent_comment_id`,
+      [blogId, userId, text, parentCommentId || null]
     );
 
     const commentId = res.rows[0].comment_id;
@@ -137,26 +138,51 @@ export async function POST(request) {
     // Save to user history
     await updateUserHistory(userId, 'comment', blogId);
 
-    // Create notification for the blog owner
-    const blogOwnerRes = await pool.query(
-      `SELECT user_id FROM blogs WHERE blog_id = $1`,
-      [blogId]
-    );
-
-    const blogOwnerId = blogOwnerRes.rows[0]?.user_id;
-
-    if (blogOwnerId && blogOwnerId !== userId) {
-      await pool.query(
-        `INSERT INTO notifications (user_id, actor_id, type, message, location_id)
-         VALUES ($1, $2, $3, $4, $5) ON CONFLICT DO NOTHING`,
-        [
-          blogOwnerId,
-          userId,
-          'commented',
-          `${userRes.rows[0]?.user_name} commented on your blog`,
-          blogId
-        ]
+    // Create notifications
+    if (parentCommentId) {
+      // This is a reply - notify the parent comment author
+      const parentCommentRes = await pool.query(
+        `SELECT user_id FROM comments WHERE comment_id = $1`,
+        [parentCommentId]
       );
+
+      const parentCommentAuthorId = parentCommentRes.rows[0]?.user_id;
+
+      if (parentCommentAuthorId && parentCommentAuthorId !== userId) {
+        await pool.query(
+          `INSERT INTO notifications (user_id, actor_id, type, message, location_id)
+           VALUES ($1, $2, $3, $4, $5) ON CONFLICT DO NOTHING`,
+          [
+            parentCommentAuthorId,
+            userId,
+            'replied',
+            `${userRes.rows[0]?.user_name} replied to your comment`,
+            blogId
+          ]
+        );
+      }
+    } else {
+      // This is a top-level comment - notify the blog owner
+      const blogOwnerRes = await pool.query(
+        `SELECT user_id FROM blogs WHERE blog_id = $1`,
+        [blogId]
+      );
+
+      const blogOwnerId = blogOwnerRes.rows[0]?.user_id;
+
+      if (blogOwnerId && blogOwnerId !== userId) {
+        await pool.query(
+          `INSERT INTO notifications (user_id, actor_id, type, message, location_id)
+           VALUES ($1, $2, $3, $4, $5) ON CONFLICT DO NOTHING`,
+          [
+            blogOwnerId,
+            userId,
+            'commented',
+            `${userRes.rows[0]?.user_name} commented on your blog`,
+            blogId
+          ]
+        );
+      }
     }
 
     return NextResponse.json({ success: true, comment });
@@ -166,7 +192,7 @@ export async function POST(request) {
   }
 }
 
-// DELETE a comment
+// DELETE a comment (soft delete if has replies, hard delete if no replies)
 export async function DELETE(request) {
   try {
     const token = await getToken({ req: request, secret: SECRET });
@@ -196,10 +222,26 @@ export async function DELETE(request) {
       return NextResponse.json({ success: false, error: "Unauthorized - You can only delete your own comments" }, { status: 403 });
     }
 
-    // Delete the comment
-    await pool.query("DELETE FROM comments WHERE comment_id = $1", [commentId]);
+    // Check if comment has replies
+    const repliesRes = await pool.query(
+      "SELECT COUNT(*) as reply_count FROM comments WHERE parent_comment_id = $1",
+      [commentId]
+    );
 
-    return NextResponse.json({ success: true, message: "Comment deleted" });
+    const hasReplies = parseInt(repliesRes.rows[0].reply_count) > 0;
+
+    if (hasReplies) {
+      // Soft delete: Replace content with [deleted] and mark as deleted
+      await pool.query(
+        "UPDATE comments SET text = $1, is_deleted = true WHERE comment_id = $2",
+        ["[deleted]", commentId]
+      );
+      return NextResponse.json({ success: true, message: "Comment deleted (replies preserved)", softDelete: true });
+    } else {
+      // Hard delete: No replies, safe to remove completely
+      await pool.query("DELETE FROM comments WHERE comment_id = $1", [commentId]);
+      return NextResponse.json({ success: true, message: "Comment deleted", softDelete: false });
+    }
   } catch (err) {
     console.error(err);
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });
