@@ -117,7 +117,7 @@ export default function HelpSupportModal({ isOpen, onClose }) {
       {/* Modal */}
       <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[101] w-[90vw] max-w-2xl max-h-[80vh] bg-white rounded-2xl shadow-2xl flex flex-col">
         {/* Header */}
-        <div className="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-t-2xl p-4 sm:p-5 flex items-center justify-between">
+        <div className="bg-gradient-to-r from-black/50 to-black/60 rounded-t-2xl p-4 sm:p-5 flex items-center justify-between">
           <div>
             <h2 className="text-xl sm:text-2xl font-bold text-white mb-1">
               Help & Support
